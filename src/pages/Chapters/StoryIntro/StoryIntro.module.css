@@ -406,11 +406,11 @@
 .captionTextTyped {
   margin: 0;
   white-space: pre-wrap;
-  font-size: clamp(18px, 1.38vw, 24px);
-  line-height: 1.58;
-  color: #3b2b1f;
+  font-size: clamp(17px, 1.28vw, 22px);
+  line-height: 1.72;
+  color: var(--diet-ink);
   font-family: var(--font-body);
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .textViewport {
@@ -423,12 +423,14 @@
 
 .sceneKicker {
   display: block;
-  margin: 0 0 clamp(18px, 2vw, 28px);
-  font-family: var(--font-case-file);
-  font-size: clamp(18px, 1.35vw, 24px);
-  font-weight: 600;
+  margin: 0 0 clamp(16px, 1.8vw, 24px);
+  padding-bottom: clamp(12px, 1.4vw, 18px);
+  border-bottom: 1px solid rgba(212, 197, 169, 0.6);
+  font-family: var(--font-display);
+  font-size: clamp(19px, 1.5vw, 26px);
+  font-weight: 700;
+  font-style: italic;
   letter-spacing: 0;
-  text-transform: uppercase;
   color: var(--diet-copper);
 }
 
@@ -1063,7 +1065,8 @@
 
   .sceneKicker {
     margin-bottom: 10px;
-    font-size: 14px;
+    padding-bottom: 10px;
+    font-size: 16px;
   }
 
   .pageTurnCue {
@@ -1085,7 +1088,7 @@
   }
 
   .compactTextPanel .sceneKicker {
-    font-size: 15px;
+    font-size: 17px;
   }
 
   .compactTextPanel .captionTextTyped {
