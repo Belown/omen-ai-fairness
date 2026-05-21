@@ -130,7 +130,7 @@ export const PASSAGES: Record<PassageId, Passage> = {
     chatbox: "open",
     chunks: [
       "Day 2 complete. Two batches of field data are in.",
-      "The model's picture of New Eden is sharpening — but gaps remain.",
+      "The model's picture of Novus is sharpening — but gaps remain.",
       "One day left.",
       "The regions you haven't sampled are blind spots.",
       "The questions you chose shape what the model considers a threat signal. Choose carefully.",
@@ -175,7 +175,7 @@ export const PASSAGES: Record<PassageId, Passage> = {
     chatbox: "close",
     chunks: [
       "The model finishes training on your three-day dataset.",
-      "Below are the accuracy scores — first for New Eden itself, then deployed to a neighboring city to test whether your approach travels.",
+      "Below are the accuracy scores — first for Novus itself, then deployed to a neighboring city to test whether your approach travels.",
       "A score above 80% means the model rarely makes mistakes.",
       "Below 50% means it's little better than a coin flip.",
       "But accuracy isn't everything — ask yourself: who did the model get wrong, and why?",

@@ -35,7 +35,7 @@ export default function BriefingSheet({ sheet, children, spotlight = false, spot
         <div className={styles.caseSheetLandscape}>
           <div className={styles.caseSheetBrief}>
             <div className={styles.caseSheetHeader}>
-              <p className={styles.caseSheetKicker}>New Eden Police Archive</p>
+              <p className={styles.caseSheetKicker}>Novus Police Archive</p>
               <h2 className={styles.caseSheetTitle}>{sheet.title}</h2>
             </div>
             <p className={styles.caseSheetBody}>

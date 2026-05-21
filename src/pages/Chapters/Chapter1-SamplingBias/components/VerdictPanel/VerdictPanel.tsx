@@ -104,7 +104,7 @@ function DistrictCard({ index, localScore, transferScore, sampled, isWeakest, pc
         <div className={styles.scorePair}>
           <div className={styles.scoreColumn}>
             <div className={styles.scoreMeta}>
-              <span>New Eden</span>
+              <span>Novus</span>
               <strong className={styles[`tone_${localTone}`]}>{pct(localScore)}</strong>
             </div>
             <div className={styles.miniTrack} aria-hidden="true">
@@ -241,7 +241,7 @@ export default function VerdictPanel({
         </div>
 
         <div className={styles.heroScoreDeck}>
-          <ScoreRing label="New Eden" value={overallAcc} tone={scoreTone(overallAcc)} pct={pct} />
+          <ScoreRing label="Novus" value={overallAcc} tone={scoreTone(overallAcc)} pct={pct} />
           <ScoreRing label="Neighbor" value={otherCityOvr} tone={scoreTone(otherCityOvr)} pct={pct} />
           <div className={`${styles.transferDelta} ${styles[`transferDelta_${transferDeltaTone}`]}`}>
             <span>Transfer shift</span>

@@ -101,7 +101,7 @@ function day1Debrief(s: StrategyResult): Passage {
   } else if (label === "great") {
     chunks.push("Day 1 complete. Strong first sweep — three districts in the dataset, accuracy starting to take shape.");
   } else if (label === "good") {
-    chunks.push("Day 1 complete. Two districts covered — it's a start. Most of New Eden is still outside the dataset, but there's time.");
+    chunks.push("Day 1 complete. Two districts covered — it's a start. Most of Novus is still outside the dataset, but there's time.");
   } else if (label === "mediocre") {
     chunks.push("Day 1 complete. The coverage is thin. The detective didn't move far enough beyond familiar ground.");
   } else if (label === "poor") {
@@ -334,7 +334,7 @@ function day3Brief(s: StrategyResult): Passage {
 
   // Stakes
   if (label === "outstanding" || label === "great") {
-    chunks.push("After today, the model faces its real test: deployment to a neighboring city it has never seen. If the approach generalized — if it wasn't just tuned to New Eden — it will hold.");
+    chunks.push("After today, the model faces its real test: deployment to a neighboring city it has never seen. If the approach generalized — if it wasn't just tuned to Novus — it will hold.");
   } else {
     chunks.push("After today, the verdict lands on whatever is in the dataset. It cannot be appealed. Make this day count.");
   }
@@ -396,7 +396,7 @@ function day3Debrief(s: StrategyResult): Passage {
 
   // Bridge to verdict
   if (label === "outstanding") {
-    chunks.push("Now the real test: the neighboring city. If the approach generalized — if it wasn't just tuned to New Eden's specifics — the model will hold. Let's find out.");
+    chunks.push("Now the real test: the neighboring city. If the approach generalized — if it wasn't just tuned to Novus's specifics — the model will hold. Let's find out.");
   } else if (label === "great") {
     chunks.push("The neighboring city transfer is the honest judge. A strong local dataset doesn't always travel. Let's see the verdict.");
   } else {
@@ -419,7 +419,7 @@ function verdict(s: StrategyResult): Passage {
   const variants: Record<TierLabel, string[]> = {
     outstanding: [
       "Look at these numbers.",
-      `Overall accuracy above ${t.overallAcc}%. Every district performing well. And the neighboring city? The transfer held — the model didn't just work for New Eden, it traveled.`,
+      `Overall accuracy above ${t.overallAcc}%. Every district performing well. And the neighboring city? The transfer held — the model didn't just work for Novus, it traveled.`,
       "The Factory Zone night-shift workers? Classified correctly. The Slums? No longer an algorithmic blind spot. The model sees patterns without prejudice — because you gave it data that included everyone.",
       "The original AI sent an innocent person to prison because its dataset was narrow, privileged, and incomplete. Your dataset is broad, representative, and fair.",
       "You didn't just fix a model. You proved that who collects the data, where they go, and what they ask... changes whose freedom is protected and whose is taken.",
@@ -427,7 +427,7 @@ function verdict(s: StrategyResult): Passage {
     ],
     great: [
       `Overall accuracy at ${t.overallAcc}%. Solid — far better than the coin-flip the original system essentially was.`,
-      `But the neighboring city transfer dropped to ${t.otherCityOvr}%. Your model works well for New Eden — but it stumbles when it crosses the city line.`,
+      `But the neighboring city transfer dropped to ${t.otherCityOvr}%. Your model works well for Novus — but it stumbles when it crosses the city line.`,
       "That's the deeper lesson: a model trained in one context doesn't automatically travel to another. Fairness isn't a one-time achievement — it's a continuous commitment to checking, retraining, and questioning.",
       "You improved the system significantly. The apprentice would have a fighting chance. But the work isn't finished — it never is.",
     ],

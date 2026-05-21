@@ -65,7 +65,7 @@ export const QUESTION_OPTIONS: QuestionOption[] = [
     why: "The detective records whether prior police stops appear in the resident's file.",
     cost: 10,
     flavor: [
-      "Querying New Eden Police Database...",
+      "Querying Novus Police Database...",
       "Checking for prior stop-and-frisk records...",
       "Running background check for past detainments.",
     ],
