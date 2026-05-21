@@ -200,21 +200,6 @@ export default function Assessment() {
                 : "Before you begin the investigation, answer each question as best you can. For each question, select the answer you believe is correct and rate your confidence."}
             </p>
           </div>
-
-          <aside className={styles.assessmentPanel} aria-label="Assessment details">
-            <div>
-              <span>Format</span>
-              <strong>9 questions</strong>
-            </div>
-            <div>
-              <span>Scale</span>
-              <strong>Confidence + understanding</strong>
-            </div>
-            <div>
-              <span>Output</span>
-              <strong>Local JSON record</strong>
-            </div>
-          </aside>
         </div>
 
         <div className={styles.sections}>
