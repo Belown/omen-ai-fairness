@@ -73,7 +73,7 @@
 
 .heroChapterLink {
   position: absolute;
-  top: clamp(28px, 4vw, 44px);
+  top: clamp(28px, 4vw, 35px);
   right: 0;
   display: inline-flex;
   align-items: center;
@@ -270,7 +270,7 @@
 
 .definition {
   margin: 0;
-  color: var(--diet-machine-text);
+  color: rgba(220, 230, 240, 0.82);
   font-size: 15px;
   line-height: 1.55;
 }
@@ -373,10 +373,10 @@
   place-items: center;
   width: 28px;
   height: 28px;
-  border: 1.5px solid rgba(77, 201, 246, 0.28);
+  border: 1.5px solid rgba(77, 201, 246, 0.38);
   border-radius: var(--diet-radius-stamp);
   background: rgba(20, 27, 34, 0.86);
-  color: var(--diet-machine-text);
+  color: rgba(220, 230, 240, 0.86);
   font-family: var(--font-case-file);
   font-size: 13px;
   font-weight: 800;
@@ -391,7 +391,7 @@
 .optionText {
   font-size: 14px;
   line-height: 1.48;
-  color: rgba(220, 230, 240, 0.78);
+  color: rgba(220, 230, 240, 0.9);
 }
 
 .optionSelected .optionText {
@@ -416,7 +416,7 @@
   font-weight: 700;
   letter-spacing: 0.4px;
   text-transform: uppercase;
-  color: var(--diet-machine-text);
+  color: rgba(220, 230, 240, 0.9);
   white-space: nowrap;
 }
 
@@ -426,12 +426,17 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  flex: 1 1 280px;
+  min-width: min(280px, 100%);
 }
 
 .scaleButtons {
   display: flex;
-  gap: 6px;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+  padding-inline: 36px;
 }
 
 .scaleBtn {
@@ -439,10 +444,10 @@
   place-items: center;
   width: 36px;
   height: 36px;
-  border: 1.5px solid rgba(77, 201, 246, 0.24);
+  border: 1.5px solid rgba(77, 201, 246, 0.4);
   border-radius: var(--diet-radius-document);
-  background: rgba(10, 14, 20, 0.72);
-  color: var(--diet-machine-text);
+  background: rgba(10, 14, 20, 0.86);
+  color: rgba(220, 230, 240, 0.9);
   font-family: var(--font-case-file);
   font-size: 14px;
   font-weight: 700;
@@ -468,15 +473,29 @@
 }
 
 .scaleEndLabels {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, 36px);
   justify-content: space-between;
-  padding: 0 2px;
-  color: var(--diet-machine-text);
+  box-sizing: border-box;
+  padding: 0;
+  padding-inline: 36px;
+  color: rgba(220, 230, 240, 0.82);
   font-family: var(--font-case-file);
   font-size: 10px;
+  font-weight: 700;
   letter-spacing: 0.3px;
   text-transform: uppercase;
-  opacity: 0.72;
+  opacity: 1;
+}
+
+.scaleEndLabels span {
+  justify-self: center;
+  width: max-content;
+  text-align: center;
+}
+
+.scaleEndLabels span:last-child {
+  grid-column: 5;
 }
 
 .understandingRow {
@@ -524,7 +543,7 @@
 .pagePost .optionText,
 .pagePost .scaleRowLabel,
 .pagePost .scaleEndLabels {
-  color: var(--diet-machine-text);
+  color: rgba(220, 230, 240, 0.86);
 }
 
 .pagePost .option:hover {
@@ -549,9 +568,9 @@
 }
 
 .pagePost .scaleBtn {
-  border-color: rgba(77, 201, 246, 0.24);
-  background: rgba(10, 14, 20, 0.72);
-  color: var(--diet-machine-text);
+  border-color: rgba(77, 201, 246, 0.4);
+  background: rgba(10, 14, 20, 0.86);
+  color: rgba(220, 230, 240, 0.9);
 }
 
 .pagePost .understandingRow {
@@ -837,6 +856,11 @@
   .understandingLabel,
   .scaleRowLabel {
     white-space: normal;
+  }
+
+  .scaleFieldset {
+    flex: 0 1 auto;
+    width: 100%;
   }
 
   .likertButtons {
