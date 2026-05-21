@@ -6,10 +6,8 @@ import { CHAPTER1_BACKGROUNDS } from "../../../assets/image/image";
 import styles from "./Chapter2COMPAS.module.css";
 import { INTRO_CHUNKS, MAX_CURRENT_DAY, STARTING_BUDGET, STUDY_METRICS, type FairnessDefinitionId, type StudyMetricId } from "./chapter2Data";
 import {
-  aggregatedAccuracy,
-  computeDailyAccuracy,
-  computeFinalSystemAccuracy,
-  FINAL_CONFIRMATION_MODIFIER,
+  aggregatedSatisfaction,
+  computeDailySatisfaction,
   resolveDayStudies,
 } from "./chapter2Simulation";
 import type { DayRecord } from "./chapter2Types";
@@ -27,7 +25,7 @@ const getPortrait = (text: string) => {
   const t = text.toLowerCase();
   if (t.includes("budget") || t.includes("insufficient")) return portraits.worried;
   if (t.includes("trade") || t.includes("locked")) return portraits.thoughtful;
-  if (t.includes("accuracy") || t.includes("study")) return portraits.suspicious;
+  if (t.includes("satisfaction") || t.includes("community") || t.includes("study")) return portraits.suspicious;
   if (t.includes("final") || t.includes("confirm")) return portraits.serious;
   if (t.includes("queue") || t.includes("advance")) return portraits.encouraging;
   return portraits.neutral;
@@ -48,7 +46,9 @@ export default function Chapter2COMPAS() {
     INITIAL_GAME_STATE.switchedMetricOnDay,
   );
   const [budget, setBudget] = useState(STARTING_BUDGET);
-  const [aggregateAccuracy, setAggregateAccuracy] = useState<number[]>([]);
+  const [aggregateSatisfaction, setAggregateSatisfaction] = useState<typeof INITIAL_GAME_STATE.aggregateSatisfaction>(
+    [],
+  );
   const [days, setDays] = useState<DayRecord[]>([]);
   const [pendingQueue, setPendingQueue] = useState<StudyMetricId[]>([]);
 
@@ -60,8 +60,11 @@ export default function Chapter2COMPAS() {
   const overnightFromNight = currentDay >= 1 ? days[currentDay - 1]?.day ?? null : null;
 
   const latestDaily =
-    aggregateAccuracy.length > 0 ? aggregateAccuracy[aggregateAccuracy.length - 1] : null;
-  const aggregateScore = aggregateAccuracy.length > 0 ? aggregatedAccuracy(aggregateAccuracy) : null;
+    aggregateSatisfaction.length > 0
+      ? aggregateSatisfaction[aggregateSatisfaction.length - 1]
+      : null;
+  const aggregateScore =
+    aggregateSatisfaction.length > 0 ? aggregatedSatisfaction(aggregateSatisfaction) : null;
 
   const toggleQueue = (metricId: StudyMetricId) => {
     if (currentDay >= MAX_CURRENT_DAY || budget <= 0) return;
@@ -98,9 +101,9 @@ export default function Chapter2COMPAS() {
     };
 
     const applySwitchPenalty =
-      switchedMetricOnDay !== null && record.day === switchedMetricOnDay;
+      switchedMetricOnDay !== null && record.day === switchedMetricOnDay + 1;
 
-    const dailyAcc = computeDailyAccuracy(record.metricActive, record.day, {
+    const dailySat = computeDailySatisfaction(record.metricActive, record.day, {
       applySwitchPenalty,
     });
 
@@ -108,18 +111,19 @@ export default function Chapter2COMPAS() {
       record.studiesQueued,
       record.metricActive,
       record.day,
-      dailyAcc,
+      dailySat,
+      { applySwitchPenalty },
     );
 
     const completedRecord: DayRecord = {
       ...record,
       results: resolvedResults,
-      dailyAccuracy: dailyAcc,
+      dailySatisfaction: dailySat,
     };
 
     setDays((prev) => [...prev, completedRecord]);
     setBudget((b) => b - pendingCost);
-    setAggregateAccuracy((prev) => [...prev, dailyAcc]);
+    setAggregateSatisfaction((prev) => [...prev, dailySat]);
     setCurrentDay((d) => d + 1);
     setPendingQueue([]);
     setMetricChangedToday(false);
@@ -138,15 +142,10 @@ export default function Chapter2COMPAS() {
     setMetricChangedToday(false);
     setSwitchedMetricOnDay(null);
     setBudget(STARTING_BUDGET);
-    setAggregateAccuracy([]);
+    setAggregateSatisfaction([]);
     setDays([]);
     setPendingQueue([]);
   };
-
-  const operationalAggregate =
-    aggregateAccuracy.length > 0 ? aggregatedAccuracy(aggregateAccuracy) : 0;
-  const finalModifier = FINAL_CONFIRMATION_MODIFIER[fairnessMetric];
-  const finalSystemAccuracy = computeFinalSystemAccuracy(operationalAggregate, fairnessMetric);
 
   const narrativeText = useMemo(() => {
     if (phase === "intro") return INTRO_CHUNKS[introIndex] ?? "";
@@ -188,17 +187,12 @@ export default function Chapter2COMPAS() {
   const gamePanel =
     phase === "game" ? (
       <>
-        <GameHud
-          currentDay={currentDay}
-          budget={budget}
-          dailyAccuracy={latestDaily}
-          aggregateAccuracy={aggregateScore}
-        />
+        <GameHud currentDay={currentDay} budget={budget} dailySatisfaction={latestDaily} />
         <StudyResultsPanel results={overnightResults} fromNight={overnightFromNight} />
         <DaySummaryPanel
           currentDay={currentDay}
-          dailyAccuracy={latestDaily}
-          aggregateAccuracy={aggregateScore}
+          dailySatisfaction={latestDaily}
+          aggregateSatisfaction={aggregateScore}
           queuedTonight={pendingQueue.length}
           queueCost={pendingCost}
         />
@@ -244,10 +238,7 @@ export default function Chapter2COMPAS() {
   const endPanel =
     phase === "end" ? (
       <EndgamePanel
-        dailyScores={aggregateAccuracy}
-        operationalAccuracy={operationalAggregate}
-        finalModifier={finalModifier}
-        finalSystemAccuracy={finalSystemAccuracy}
+        dailyHistory={aggregateSatisfaction}
         finalFairness={fairnessMetric}
         finalBudget={budget}
         onReplay={resetGame}

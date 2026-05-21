@@ -49,11 +49,11 @@ export const STUDY_METRICS: Array<{
   },
   {
     id: "accuracy-overall",
-    label: "Overall accuracy",
-    shortLabel: "Overall accuracy",
+    label: "Community Impact Assessment",
+    shortLabel: "Community impact",
     cost: 75,
     description:
-      "Aggregate correct‑prediction rate — can rise while group‑wise errors stay sharply unequal.",
+      "Stakeholder satisfaction with the current fairness policy — judges, Black defendants, and White defendants.",
   },
 ];
 

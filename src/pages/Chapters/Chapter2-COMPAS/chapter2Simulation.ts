@@ -1,5 +1,7 @@
 import type { FairnessDefinitionId, StudyMetricId } from "./chapter2Data";
 
+export type StakeholderGroup = "judges" | "black" | "white";
+export type SatisfactionScores = Record<StakeholderGroup, number>;
 export type StudyOutcome = "win" | "warn" | "neutral";
 
 export type StudyResult = {
@@ -11,42 +13,59 @@ export type StudyResult = {
   secondaryLabel?: string;
   outcome: StudyOutcome;
   interpretation: string;
+  satisfaction?: SatisfactionScores;
 };
 
-const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
+const GROUPS: StakeholderGroup[] = ["judges", "black", "white"];
 
-const METRIC_INDEX: Record<FairnessDefinitionId, number> = {
-  equal_rates: 0,
-  predictive_parity: 1,
-  max_accuracy: 2,
+const GROUP_INDEX: Record<StakeholderGroup, number> = {
+  judges: 0,
+  black: 1,
+  white: 2,
 };
 
-/** Day 1 baseline accuracy (%). */
-const BASE_ACCURACY: Record<FairnessDefinitionId, number> = {
-  max_accuracy: 84,
-  predictive_parity: 74,
-  equal_rates: 69,
+/** Day 1 baseline satisfaction (%). */
+const BASE_SATISFACTION: Record<StakeholderGroup, Record<FairnessDefinitionId, number>> = {
+  judges: { equal_rates: 38, predictive_parity: 78, max_accuracy: 65 },
+  black: { equal_rates: 74, predictive_parity: 52, max_accuracy: 31 },
+  white: { equal_rates: 61, predictive_parity: 72, max_accuracy: 76 },
 };
 
 /** Drift by work night index (0 = Day 1, 1 = Day 2, 2 = Day 3). */
-const DAY_DRIFT: Record<FairnessDefinitionId, [number, number, number]> = {
-  max_accuracy: [0, 1.5, 2.5],
-  predictive_parity: [0, -1.5, -2.5],
-  equal_rates: [0, -2.5, -4.0],
+const DRIFT: Record<StakeholderGroup, Record<FairnessDefinitionId, [number, number, number]>> = {
+  judges: {
+    equal_rates: [0, -5, -8],
+    predictive_parity: [0, 3, 5],
+    max_accuracy: [0, 2, 3],
+  },
+  black: {
+    equal_rates: [0, 4, 6],
+    predictive_parity: [0, -2, -4],
+    max_accuracy: [0, -4, -7],
+  },
+  white: {
+    equal_rates: [0, -2, -3],
+    predictive_parity: [0, 1, 2],
+    max_accuracy: [0, 1, 2],
+  },
 };
 
-export const FINAL_CONFIRMATION_MODIFIER: Record<FairnessDefinitionId, number> = {
-  max_accuracy: 2,
-  predictive_parity: -1,
-  equal_rates: -3,
-};
+export const SWITCH_PENALTY = 6;
 
-const SWITCH_PENALTY = 3;
+export const SATISFACTION_COLORS = {
+  happy: "#22c55e",
+  neutral: "#f97316",
+  unhappy: "#ef4444",
+} as const;
 
-/** Deterministic jitter ±1.5% max (percentage points). */
-export function seedNoise(dayIndex: number, metric: FairnessDefinitionId): number {
-  const metricIndex = METRIC_INDEX[metric];
-  return ((dayIndex * 31 + metricIndex * 7) % 13) / 10 - 0.65;
+export type SatisfactionLevel = keyof typeof SATISFACTION_COLORS;
+
+const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
+
+/** Deterministic jitter ±1.6% max (percentage points). day is 1-based (Days 1–3). */
+export function satisfactionNoise(group: StakeholderGroup, day: number): number {
+  const groupIndex = GROUP_INDEX[group];
+  return (((groupIndex * 17 + day * 11) % 9) - 4) * 0.4;
 }
 
 /** Deterministic 0–1 from session inputs (stable re-reads). */
@@ -63,32 +82,95 @@ export function formatPct(x: number) {
   return `${Math.round(x * 100)}%`;
 }
 
-export function roundAccuracy(value: number) {
-  return Math.round(Math.max(0, Math.min(100, value)) * 10) / 10;
+export function clampSatisfaction(value: number) {
+  return Math.round(Math.max(5, Math.min(95, value)) * 10) / 10;
 }
 
-/** Operational daily accuracy for a completed work night (Days 1–3 on HUD). */
-export function computeDailyAccuracy(
+export function satisfactionLevel(score: number): SatisfactionLevel {
+  if (score >= 70) return "happy";
+  if (score >= 40) return "neutral";
+  return "unhappy";
+}
+
+export function satisfactionColor(score: number): string {
+  return SATISFACTION_COLORS[satisfactionLevel(score)];
+}
+
+/** Operational daily satisfaction for a completed work night (Days 1–3 on HUD). */
+export function computeDailySatisfaction(
   fairness: FairnessDefinitionId,
   workNightIndex: number,
   options?: { applySwitchPenalty?: boolean },
-): number {
-  const base = BASE_ACCURACY[fairness];
-  const drift = DAY_DRIFT[fairness][workNightIndex] ?? 0;
-  const noise = seedNoise(workNightIndex, fairness);
-  let acc = base + drift + noise;
-  if (options?.applySwitchPenalty) acc -= SWITCH_PENALTY;
-  return roundAccuracy(acc);
+): SatisfactionScores {
+  const day = workNightIndex + 1;
+  const out = {} as SatisfactionScores;
+  for (const group of GROUPS) {
+    const base = BASE_SATISFACTION[group][fairness];
+    const drift = DRIFT[group][fairness][workNightIndex] ?? 0;
+    const noise = satisfactionNoise(group, day);
+    let score = base + drift + noise;
+    if (options?.applySwitchPenalty) score -= SWITCH_PENALTY;
+    out[group] = clampSatisfaction(score);
+  }
+  return out;
 }
 
-export function aggregatedAccuracy(dayScores: number[]) {
-  if (!dayScores.length) return 0;
-  return roundAccuracy(dayScores.reduce((a, b) => a + b, 0) / dayScores.length);
+export function aggregatedSatisfaction(history: SatisfactionScores[]): SatisfactionScores {
+  if (!history.length) {
+    return { judges: 0, black: 0, white: 0 };
+  }
+  const sums = { judges: 0, black: 0, white: 0 };
+  for (const day of history) {
+    for (const g of GROUPS) sums[g] += day[g];
+  }
+  const n = history.length;
+  return {
+    judges: clampSatisfaction(sums.judges / n),
+    black: clampSatisfaction(sums.black / n),
+    white: clampSatisfaction(sums.white / n),
+  };
 }
 
-export function computeFinalSystemAccuracy(operationalAverage: number, finalFairness: FairnessDefinitionId) {
-  const modifier = FINAL_CONFIRMATION_MODIFIER[finalFairness];
-  return roundAccuracy(operationalAverage + modifier);
+function isHappy(s: number) {
+  return s >= 70;
+}
+function isUnhappy(s: number) {
+  return s < 40;
+}
+function isNeutralish(s: number) {
+  return s >= 40 && s < 70;
+}
+
+/** One-line outcome summary from aggregate satisfaction pattern. */
+export function pickSatisfactionSummary(aggregate: SatisfactionScores): string {
+  const { judges, black, white } = aggregate;
+
+  if (isHappy(judges) && isUnhappy(black)) {
+    return "Your model is trusted by the courts but has deepened racial disparities in sentencing.";
+  }
+  if (isHappy(black) && isUnhappy(judges)) {
+    return "You reduced racial bias in flagging, but judges have lost confidence in the system.";
+  }
+  if (isNeutralish(judges) && isNeutralish(black) && isNeutralish(white)) {
+    return "Predictive parity produced a model seen as fair by most — though critics note it does not equalise error rates.";
+  }
+  if (isUnhappy(judges) && isUnhappy(black) && isUnhappy(white)) {
+    return "A late-stage policy reversal left all parties dissatisfied.";
+  }
+  if (isHappy(black) && isHappy(white) && isUnhappy(judges)) {
+    return "Defendants see fairer treatment, but the bench views the instrument as inconsistent.";
+  }
+  if (isHappy(judges) && isHappy(white) && isUnhappy(black)) {
+    return "Courts and majority-group defendants are comfortable; Black defendants still bear the brunt of errors.";
+  }
+  if (isHappy(judges) && isHappy(black) && isUnhappy(white)) {
+    return "Judges and Black defendants are broadly satisfied, while White defendants resent the small costs of equalising error rates.";
+  }
+  if (isHappy(black) && isNeutralish(judges) && isNeutralish(white)) {
+    return "Equal error rates eased the burden on Black defendants; judges and White defendants remain cautiously supportive.";
+  }
+
+  return "Three constituencies read the same scores through different lenses — no single headline captures the term.";
 }
 
 /** Seeded disparity in percentage points (delta between groups). */
@@ -117,15 +199,6 @@ function pairFromDisparity(mid: number, disparity: number, seed: number): { blac
   };
 }
 
-function accuracyStudyValues(dailyAccuracyPct: number, seed: number): { black: number; white: number } {
-  const overall = dailyAccuracyPct / 100;
-  const spread = (seed - 0.5) * 0.008;
-  return {
-    black: clamp01(overall + spread),
-    white: clamp01(overall - spread),
-  };
-}
-
 type MetricProfile = {
   outcome: StudyOutcome;
   black: number;
@@ -134,14 +207,26 @@ type MetricProfile = {
   whiteSecondary?: number;
   secondaryLabel?: string;
   interpretation: string;
+  satisfaction?: SatisfactionScores;
 };
+
+function communityImpactInterpretation(fairness: FairnessDefinitionId, sat: SatisfactionScores): string {
+  if (fairness === "equal_rates") {
+    return `Judges report ${sat.judges.toFixed(0)}% satisfaction — equal error rates require different thresholds by race, which the bench reads as procedural inconsistency. Black defendants at ${sat.black.toFixed(0)}% welcome fewer wrongful high-risk flags; White defendants at ${sat.white.toFixed(0)}% accept a modest loss of prior advantage.`;
+  }
+  if (fairness === "predictive_parity") {
+    return `Judges at ${sat.judges.toFixed(0)}% trust that a high-risk score means the same thing across groups. Black defendants at ${sat.black.toFixed(0)}% remain wary: equal PPV does not cap false positives, so wrongful flags can still fall unevenly. White defendants at ${sat.white.toFixed(0)}% see little harm.`;
+  }
+  return `Judges at ${sat.judges.toFixed(0)}% appreciate headline performance but miss a formal fairness guarantee. Black defendants at ${sat.black.toFixed(0)}% are sharply dissatisfied as unconstrained optimisation amplifies disparities. White defendants at ${sat.white.toFixed(0)}% benefit from the status quo.`;
+}
 
 function profileForMetric(
   metricId: StudyMetricId,
   fairness: FairnessDefinitionId,
   workNightIndex: number,
   seed: number,
-  dailyAccuracyPct: number,
+  dailySatisfaction: SatisfactionScores,
+  options?: { applySwitchPenalty?: boolean },
 ): MetricProfile {
   const s = seed;
 
@@ -160,7 +245,7 @@ function profileForMetric(
         whiteSecondary: fnr.white,
         secondaryLabel: "FNR",
         interpretation:
-          "By forcing equal false positive and false negative rates across groups, the model must use a different decision threshold per group. This directly reduces overall accuracy because the threshold is no longer optimal for either group individually.",
+          "Equal false positive and false negative rates directly help Black defendants, who are less often wrongly flagged high-risk. Judges see different thresholds by group and lose trust; White defendants give up a small prior advantage as white FPR rises to match Black rates.",
       };
     }
     if (fairness === "predictive_parity") {
@@ -172,7 +257,7 @@ function profileForMetric(
         whiteSecondary: fnr.white,
         secondaryLabel: "FNR",
         interpretation:
-          "Predictive parity constrains the model to equalise positive predictive value, but when base recidivism rates differ between groups, this mathematically requires unequal error rates — a consequence of Chouldechova's impossibility theorem.",
+          "Predictive parity pleases judges by aligning high-risk meaning across races, but when base recidivism rates differ, equal PPV still leaves Black defendants with higher FPR — harming the group most sensitive to wrongful detention.",
       };
     }
     return {
@@ -183,7 +268,7 @@ function profileForMetric(
       whiteSecondary: fnr.white,
       secondaryLabel: "FNR",
       interpretation:
-        "Without fairness constraints, the model sets a single optimal decision threshold across all groups. This maximises accuracy but allows disparate error rates to emerge wherever base rates differ between groups.",
+        "Without fairness constraints, error rates diverge: Black defendants face the highest false positive burden, White defendants fare better, and judges see strong aggregate performance while community trust among Black defendants erodes.",
     };
   }
 
@@ -202,7 +287,7 @@ function profileForMetric(
         whiteSecondary: tnr.white,
         secondaryLabel: "TNR",
         interpretation:
-          "Equalising true positive and true negative rates forces the classifier to treat groups with different base rates as if they were identical. That alignment is your goal — but it is purchased with lower overall accuracy than an unconstrained model.",
+          "Aligned TPR and TNR support Black defendants by balancing who is caught and who is released. Judges perceive race-specific thresholds as undermining a single consistent scale; White defendants absorb a slight tightening of their former advantage.",
       };
     }
     if (fairness === "predictive_parity") {
@@ -214,7 +299,7 @@ function profileForMetric(
         whiteSecondary: tnr.white,
         secondaryLabel: "TNR",
         interpretation:
-          "When you prioritise equal PPV among high‑risk flags, TPR and TNR cannot stay aligned across groups if recidivism base rates differ. The impossibility result shows up here as widening TPR/TNR gaps, not as a software bug.",
+          "Equal PPV among high-risk flags satisfies judges but cannot keep TPR/TNR aligned when base rates differ — Black defendants still see wider gaps in who is detained versus released correctly.",
       };
     }
     return {
@@ -225,7 +310,7 @@ function profileForMetric(
       whiteSecondary: tnr.white,
       secondaryLabel: "TNR",
       interpretation:
-        "Maximising aggregate accuracy lets each group keep thresholds closer to their own base rates, so TPR/TNR diverge. The system scores well on the headline number while who receives which kind of error stays uneven.",
+        "Maximising accuracy lets each group keep thresholds near its own base rate, so TPR/TNR diverge: White defendants benefit, Black defendants bear more detention errors, and judges focus on the headline score rather than uneven burdens.",
     };
   }
 
@@ -239,7 +324,7 @@ function profileForMetric(
         black: ppv.black,
         white: ppv.white,
         interpretation:
-          "Constraining equal PPV among high‑risk scores is a lighter distortion than equalising full error rates, so accuracy stays higher than under equal error rates — but you still accept unequal FPR/FNR as the price of calibration.",
+          "Equal PPV makes high-risk labels mean the same thing across races — the core concern for judges. Black defendants gain less than under equal error rates because FPR can still stay unequal; White defendants remain largely satisfied.",
       };
     }
     if (fairness === "equal_rates") {
@@ -248,7 +333,7 @@ function profileForMetric(
         black: ppv.black,
         white: ppv.white,
         interpretation:
-          "Equal error rates do not guarantee equal PPV when base rates differ — high‑risk flags can mean different things by group. That is the other half of the fairness impossibility story, visible once you look past TPR/TNR.",
+          "Equal error rates help Black defendants on wrongful flags but do not guarantee equal PPV when base rates differ — judges still chafe at inconsistent thresholds, and White defendants see moderate satisfaction.",
       };
     }
     return {
@@ -256,36 +341,36 @@ function profileForMetric(
       black: ppv.black,
       white: ppv.white,
       interpretation:
-        "With no fairness constraint, PPV gaps are moderate: the model is not trying to equalise calibration, only to maximise correct calls. Accuracy looks strong while high‑risk slices still diverge somewhat.",
+        "With no fairness constraint, PPV gaps stay moderate while the model maximises correct calls overall — White defendants stay comfortable, Black defendants remain exposed to uneven high-risk meaning, and judges weigh accuracy over calibration.",
     };
   }
 
-  // accuracy-overall — must match HUD daily accuracy (±0.5%)
-  const acc = accuracyStudyValues(dailyAccuracyPct, s);
+  // accuracy-overall — Community Impact Assessment; must match HUD satisfaction
+  const sat = dailySatisfaction;
   if (fairness === "max_accuracy") {
     return {
       outcome: "win",
-      black: acc.black,
-      white: acc.white,
-      interpretation:
-        "With no fairness constraint, the model freely optimises its decision boundary for overall accuracy. That is why this figure is highest — and why error‑rate studies still show large group gaps.",
+      black: sat.black / 100,
+      white: sat.white / 100,
+      satisfaction: sat,
+      interpretation: communityImpactInterpretation(fairness, sat),
     };
   }
   if (fairness === "equal_rates") {
     return {
       outcome: "neutral",
-      black: acc.black,
-      white: acc.white,
-      interpretation:
-        "Equalising TPR and TNR across groups with different base rates forces systematically suboptimal thresholds — the harshest accuracy cost of the three metrics, consistent with Chouldechova's impossibility theorem.",
+      black: sat.black / 100,
+      white: sat.white / 100,
+      satisfaction: sat,
+      interpretation: communityImpactInterpretation(fairness, sat),
     };
   }
   return {
     outcome: "neutral",
-    black: acc.black,
-    white: acc.white,
-    interpretation:
-      "Predictive parity constrains only PPV equality, which distorts the boundary less than full error‑rate parity. Accuracy sits between max‑accuracy and equal‑rates — a real tradeoff, not a tie.",
+    black: sat.black / 100,
+    white: sat.white / 100,
+    satisfaction: sat,
+    interpretation: communityImpactInterpretation(fairness, sat),
   };
 }
 
@@ -294,10 +379,11 @@ export function generateStudyResult(
   fairness: FairnessDefinitionId,
   workNightIndex: number,
   launchIndex: number,
-  dailyAccuracyPct: number,
+  dailySatisfaction: SatisfactionScores,
+  options?: { applySwitchPenalty?: boolean },
 ): StudyResult {
   const seed = studySeed(workNightIndex, metricId, launchIndex, fairness);
-  const p = profileForMetric(metricId, fairness, workNightIndex, seed, dailyAccuracyPct);
+  const p = profileForMetric(metricId, fairness, workNightIndex, seed, dailySatisfaction, options);
   return { metricId, ...p };
 }
 
@@ -305,9 +391,10 @@ export function resolveDayStudies(
   studiesQueued: StudyMetricId[],
   metricActive: FairnessDefinitionId,
   workNightIndex: number,
-  dailyAccuracyPct: number,
+  dailySatisfaction: SatisfactionScores,
+  options?: { applySwitchPenalty?: boolean },
 ): StudyResult[] {
   return studiesQueued.map((metricId, launchIndex) =>
-    generateStudyResult(metricId, metricActive, workNightIndex, launchIndex, dailyAccuracyPct),
+    generateStudyResult(metricId, metricActive, workNightIndex, launchIndex, dailySatisfaction, options),
   );
 }

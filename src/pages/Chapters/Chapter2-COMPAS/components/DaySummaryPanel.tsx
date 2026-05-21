@@ -1,17 +1,19 @@
 import styles from "./EndgamePanel.module.css";
+import type { SatisfactionScores } from "../chapter2Simulation";
+import SatisfactionCircles from "./SatisfactionCircles";
 
 type DaySummaryPanelProps = {
   currentDay: number;
-  dailyAccuracy: number | null;
-  aggregateAccuracy: number | null;
+  dailySatisfaction: SatisfactionScores | null;
+  aggregateSatisfaction: SatisfactionScores | null;
   queuedTonight: number;
   queueCost: number;
 };
 
 export default function DaySummaryPanel({
   currentDay,
-  dailyAccuracy,
-  aggregateAccuracy,
+  dailySatisfaction,
+  aggregateSatisfaction,
   queuedTonight,
   queueCost,
 }: DaySummaryPanelProps) {
@@ -21,17 +23,11 @@ export default function DaySummaryPanel({
     <section className={styles.panel} aria-label="Session summary">
       <h2 className={styles.title}>Session summary</h2>
       <div className={styles.scoreRow}>
-        <div className={styles.scoreBlock}>
-          <h3 className={styles.subhead}>Daily accuracy</h3>
-          <p className={styles.score}>{dailyAccuracy != null ? `${dailyAccuracy.toFixed(1)}%` : "—"}</p>
-        </div>
-        <div className={styles.scoreBlock}>
-          <h3 className={styles.subhead}>Aggregate accuracy</h3>
-          <p className={styles.score}>{aggregateAccuracy != null ? `${aggregateAccuracy.toFixed(1)}%` : "—"}</p>
-          <p className={styles.scoreNote} style={{ marginTop: 4, fontSize: 12 }}>
-            Operational average only
-          </p>
-        </div>
+        <SatisfactionCircles
+          variant="summary"
+          daily={dailySatisfaction}
+          aggregate={aggregateSatisfaction}
+        />
       </div>
       {currentDay < 3 && (
         <p className={styles.scoreNote}>
