@@ -2,10 +2,12 @@
   font-family: "IBM Plex Serif", Georgia, serif;
   font-size: 22px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0;
   color: var(--diet-paper);
   position: relative;
   display: inline-block;
+  padding: 8px 0;
+  text-shadow: 0 0 18px rgba(77, 201, 246, 0.18);
 }
 
 .logo::after {
@@ -30,7 +32,7 @@
 }
 
 .dot {
-  color: var(--diet-red-string);
+  color: var(--diet-amber);
   display: inline-block;
 }
 
@@ -46,4 +48,5 @@
   font-weight: 800;
   margin-right: 1px;
   color: var(--diet-holo-blue);
+  text-shadow: 0 0 14px rgba(77, 201, 246, 0.42);
 }

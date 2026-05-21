@@ -6,34 +6,60 @@
   align-items: center;
   justify-content: space-between;
   padding: 18px var(--gutter);
-  background: rgba(10, 14, 20, 0.82);
-  backdrop-filter: saturate(140%) blur(14px);
-  -webkit-backdrop-filter: saturate(140%) blur(14px);
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background:
+    linear-gradient(180deg, rgba(26, 20, 16, 0.95), rgba(10, 14, 20, 0.95)),
+    linear-gradient(90deg, rgba(199, 125, 32, 0.12), rgba(77, 201, 246, 0.06));
+  backdrop-filter: saturate(150%) blur(16px);
+  -webkit-backdrop-filter: saturate(150%) blur(16px);
+  border-bottom: 1px solid rgba(199, 125, 32, 0.22);
+  box-shadow: inset 0 -1px 0 rgba(77, 201, 246, 0.08);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .scrolled {
-  border-bottom-color: rgba(77, 201, 246, 0.18);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  border-bottom-color: rgba(199, 125, 32, 0.34);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.34),
+    inset 0 -1px 0 rgba(77, 201, 246, 0.12);
 }
 
 .links {
   display: flex;
-  gap: 32px;
+  gap: 12px;
   font-family: var(--font-case-file);
   font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+  font-weight: 700;
+  letter-spacing: 0;
 }
 
 .links a {
-  color: rgba(220, 230, 240, 0.72);
-  transition: color 0.2s ease;
+  position: relative;
+  padding: 9px 12px;
+  color: rgba(245, 240, 232, 0.76);
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.links a::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 4px;
+  height: 2px;
+  background: var(--diet-red-string);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.2s ease;
 }
 
 .links a:hover {
-  color: var(--diet-cold-white);
+  color: var(--diet-paper);
+  background: rgba(245, 240, 232, 0.06);
+}
+
+.links a:hover::after,
+.links a:focus-visible::after {
+  transform: scaleX(1);
 }
 
 .cta {

@@ -67,12 +67,15 @@
 
 .ghostDark {
   background: transparent;
-  color: var(--diet-cold-white);
+  color: rgba(245, 240, 232, 0.82);
   padding: 14px 20px;
+  border-color: rgba(212, 197, 169, 0.16);
 }
 
 .ghostDark:hover {
-  background: rgba(77, 201, 246, 0.08);
+  color: var(--diet-paper);
+  background: rgba(245, 240, 232, 0.06);
+  border-color: rgba(212, 197, 169, 0.28);
   opacity: 1;
 }
 
