@@ -17,16 +17,16 @@ import Scene7 from "./Scene/Scene7.png";
 import Scene8 from "./Scene/Scene8.png";
 import Scene9 from "./Scene/Scene9.png";
 
-import budgetIcon from "./Budget.png";
-import spentIcon from "./Spend.png";
-import draftIcon from "./Draft.png";
-import p100 from "./P100.png";
-import p500 from "./P500.png";
-import p1000 from "./P1000.png";
-import routineIcon from "./routine.png";
-import phoneIcon from "./phone.png";
-import policeIcon from "./police.png";
-import caseRoom from "./caseroom.jpeg";
+import budgetIcon from "./Mission/Budget.png";
+import spentIcon from "./Mission/Spend.png";
+import draftIcon from "./Mission/Draft.png";
+import p100 from "./Mission/P100.png";
+import p500 from "./Mission/P500.png";
+import p1000 from "./Mission/P1000.png";
+import routineIcon from "./Mission/routine.png";
+import phoneIcon from "./Mission/phone.png";
+import policeIcon from "./Mission/police.png";
+import caseRoom from "./caseroom.png";
 import chapter1CaseRoom from "./Chapter1/chapter1_case_room.png";
 
 export const ZONE_VISUALS = [
