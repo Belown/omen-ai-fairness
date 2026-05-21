@@ -1,9 +1,9 @@
-import angry from "./portrait/Angry.png";
-import curious from "./portrait/Curious.png";
-import happy from "./portrait/Happy.png";
-import neutral from "./portrait/Neutral.png";
-import sad from "./portrait/Sad.png";
-import scared from "./portrait/Scared.png";
+import angry from "./portrait/new/Angry.png";
+import curious from "./portrait/new/Curious.png";
+import happy from "./portrait/new/Happy.png";
+import neutral from "./portrait/new/Neutral.png";
+import sad from "./portrait/new/Sad.png";
+import scared from "./portrait/new/Scared.png";
 
 export const portraits = {
   angry,
