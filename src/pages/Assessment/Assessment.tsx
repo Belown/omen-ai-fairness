@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import InvestigationNav from "../../components/InvestigationNav/InvestigationNav";
+import Nav from "../../components/Nav/Nav";
 import {
   BIAS_SECTIONS,
   FEEDBACK_STATEMENTS,
@@ -175,7 +175,7 @@ export default function Assessment() {
 
   return (
     <>
-      <InvestigationNav />
+      <Nav investigation />
       <main className={`${styles.page} ${isPost ? styles.pagePost : styles.pagePre}`}>
         <div className={styles.sceneWash} />
         <div className={styles.hero}>
@@ -402,7 +402,7 @@ export default function Assessment() {
 function CompletionState({ isPost }: { isPost: boolean }) {
   return (
     <>
-      <InvestigationNav />
+      <Nav investigation />
       <main className={`${styles.page} ${isPost ? styles.pagePost : styles.pagePre}`}>
         <div className={styles.sceneWash} />
         <div className={styles.completion}>

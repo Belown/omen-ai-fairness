@@ -27,7 +27,7 @@ import routineIcon from "./Mission/routine.png";
 import phoneIcon from "./Mission/phone.png";
 import policeIcon from "./Mission/police.png";
 import caseRoom from "./caseroom.png";
-import chapter1CaseRoom from "./Chapter1/chapter1_case_room.png";
+import chapter1CaseRoom from "./caseroom.png";
 
 export const ZONE_VISUALS = [
   { icon: zone1icon, image: zone1image },
