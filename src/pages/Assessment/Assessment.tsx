@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import InvestigationNav from "../../components/InvestigationNav/InvestigationNav";
 import {
@@ -7,7 +7,11 @@ import {
   LIKERT_OPTIONS,
   OPEN_ENDED_QUESTIONS,
 } from "./assessmentData";
-import { saveAssessment } from "../../utils/assessmentStorage";
+import {
+  loadAssessmentDraft,
+  saveAssessment,
+  saveAssessmentDraft,
+} from "../../utils/assessmentStorage";
 import styles from "./Assessment.module.css";
 
 type Answers = Record<string, string>;
@@ -90,14 +94,44 @@ export default function Assessment() {
   const [searchParams] = useSearchParams();
   const mode = searchParams.get("mode") === "post" ? "post" : "pre";
   const isPost = mode === "post";
+  const initialDraft = useRef(loadAssessmentDraft(mode));
+  const skipNextDraftSave = useRef(false);
 
-  const [answers, setAnswers] = useState<Answers>({});
-  const [confidence, setConfidence] = useState<Scale>({});
-  const [understanding, setUnderstanding] = useState<Scale>({});
-  const [feedback, setFeedback] = useState<Feedback>({});
-  const [openEnded, setOpenEnded] = useState<OpenEnded>({});
+  const [answers, setAnswers] = useState<Answers>(initialDraft.current.answers);
+  const [confidence, setConfidence] = useState<Scale>(initialDraft.current.confidence);
+  const [understanding, setUnderstanding] = useState<Scale>(initialDraft.current.understanding);
+  const [feedback, setFeedback] = useState<Feedback>(initialDraft.current.feedback);
+  const [openEnded, setOpenEnded] = useState<OpenEnded>(initialDraft.current.openEnded);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const draft = loadAssessmentDraft(mode);
+    skipNextDraftSave.current = true;
+    setAnswers(draft.answers);
+    setConfidence(draft.confidence);
+    setUnderstanding(draft.understanding);
+    setFeedback(draft.feedback);
+    setOpenEnded(draft.openEnded);
+    setSubmitted(false);
+    setError("");
+    window.scrollTo({ top: 0, left: 0 });
+  }, [mode]);
+
+  useEffect(() => {
+    if (skipNextDraftSave.current) {
+      skipNextDraftSave.current = false;
+      return;
+    }
+
+    saveAssessmentDraft(mode, {
+      answers,
+      confidence,
+      understanding,
+      feedback,
+      openEnded,
+    });
+  }, [answers, confidence, feedback, mode, openEnded, understanding]);
 
   const handleSubmit = () => {
     const allQuestionsAnswered = BIAS_SECTIONS.every((section) =>
@@ -144,6 +178,11 @@ export default function Assessment() {
       <InvestigationNav />
       <main className={styles.page}>
         <div className={styles.hero}>
+          {!isPost && (
+            <Link to="/chapters?chapter=ch1" className={styles.heroChapterLink}>
+              Go to Chapter 1
+            </Link>
+          )}
           <span className={`eyebrow ${isPost ? styles.postBadge : styles.preBadge}`}>
             {isPost ? "Post-Game Assessment" : "Pre-Game Assessment"}
           </span>

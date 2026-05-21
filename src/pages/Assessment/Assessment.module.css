@@ -19,9 +19,37 @@
 /* ── Hero ─────────────────────────────────────────── */
 
 .hero {
+  position: relative;
   width: min(1040px, calc(100% - 2 * var(--gutter)));
   margin: 0 auto;
   padding: clamp(56px, 7vw, 96px) 0 clamp(32px, 4vw, 48px);
+}
+
+.heroChapterLink {
+  position: absolute;
+  top: clamp(28px, 4vw, 44px);
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 11px 22px;
+  border: 1px solid rgba(92, 61, 46, 0.24);
+  border-radius: var(--diet-radius-document);
+  background: var(--diet-paper);
+  color: var(--diet-ink);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.heroChapterLink:hover {
+  border-color: var(--diet-copper);
+  color: var(--diet-copper);
+  transform: translateY(-1px);
 }
 
 .preBadge {
@@ -579,6 +607,15 @@
 /* ── Responsive ───────────────────────────────────── */
 
 @media (max-width: 700px) {
+  .hero {
+    padding-top: clamp(32px, 7vw, 56px);
+  }
+
+  .heroChapterLink {
+    position: static;
+    margin-bottom: 22px;
+  }
+
   .sectionHeader {
     flex-direction: column;
     gap: 12px;

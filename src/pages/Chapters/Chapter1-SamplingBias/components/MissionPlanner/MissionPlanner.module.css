@@ -258,7 +258,6 @@
   grid-row: 1 / span 3;
   position: sticky;
   align-self: start;
-  max-height: calc(100vh - 112px);
   display: grid;
   gap: 14px;
   animation-delay: 0.26s;
@@ -600,6 +599,10 @@
   --queue-item-preview-height: 190px;
   display: grid;
   gap: 10px;
+  min-height: 0;
+}
+
+.queueListScrollable {
   max-height: calc(var(--queue-item-preview-height) * 2 + 10px);
   overflow-y: auto;
   overflow-x: hidden;
@@ -676,6 +679,7 @@
 .previousDecisions {
   display: grid;
   gap: 12px;
+  min-height: 0;
   padding-top: 4px;
 }
 
@@ -703,16 +707,10 @@
 .previousDecisionList {
   display: grid;
   gap: 10px;
-  max-height: 260px;
+  max-height: clamp(120px, 22vh, 260px);
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 0;
-  scrollbar-width: none;
-}
-
-.previousDecisionList::-webkit-scrollbar {
-  width: 0;
-  height: 0;
+  padding-right: 6px;
 }
 
 .previousDecisionDay {

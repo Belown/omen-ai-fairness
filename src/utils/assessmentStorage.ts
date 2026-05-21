@@ -8,7 +8,24 @@ export type AssessmentEntry = {
   openEnded?: Record<number, string>;
 };
 
+export type AssessmentDraft = {
+  answers: Record<string, string>;
+  confidence: Record<string, number>;
+  understanding: Record<string, number>;
+  feedback: Record<number, number>;
+  openEnded: Record<number, string>;
+};
+
 const STORAGE_KEY = "diet_assessment_log";
+const DRAFT_KEY_PREFIX = "diet_assessment_draft";
+
+export const createEmptyAssessmentDraft = (): AssessmentDraft => ({
+  answers: {},
+  confidence: {},
+  understanding: {},
+  feedback: {},
+  openEnded: {},
+});
 
 export function saveAssessment(entry: AssessmentEntry): void {
   const all = loadAllAssessments();
@@ -32,4 +49,21 @@ export function loadAllAssessments(): AssessmentEntry[] {
 
 export function hasCompleted(mode: "pre" | "post"): boolean {
   return loadAllAssessments().some((e) => e.mode === mode);
+}
+
+export function saveAssessmentDraft(mode: "pre" | "post", draft: AssessmentDraft): void {
+  try {
+    sessionStorage.setItem(`${DRAFT_KEY_PREFIX}_${mode}`, JSON.stringify(draft));
+  } catch {
+    console.error("[DIET] Could not persist assessment draft to sessionStorage");
+  }
+}
+
+export function loadAssessmentDraft(mode: "pre" | "post"): AssessmentDraft {
+  try {
+    const raw = sessionStorage.getItem(`${DRAFT_KEY_PREFIX}_${mode}`);
+    return raw ? { ...createEmptyAssessmentDraft(), ...JSON.parse(raw) } : createEmptyAssessmentDraft();
+  } catch {
+    return createEmptyAssessmentDraft();
+  }
 }

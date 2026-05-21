@@ -379,7 +379,7 @@ export default function MissionPlanner({
             Add Sortie
           </button>
 
-          <div className={`${styles.queueList} prettyScrollbar`}>
+          <div className={`${styles.queueList} ${currentPlans.length > 2 ? styles.queueListScrollable : ""} prettyScrollbar`}>
             {currentPlans.length === 0 ? (
               <p className={styles.featureIntelEmpty}>No missions queued for Day {currentDay + 1}.</p>
             ) : (
@@ -425,7 +425,7 @@ export default function MissionPlanner({
             {previousDecisionDays.length === 0 ? (
               <p className={styles.featureIntelEmpty}>No earlier missions yet.</p>
             ) : (
-              <div className={styles.previousDecisionList}>
+              <div className={`${styles.previousDecisionList} prettyScrollbar`}>
                 {previousDecisionDays.map((day) => (
                   <div key={day.day} className={styles.previousDecisionDay}>
                     <div className={styles.previousDecisionDayHeader}>
