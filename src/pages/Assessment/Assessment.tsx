@@ -179,8 +179,8 @@ export default function Assessment() {
       <main className={styles.page}>
         <div className={styles.hero}>
           {!isPost && (
-            <Link to="/chapters?chapter=ch1" className={styles.heroChapterLink}>
-              Go to Chapter 1
+            <Link to="/chapters?intro=story" className={styles.heroChapterLink}>
+              Skip
             </Link>
           )}
           <span className={`eyebrow ${isPost ? styles.postBadge : styles.preBadge}`}>

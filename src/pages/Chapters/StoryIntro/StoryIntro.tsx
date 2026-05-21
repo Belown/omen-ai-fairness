@@ -63,6 +63,7 @@ const BOOK_PAGE_ASPECT = 710 / 640;
 const MIN_PAGE_WIDTH = 140;
 const MAX_PAGE_WIDTH = 640;
 const COMPACT_STORY_QUERY = "(max-width: 720px)";
+const STORY_CHROME_OFFSET = 172;
 const getBookPageForScene = (index: number) => index * 2;
 
 export default function StoryIntro({ onStart, onSelectChapter }: StoryIntroProps) {
@@ -109,7 +110,12 @@ export default function StoryIntro({ onStart, onSelectChapter }: StoryIntroProps
 
     const updateBookSize = () => {
       const spreadWidth = spread.clientWidth;
-      const nextWidth = Math.max(MIN_PAGE_WIDTH, Math.min(MAX_PAGE_WIDTH, Math.floor(spreadWidth / 2)));
+      const maxHeight = Math.max(360, window.innerHeight - STORY_CHROME_OFFSET);
+      const heightLimitedWidth = Math.floor(maxHeight / BOOK_PAGE_ASPECT);
+      const nextWidth = Math.max(
+        MIN_PAGE_WIDTH,
+        Math.min(MAX_PAGE_WIDTH, heightLimitedWidth, Math.floor(spreadWidth / 2)),
+      );
       const nextHeight = Math.round(nextWidth * BOOK_PAGE_ASPECT);
       setBookPageSize((current) => (
         current.width === nextWidth && current.height === nextHeight

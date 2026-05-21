@@ -4,6 +4,7 @@
   padding: 0;
   width: 100%;
   min-width: 0;
+  overflow: clip;
 }
 
 .bookShell {
@@ -12,7 +13,7 @@
   width: min(70em, calc(100vw - 24px));
   max-width: 100%;
   margin: 0 auto;
-  padding: clamp(18px, 2.4vw, 30px);
+  padding: clamp(12px, 1.8vw, 22px);
   border: 1px solid rgba(28, 43, 64, 0.12);
   border-radius: 8px;
   background:
@@ -53,7 +54,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: clamp(14px, 1.8vw, 22px);
+  margin-bottom: clamp(10px, 1.2vw, 16px);
 }
 
 .progressDots {

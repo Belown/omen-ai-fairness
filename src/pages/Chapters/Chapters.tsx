@@ -5,7 +5,7 @@ import Logo from "../../components/Logo/Logo";
 import Chapter1SamplingBias from "./Chapter1-SamplingBias/Chapter1SamplingBias";
 import Chapter2COMPAS from "./Chapter2-COMPAS";
 import Chapter3Alignment from "./Chapter3-Alignment/Chapter3Alignment";
-import StoryIntro from "./components/StoryIntro/StoryIntro";
+import StoryIntro from "./StoryIntro/StoryIntro";
 import styles from "./Chapters.module.css";
 
 type ChapterId = "ch1" | "ch2" | "ch3";
