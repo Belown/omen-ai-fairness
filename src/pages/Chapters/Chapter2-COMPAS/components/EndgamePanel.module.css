@@ -41,6 +41,35 @@
   color: rgba(25, 28, 31, 0.72);
 }
 
+.finalAccuracyBlock {
+  margin: 16px 0;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: rgba(250, 248, 242, 0.9);
+  border: 1px solid rgba(25, 28, 31, 0.1);
+}
+
+.finalLine {
+  margin: 8px 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: rgba(25, 28, 31, 0.88);
+}
+
+.finalLabel {
+  font-weight: 500;
+}
+
+.finalHint {
+  font-size: 13px;
+  color: rgba(25, 28, 31, 0.6);
+}
+
+.finalScore {
+  font-family: var(--font-display, serif);
+  font-size: 1.35em;
+}
+
 .legacyBlock {
   margin-bottom: 22px;
 }

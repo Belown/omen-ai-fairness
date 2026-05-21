@@ -26,12 +26,14 @@ export default function GameHud({ currentDay, budget, dailyAccuracy, aggregateAc
         <span className={styles.value}>
           {dailyAccuracy != null ? `${dailyAccuracy.toFixed(1)}%` : "—"}
         </span>
+        <span className={styles.sub}>Last completed night</span>
       </div>
       <div className={styles.hudBlock}>
         <span className={styles.kicker}>Aggregate accuracy</span>
         <span className={styles.value}>
           {aggregateAccuracy != null ? `${aggregateAccuracy.toFixed(1)}%` : "—"}
         </span>
+        <span className={styles.sub}>Operational average (no deployment adjustment)</span>
       </div>
     </header>
   );

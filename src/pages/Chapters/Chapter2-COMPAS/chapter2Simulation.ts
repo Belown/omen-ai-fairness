@@ -1,14 +1,4 @@
 import type { FairnessDefinitionId, StudyMetricId } from "./chapter2Data";
-import { BASELINE_FIGURES } from "./chapter2Data";
-
-export type RaceCode = "B" | "W";
-
-export type Defendant = {
-  id: string;
-  race: RaceCode;
-  willReoffend: boolean;
-  riskBand: "high" | "low";
-};
 
 export type StudyOutcome = "win" | "warn" | "neutral";
 
@@ -25,6 +15,40 @@ export type StudyResult = {
 
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
 
+const METRIC_INDEX: Record<FairnessDefinitionId, number> = {
+  equal_rates: 0,
+  predictive_parity: 1,
+  max_accuracy: 2,
+};
+
+/** Day 1 baseline accuracy (%). */
+const BASE_ACCURACY: Record<FairnessDefinitionId, number> = {
+  max_accuracy: 84,
+  predictive_parity: 74,
+  equal_rates: 69,
+};
+
+/** Drift by work night index (0 = Day 1, 1 = Day 2, 2 = Day 3). */
+const DAY_DRIFT: Record<FairnessDefinitionId, [number, number, number]> = {
+  max_accuracy: [0, 1.5, 2.5],
+  predictive_parity: [0, -1.5, -2.5],
+  equal_rates: [0, -2.5, -4.0],
+};
+
+export const FINAL_CONFIRMATION_MODIFIER: Record<FairnessDefinitionId, number> = {
+  max_accuracy: 2,
+  predictive_parity: -1,
+  equal_rates: -3,
+};
+
+const SWITCH_PENALTY = 3;
+
+/** Deterministic jitter ±1.5% max (percentage points). */
+export function seedNoise(dayIndex: number, metric: FairnessDefinitionId): number {
+  const metricIndex = METRIC_INDEX[metric];
+  return ((dayIndex * 31 + metricIndex * 7) % 13) / 10 - 0.65;
+}
+
 /** Deterministic 0–1 from session inputs (stable re-reads). */
 export function studySeed(dayIndex: number, metricId: StudyMetricId, launchIndex: number, fairness: FairnessDefinitionId) {
   let h = dayIndex * 997 + launchIndex * 131;
@@ -35,151 +59,71 @@ export function studySeed(dayIndex: number, metricId: StudyMetricId, launchIndex
   return (h % 10000) / 10000;
 }
 
-function jitter(base: number, seed: number, spread: number) {
-  return clamp01(base + (seed - 0.5) * 2 * spread);
-}
-
 export function formatPct(x: number) {
   return `${Math.round(x * 100)}%`;
 }
 
-export function algorithmDecision(d: Defendant): "detain" | "release" {
-  return d.riskBand === "high" ? "detain" : "release";
+export function roundAccuracy(value: number) {
+  return Math.round(Math.max(0, Math.min(100, value)) * 10) / 10;
 }
 
-export function machineDecisions(population: Defendant[]): Record<string, "detain" | "release"> {
-  const out: Record<string, "detain" | "release"> = {};
-  for (const d of population) out[d.id] = algorithmDecision(d);
-  return out;
-}
-
-export function generatePopulation(dayIndex: number, size = 12): Defendant[] {
-  const seedBase = studySeed(dayIndex, "accuracy-overall", 0, "max_accuracy");
-  const rand = (i: number) => studySeed(dayIndex, "fpr-fnr-by-race", i, "equal_rates");
-
-  const blackShare = clamp01(0.52 + (seedBase - 0.5) * 0.08);
-
-  return Array.from({ length: size }, (_, i) => {
-    const r = rand(i);
-    const race: RaceCode = r < blackShare ? "B" : "W";
-    const baseRec = race === "B" ? 0.51 : 0.39;
-    const willReoffend = studySeed(dayIndex, "ppv-high-risk", i, "predictive_parity") < clamp01(baseRec + 0.03);
-
-    const pHighIfNot = race === "B" ? BASELINE_FIGURES.fprBlack : BASELINE_FIGURES.fprWhite;
-    const pHighIfYes = race === "B" ? 1 - BASELINE_FIGURES.fnrBlack : 1 - BASELINE_FIGURES.fnrWhite;
-    const pHigh = willReoffend ? pHighIfYes : pHighIfNot;
-    const riskBand: "high" | "low" =
-      studySeed(dayIndex, "tpr-tnr-by-race", i, "equal_rates") < clamp01(pHigh + 0.04) ? "high" : "low";
-
-    return { id: `d${dayIndex}-${i}`, race, willReoffend, riskBand };
-  });
-}
-
-type Confusion = { tp: number; fp: number; tn: number; fn: number };
-
-function confusionForGroup(defs: Defendant[], decisions: Record<string, "detain" | "release">, race: RaceCode): Confusion {
-  const c: Confusion = { tp: 0, fp: 0, tn: 0, fn: 0 };
-  for (const d of defs) {
-    if (d.race !== race) continue;
-    const pred = decisions[d.id] === "detain";
-    const act = d.willReoffend;
-    if (pred && act) c.tp += 1;
-    if (pred && !act) c.fp += 1;
-    if (!pred && !act) c.tn += 1;
-    if (!pred && act) c.fn += 1;
-  }
-  return c;
-}
-
-function safeRate(num: number, den: number) {
-  if (den <= 0) return 0;
-  return num / den;
-}
-
-/** Daily accuracy score in [0, 100] for machine decisions under the chosen fairness lens. */
-export function scoreDay(
-  defs: Defendant[],
-  decisions: Record<string, "detain" | "release">,
+/** Operational daily accuracy for a completed work night (Days 1–3 on HUD). */
+export function computeDailyAccuracy(
   fairness: FairnessDefinitionId,
+  workNightIndex: number,
+  options?: { applySwitchPenalty?: boolean },
 ): number {
-  const cB = confusionForGroup(defs, decisions, "B");
-  const cW = confusionForGroup(defs, decisions, "W");
-
-  const tprB = safeRate(cB.tp, cB.tp + cB.fn);
-  const tprW = safeRate(cW.tp, cW.tp + cW.fn);
-  const tnrB = safeRate(cB.tn, cB.tn + cB.fp);
-  const tnrW = safeRate(cW.tn, cW.tn + cW.fp);
-
-  const fprB = safeRate(cB.fp, cB.fp + cB.tn);
-  const fprW = safeRate(cW.fp, cW.fp + cW.tn);
-  const fnrB = safeRate(cB.fn, cB.fn + cB.tp);
-  const fnrW = safeRate(cW.fn, cW.fn + cW.tp);
-
-  const accOverall = safeRate(
-    cB.tp + cB.tn + cW.tp + cW.tn,
-    cB.tp + cB.fp + cB.tn + cB.fn + cW.tp + cW.fp + cW.tn + cW.fn,
-  );
-
-  const highB = defs.filter((d) => d.race === "B" && decisions[d.id] === "detain");
-  const highW = defs.filter((d) => d.race === "W" && decisions[d.id] === "detain");
-  const ppvB = safeRate(highB.filter((d) => d.willReoffend).length, highB.length);
-  const ppvW = safeRate(highW.filter((d) => d.willReoffend).length, highW.length);
-
-  const gapTpr = Math.abs(tprB - tprW);
-  const gapTnr = Math.abs(tnrB - tnrW);
-  const gapFpr = Math.abs(fprB - fprW);
-  const gapFnr = Math.abs(fnrB - fnrW);
-  const gapPpv = Math.abs(ppvB - ppvW);
-
-  let raw = 68;
-
-  if (fairness === "equal_rates") {
-    raw += 40 * (0.08 - (gapTpr + gapTnr) / 2);
-    raw += 18 * (0.1 - (gapFpr + gapFnr) / 2);
-    raw -= 12 * gapPpv;
-    raw += 8 * (accOverall - 0.62);
-  } else if (fairness === "predictive_parity") {
-    raw += 44 * (0.06 - gapPpv);
-    raw -= 14 * (gapFpr + gapFnr) / 2;
-    raw -= 10 * (gapTpr + gapTnr) / 2;
-    raw += 6 * (accOverall - 0.6);
-  } else {
-    raw += 50 * (accOverall - 0.64);
-    raw -= 10 * gapPpv;
-    raw -= 8 * (gapFpr + gapFnr) / 2;
-    raw -= 6 * (gapTpr + gapTnr) / 2;
-  }
-
-  return clamp01(raw / 100) * 100;
+  const base = BASE_ACCURACY[fairness];
+  const drift = DAY_DRIFT[fairness][workNightIndex] ?? 0;
+  const noise = seedNoise(workNightIndex, fairness);
+  let acc = base + drift + noise;
+  if (options?.applySwitchPenalty) acc -= SWITCH_PENALTY;
+  return roundAccuracy(acc);
 }
 
 export function aggregatedAccuracy(dayScores: number[]) {
   if (!dayScores.length) return 0;
-  return dayScores.reduce((a, b) => a + b, 0) / dayScores.length;
+  return roundAccuracy(dayScores.reduce((a, b) => a + b, 0) / dayScores.length);
 }
 
-/** Seeded daily accuracy for completed work nights (Days 1–3 display). */
-export function computeDailyAccuracy(fairness: FairnessDefinitionId, workNightIndex: number): number {
-  const seed = studySeed(workNightIndex, "accuracy-overall", 0, fairness);
-  const bands: Record<FairnessDefinitionId, [number, number]> = {
-    equal_rates: [71, 75],
-    predictive_parity: [72, 76],
-    max_accuracy: [82, 87],
-  };
-  const [lo, hi] = bands[fairness];
-  const mid = (lo + hi) / 2;
-  const jitter = (seed - 0.5) * 4;
-  return Math.round((mid + jitter) * 10) / 10;
+export function computeFinalSystemAccuracy(operationalAverage: number, finalFairness: FairnessDefinitionId) {
+  const modifier = FINAL_CONFIRMATION_MODIFIER[finalFairness];
+  return roundAccuracy(operationalAverage + modifier);
 }
 
-export function resolveDayStudies(
-  studiesQueued: StudyMetricId[],
-  metricActive: FairnessDefinitionId,
+/** Seeded disparity in percentage points (delta between groups). */
+function disparityFor(
+  fairness: FairnessDefinitionId,
+  kind: "fpr" | "fnr" | "ppv",
   workNightIndex: number,
-): StudyResult[] {
-  return studiesQueued.map((metricId, launchIndex) =>
-    generateStudyResult(metricId, metricActive, workNightIndex, launchIndex),
-  );
+): number {
+  const s = studySeed(workNightIndex, "fpr-fnr-by-race", kind === "fpr" ? 0 : kind === "fnr" ? 1 : 2, fairness);
+  const ranges: Record<FairnessDefinitionId, Record<"fpr" | "fnr" | "ppv", [number, number]>> = {
+    equal_rates: { fpr: [2, 4], fnr: [2, 4], ppv: [15, 20] },
+    predictive_parity: { fpr: [12, 18], fnr: [10, 15], ppv: [2, 4] },
+    max_accuracy: { fpr: [20, 28], fnr: [18, 24], ppv: [8, 12] },
+  };
+  const [lo, hi] = ranges[fairness][kind];
+  return lo + s * (hi - lo);
+}
+
+/** Split a rate around a midpoint so |black − white| ≈ disparity (0–1 scale). */
+function pairFromDisparity(mid: number, disparity: number, seed: number): { black: number; white: number } {
+  const half = disparity / 2;
+  const n = (seed - 0.5) * 0.02;
+  return {
+    black: clamp01(mid + half + n),
+    white: clamp01(mid - half - n * 0.5),
+  };
+}
+
+function accuracyStudyValues(dailyAccuracyPct: number, seed: number): { black: number; white: number } {
+  const overall = dailyAccuracyPct / 100;
+  const spread = (seed - 0.5) * 0.008;
+  return {
+    black: clamp01(overall + spread),
+    white: clamp01(overall - spread),
+  };
 }
 
 type MetricProfile = {
@@ -195,157 +139,175 @@ type MetricProfile = {
 function profileForMetric(
   metricId: StudyMetricId,
   fairness: FairnessDefinitionId,
+  workNightIndex: number,
   seed: number,
+  dailyAccuracyPct: number,
 ): MetricProfile {
   const s = seed;
-  const B = BASELINE_FIGURES;
 
   if (metricId === "fpr-fnr-by-race") {
+    const fprGap = disparityFor(fairness, "fpr", workNightIndex);
+    const fnrGap = disparityFor(fairness, "fnr", workNightIndex);
+    const fpr = pairFromDisparity(0.25, fprGap / 100, s);
+    const fnr = pairFromDisparity(0.35, fnrGap / 100, s + 0.2);
+
     if (fairness === "equal_rates") {
-      const gap = jitter(0.03, s, 0.02);
       return {
         outcome: "win",
-        black: jitter(0.26, s, 0.03),
-        white: jitter(0.26 + gap, s + 0.1, 0.03),
-        blackSecondary: jitter(0.31, s + 0.2, 0.03),
-        whiteSecondary: jitter(0.31 + gap, s + 0.3, 0.03),
+        black: fpr.black,
+        white: fpr.white,
+        blackSecondary: fnr.black,
+        whiteSecondary: fnr.white,
         secondaryLabel: "FNR",
         interpretation:
-          "Under equal error‑rate constraints, FPR and FNR line up much more closely across groups — a direct win for your chosen metric. This is what your office asked the instrument to prioritise, and the audit reflects it.",
+          "By forcing equal false positive and false negative rates across groups, the model must use a different decision threshold per group. This directly reduces overall accuracy because the threshold is no longer optimal for either group individually.",
       };
     }
     if (fairness === "predictive_parity") {
-      const gap = jitter(0.19, s, 0.04);
       return {
         outcome: "warn",
-        black: jitter(B.fprBlack, s, 0.03),
-        white: jitter(B.fprWhite, s + 0.1, 0.03),
-        blackSecondary: jitter(B.fnrBlack, s + 0.2, 0.03),
-        whiteSecondary: jitter(B.fnrWhite + gap * 0.5, s + 0.3, 0.04),
+        black: fpr.black,
+        white: fpr.white,
+        blackSecondary: fnr.black,
+        whiteSecondary: fnr.white,
         secondaryLabel: "FNR",
         interpretation:
-          "Chasing equal PPV tends to push FPR/FNR apart when base rates differ — exactly the incompatibility ProPublica highlighted. Your active metric is not error‑rate parity, so this gap is expected rather than a surprise bug.",
+          "Predictive parity constrains the model to equalise positive predictive value, but when base recidivism rates differ between groups, this mathematically requires unequal error rates — a consequence of Chouldechova's impossibility theorem.",
       };
     }
-    const gap = jitter(0.24, s, 0.04);
     return {
       outcome: "warn",
-      black: jitter(B.fprBlack + 0.02, s, 0.03),
-      white: jitter(B.fprWhite, s + 0.1, 0.03),
-      blackSecondary: jitter(B.fnrBlack, s + 0.2, 0.03),
-      whiteSecondary: jitter(B.fnrWhite + gap * 0.3, s + 0.3, 0.04),
+      black: fpr.black,
+      white: fpr.white,
+      blackSecondary: fnr.black,
+      whiteSecondary: fnr.white,
       secondaryLabel: "FNR",
       interpretation:
-        "Maximising overall accuracy often widens group error gaps — the instrument looks “better” in aggregate while burdens stay uneven. Under max‑accuracy tuning, FPR/FNR disparities are typically the worst of the three fairness strategies.",
+        "Without fairness constraints, the model sets a single optimal decision threshold across all groups. This maximises accuracy but allows disparate error rates to emerge wherever base rates differ between groups.",
     };
   }
 
   if (metricId === "tpr-tnr-by-race") {
+    const tprGap = disparityFor(fairness, "fpr", workNightIndex) * 0.9;
+    const tnrGap = disparityFor(fairness, "fnr", workNightIndex) * 0.9;
+    const tpr = pairFromDisparity(0.68, tprGap / 100, s);
+    const tnr = pairFromDisparity(0.65, tnrGap / 100, s + 0.15);
+
     if (fairness === "equal_rates") {
-      const gap = jitter(0.04, s, 0.02);
       return {
         outcome: "win",
-        black: jitter(0.71, s, 0.03),
-        white: jitter(0.71 + gap, s + 0.1, 0.03),
-        blackSecondary: jitter(0.7, s + 0.2, 0.03),
-        whiteSecondary: jitter(0.7 + gap, s + 0.3, 0.03),
+        black: tpr.black,
+        white: tpr.white,
+        blackSecondary: tnr.black,
+        whiteSecondary: tnr.white,
         secondaryLabel: "TNR",
         interpretation:
-          "TPR and TNR move toward parity — this is the operational face of equal error rates on your docket. Equalising who gets which kind of correct call is the heart of the metric you queued studies under.",
+          "Equalising true positive and true negative rates forces the classifier to treat groups with different base rates as if they were identical. That alignment is your goal — but it is purchased with lower overall accuracy than an unconstrained model.",
       };
     }
     if (fairness === "predictive_parity") {
-      const gap = jitter(0.16, s, 0.04);
       return {
         outcome: "warn",
-        black: jitter(B.tprBlack, s, 0.03),
-        white: jitter(B.tprWhite, s + 0.1, 0.03),
-        blackSecondary: jitter(B.tnrBlack, s + 0.2, 0.03),
-        whiteSecondary: jitter(B.tnrWhite - gap, s + 0.3, 0.04),
+        black: tpr.black,
+        white: tpr.white,
+        blackSecondary: tnr.black,
+        whiteSecondary: tnr.white,
         secondaryLabel: "TNR",
         interpretation:
-          "Equalising high‑risk calibration usually distorts TPR/TNR — another sign that one fairness definition cannot satisfy every test at once. Predictive parity and equal error rates pull the model in different directions when base rates differ.",
+          "When you prioritise equal PPV among high‑risk flags, TPR and TNR cannot stay aligned across groups if recidivism base rates differ. The impossibility result shows up here as widening TPR/TNR gaps, not as a software bug.",
       };
     }
-    const gap = jitter(0.2, s, 0.04);
     return {
       outcome: "warn",
-      black: jitter(B.tprBlack + gap * 0.3, s, 0.03),
-      white: jitter(B.tprWhite, s + 0.1, 0.03),
-      blackSecondary: jitter(B.tnrBlack, s + 0.2, 0.03),
-      whiteSecondary: jitter(B.tnrWhite + gap * 0.2, s + 0.3, 0.04),
+      black: tpr.black,
+      white: tpr.white,
+      blackSecondary: tnr.black,
+      whiteSecondary: tnr.white,
       secondaryLabel: "TNR",
       interpretation:
-        "Accuracy‑first tuning lets TPR/TNR diverge sharply — the scoreboard improves while group‑wise treatment does not. This is among the starkest TPR/TNR gaps you will see across the three metrics.",
+        "Maximising aggregate accuracy lets each group keep thresholds closer to their own base rates, so TPR/TNR diverge. The system scores well on the headline number while who receives which kind of error stays uneven.",
     };
   }
 
   if (metricId === "ppv-high-risk") {
+    const ppvGap = disparityFor(fairness, "ppv", workNightIndex);
+    const ppv = pairFromDisparity(0.6, ppvGap / 100, s);
+
     if (fairness === "predictive_parity") {
-      const gap = jitter(0.03, s, 0.02);
       return {
         outcome: "win",
-        black: jitter(0.61, s, 0.03),
-        white: jitter(0.61 + gap, s + 0.1, 0.03),
+        black: ppv.black,
+        white: ppv.white,
         interpretation:
-          "PPV aligns across groups — your predictive‑parity mandate is doing what it promises on the high‑risk slice. Among people flagged high risk, rearrest rates now look similar across racial groups.",
+          "Constraining equal PPV among high‑risk scores is a lighter distortion than equalising full error rates, so accuracy stays higher than under equal error rates — but you still accept unequal FPR/FNR as the price of calibration.",
       };
     }
     if (fairness === "equal_rates") {
-      const gap = jitter(0.14, s, 0.03);
       return {
         outcome: "warn",
-        black: jitter(B.ppvBlack, s, 0.03),
-        white: jitter(B.ppvWhite + gap, s + 0.1, 0.03),
+        black: ppv.black,
+        white: ppv.white,
         interpretation:
-          "Equal error rates often sacrifice predictive parity — high‑risk flags stop meaning the same thing across groups. That tradeoff is structural: you cannot equalise TPR/TNR and PPV at once when recidivism base rates differ.",
+          "Equal error rates do not guarantee equal PPV when base rates differ — high‑risk flags can mean different things by group. That is the other half of the fairness impossibility story, visible once you look past TPR/TNR.",
       };
     }
-    const gap = jitter(0.13, s, 0.03);
     return {
       outcome: "neutral",
-      black: jitter(B.ppvBlack + gap * 0.4, s, 0.03),
-      white: jitter(B.ppvWhite, s + 0.1, 0.03),
+      black: ppv.black,
+      white: ppv.white,
       interpretation:
-        "PPV is neither clearly equal nor dramatically unequal under max‑accuracy tuning — calibration is not the optimisation target. The headline score can look fine while high‑risk slices still mean different things by group.",
+        "With no fairness constraint, PPV gaps are moderate: the model is not trying to equalise calibration, only to maximise correct calls. Accuracy looks strong while high‑risk slices still diverge somewhat.",
     };
   }
 
-  // accuracy-overall
+  // accuracy-overall — must match HUD daily accuracy (±0.5%)
+  const acc = accuracyStudyValues(dailyAccuracyPct, s);
   if (fairness === "max_accuracy") {
     return {
       outcome: "win",
-      black: jitter(0.84, s, 0.02),
-      white: jitter(0.83, s + 0.1, 0.02),
+      black: acc.black,
+      white: acc.white,
       interpretation:
-        "Aggregate accuracy peaks under your mandate — the highest values of the three strategies. Check error‑rate studies to see who still carries the cost of those correct totals.",
+        "With no fairness constraint, the model freely optimises its decision boundary for overall accuracy. That is why this figure is highest — and why error‑rate studies still show large group gaps.",
     };
   }
   if (fairness === "equal_rates") {
     return {
       outcome: "neutral",
-      black: jitter(0.73, s, 0.02),
-      white: jitter(0.74, s + 0.1, 0.02),
+      black: acc.black,
+      white: acc.white,
       interpretation:
-        "Accuracy sits in a moderate band — respectable, but below a pure max‑accuracy run. Equalising TPR/TNR trades away a few easy aggregate points.",
+        "Equalising TPR and TNR across groups with different base rates forces systematically suboptimal thresholds — the harshest accuracy cost of the three metrics, consistent with Chouldechova's impossibility theorem.",
     };
   }
   return {
     outcome: "neutral",
-    black: jitter(0.74, s, 0.02),
-    white: jitter(0.75, s + 0.1, 0.02),
+    black: acc.black,
+    white: acc.white,
     interpretation:
-      "Accuracy stays moderate under predictive parity — you are balancing calibration, not chasing the global maximum. This is typical when PPV is the primary constraint.",
+      "Predictive parity constrains only PPV equality, which distorts the boundary less than full error‑rate parity. Accuracy sits between max‑accuracy and equal‑rates — a real tradeoff, not a tie.",
   };
 }
 
 export function generateStudyResult(
   metricId: StudyMetricId,
   fairness: FairnessDefinitionId,
-  dayIndex: number,
+  workNightIndex: number,
   launchIndex: number,
+  dailyAccuracyPct: number,
 ): StudyResult {
-  const seed = studySeed(dayIndex, metricId, launchIndex, fairness);
-  const p = profileForMetric(metricId, fairness, seed);
+  const seed = studySeed(workNightIndex, metricId, launchIndex, fairness);
+  const p = profileForMetric(metricId, fairness, workNightIndex, seed, dailyAccuracyPct);
   return { metricId, ...p };
+}
+
+export function resolveDayStudies(
+  studiesQueued: StudyMetricId[],
+  metricActive: FairnessDefinitionId,
+  workNightIndex: number,
+  dailyAccuracyPct: number,
+): StudyResult[] {
+  return studiesQueued.map((metricId, launchIndex) =>
+    generateStudyResult(metricId, metricActive, workNightIndex, launchIndex, dailyAccuracyPct),
+  );
 }

@@ -14,6 +14,8 @@ export type Chapter2GameState = {
   currentDay: number;
   fairnessMetric: FairnessDefinitionId;
   metricChangedToday: boolean;
+  /** Calendar day when the player last switched metric (penalty on that night's accuracy). */
+  switchedMetricOnDay: number | null;
   budget: number;
   aggregateAccuracy: number[];
   days: DayRecord[];
@@ -24,6 +26,7 @@ export const INITIAL_GAME_STATE: Chapter2GameState = {
   currentDay: 0,
   fairnessMetric: "equal_rates",
   metricChangedToday: false,
+  switchedMetricOnDay: null,
   budget: 1000,
   aggregateAccuracy: [],
   days: [],

@@ -28,6 +28,9 @@ export default function DaySummaryPanel({
         <div className={styles.scoreBlock}>
           <h3 className={styles.subhead}>Aggregate accuracy</h3>
           <p className={styles.score}>{aggregateAccuracy != null ? `${aggregateAccuracy.toFixed(1)}%` : "—"}</p>
+          <p className={styles.scoreNote} style={{ marginTop: 4, fontSize: 12 }}>
+            Operational average only
+          </p>
         </div>
       </div>
       {currentDay < 3 && (
