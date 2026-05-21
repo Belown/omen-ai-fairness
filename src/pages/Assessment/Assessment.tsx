@@ -176,24 +176,45 @@ export default function Assessment() {
   return (
     <>
       <InvestigationNav />
-      <main className={styles.page}>
+      <main className={`${styles.page} ${isPost ? styles.pagePost : styles.pagePre}`}>
+        <div className={styles.sceneWash} />
         <div className={styles.hero}>
           {!isPost && (
             <Link to="/chapters?intro=story" className={styles.heroChapterLink}>
               Skip
             </Link>
           )}
-          <span className={`eyebrow ${isPost ? styles.postBadge : styles.preBadge}`}>
-            {isPost ? "Post-Game Assessment" : "Pre-Game Assessment"}
-          </span>
-          <h1 className={styles.title}>
-            {isPost ? "Reflect on what you learned." : "Test your intuitions."}
-          </h1>
-          <p className={styles.lede}>
-            {isPost
-              ? "Now that you have completed the investigation, answer the same questions again. For each question, select the answer you believe is correct and rate how confident you are on the scale below."
-              : "Before you begin the investigation, answer each question as best you can. For each question, select the answer you believe is correct and rate how confident you are in your answer using the scale below."}
-          </p>
+          <div className={styles.heroCopy}>
+            <div className={styles.caseTagRow}>
+              <span className={`${styles.caseTag} ${isPost ? styles.postBadge : styles.preBadge}`}>
+                {isPost ? "Post-Game Assessment" : "Pre-Game Assessment"}
+              </span>
+              <span className={styles.caseId}>AI Bias Knowledge Check</span>
+            </div>
+            <h1 className={styles.title}>
+              {isPost ? "Reflect on what you learned." : "Test your intuitions."}
+            </h1>
+            <p className={styles.lede}>
+              {isPost
+                ? "Now that you have completed the investigation, answer the same questions again. For each question, select the answer you believe is correct and rate how confident you are."
+                : "Before you begin the investigation, answer each question as best you can. For each question, select the answer you believe is correct and rate your confidence."}
+            </p>
+          </div>
+
+          <aside className={styles.assessmentPanel} aria-label="Assessment details">
+            <div>
+              <span>Format</span>
+              <strong>9 questions</strong>
+            </div>
+            <div>
+              <span>Scale</span>
+              <strong>Confidence + understanding</strong>
+            </div>
+            <div>
+              <span>Output</span>
+              <strong>Local JSON record</strong>
+            </div>
+          </aside>
         </div>
 
         <div className={styles.sections}>
@@ -208,7 +229,10 @@ export default function Assessment() {
                   <p className={styles.definition}>{section.definition}</p>
                 </div>
               </div>
-              <div className={styles.scenario}>{section.scenario}</div>
+              <div className={styles.scenario}>
+                <span className={styles.scenarioLabel}>Scenario</span>
+                {section.scenario}
+              </div>
 
               <div className={styles.questions}>
                 {section.questions.map((question) => (
@@ -375,6 +399,11 @@ export default function Assessment() {
 
         <div className={styles.submitArea}>
           {error && <p className={styles.errorMsg}>{error}</p>}
+          <p className={styles.submitHint}>
+            {isPost
+              ? "Submitting saves the final case record as a local JSON file."
+              : "Submitting saves the baseline case record as a local JSON file."}
+          </p>
           <button className={styles.submitBtn} onClick={handleSubmit} type="button">
             Submit {isPost ? "Post-Game" : "Pre-Game"} Assessment
           </button>
@@ -389,9 +418,10 @@ function CompletionState({ isPost }: { isPost: boolean }) {
   return (
     <>
       <InvestigationNav />
-      <main className={styles.page}>
+      <main className={`${styles.page} ${isPost ? styles.pagePost : styles.pagePre}`}>
+        <div className={styles.sceneWash} />
         <div className={styles.completion}>
-          <span className="eyebrow">Assessment complete</span>
+          <span className={styles.caseTag}>Assessment complete</span>
           <h1 className={styles.title}>
             {isPost ? "Thank you for your feedback." : "Intuitions recorded."}
           </h1>
