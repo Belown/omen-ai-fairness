@@ -1,8 +1,8 @@
 .reportRoot {
   position: relative;
-  background: var(--rui-surface);
-  border: 1px solid var(--rui-border);
-  border-radius: var(--radius-card);
+  background: var(--diet-paper-dark);
+  border: 1px solid var(--diet-file-tab);
+  border-radius: var(--diet-radius-document);
   padding: clamp(14px, 1.35vw, 20px);
   animation: reportRootIn 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
   isolation: isolate;
@@ -21,12 +21,12 @@
 
 .eyebrow {
   margin: 0 0 6px;
-  font-family: var(--font-display);
+  font-family: var(--font-case-file);
   font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.6px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--rui-gray);
+  color: var(--diet-copper);
 }
 
 .helpButtonSlot {
@@ -41,35 +41,35 @@
   position: absolute;
   inset: 0;
   z-index: 40;
-  border-radius: 999px;
-  background: rgba(25, 28, 31, 0.42);
+  border-radius: var(--diet-radius-document);
+  background: rgba(26, 20, 16, 0.42);
   pointer-events: none;
 }
 
 .helpButtonTarget {
   width: 34px;
   height: 34px;
-  border-radius: 999px;
+  border-radius: var(--diet-radius-document);
 }
 
 .helpButton {
   position: relative;
   width: 100%;
   height: 100%;
-  border: 1px solid rgba(25, 28, 31, 0.16);
-  border-radius: 999px;
-  background: var(--rui-white);
-  color: var(--rui-teal);
-  font-family: var(--font-display);
+  border: 1px solid var(--diet-file-tab);
+  border-radius: var(--diet-radius-document);
+  background: var(--diet-paper);
+  color: var(--diet-case-teal);
+  font-family: var(--font-case-file);
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 0 8px 18px rgba(25, 28, 31, 0.12);
+  box-shadow: var(--diet-shadow-paper);
 }
 
 .helpButton:hover {
-  border-color: var(--rui-teal-border);
-  background: var(--rui-teal-soft);
+  border-color: var(--diet-case-teal-border);
+  background: var(--diet-case-teal-soft);
 }
 
 .helpButton::after {
@@ -81,9 +81,9 @@
   width: max-content;
   max-width: 160px;
   padding: 7px 9px;
-  border-radius: 6px;
-  background: rgba(25, 28, 31, 0.94);
-  color: var(--rui-white);
+  border-radius: var(--diet-radius-document);
+  background: var(--diet-ink);
+  color: var(--diet-paper);
   font-family: var(--font-body);
   font-size: 12px;
   line-height: 1.2;
@@ -104,7 +104,7 @@
   font-size: clamp(19px, 1.6vw, 22px);
   font-weight: 500;
   letter-spacing: -0.01em;
-  color: var(--rui-dark);
+  color: var(--diet-ink);
 }
 
 .subtitle {
@@ -123,10 +123,10 @@
   gap: 2px;
   min-width: 160px;
   padding: 8px 12px;
-  border-radius: 16px;
+  border-radius: var(--diet-radius-document);
   border: 1px solid transparent;
   font-family: var(--font-display);
-  box-shadow: 0 8px 16px rgba(25, 28, 31, 0.08);
+  box-shadow: var(--diet-shadow-lift);
 }
 
 .overallPillSlot {
@@ -137,7 +137,7 @@
 
 .overallPillTarget {
   display: flex;
-  border-radius: 16px;
+  border-radius: var(--diet-radius-document);
 }
 
 .overallPillTarget .overallPill {
@@ -145,6 +145,7 @@
 }
 
 .overallLabel {
+  font-family: var(--font-case-file);
   font-size: 11px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -155,7 +156,7 @@
 .overallValue {
   font-size: clamp(27px, 2.4vw, 32px);
   line-height: 0.95;
-  color: var(--rui-dark);
+  color: var(--diet-ink);
 }
 
 .overallPill_good {
@@ -187,10 +188,10 @@
   min-height: 0;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  border: 1px solid var(--rui-border);
-  border-radius: 16px;
+  border: 1px solid var(--diet-file-tab);
+  border-radius: var(--diet-radius-document);
   padding: 12px;
-  background: var(--rui-white);
+  background: var(--diet-paper);
   animation: reportPanelIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -204,12 +205,12 @@
 
 .sectionEyebrow {
   margin: 0 0 8px;
-  font-family: var(--font-display);
+  font-family: var(--font-case-file);
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--rui-gray);
+  color: var(--diet-copper);
 }
 
 .zoneGrid {
@@ -225,10 +226,10 @@
   min-height: 0;
   display: grid;
   grid-template-columns: 48% 52%;
-  border: 1px solid rgba(25, 28, 31, 0.12);
-  border-radius: 14px;
+  border: 1px solid var(--diet-file-tab);
+  border-radius: var(--diet-radius-document);
   overflow: hidden;
-  background: linear-gradient(180deg, #ffffff, #f8f9fb);
+  background: var(--diet-paper);
 }
 
 .zonePhoto {
@@ -236,7 +237,7 @@
   height: 100%;
   min-height: clamp(126px, 14vh, 154px);
   object-fit: cover;
-  background: #f2f3f6;
+  background: var(--diet-paper-dark);
 }
 
 .zoneInfo {
@@ -260,7 +261,7 @@
 }
 
 .zoneLabel {
-  font-family: var(--font-display);
+  font-family: var(--font-case-file);
   font-size: 13px;
   font-weight: 600;
   line-height: 1.15;
@@ -282,7 +283,7 @@
 .zoneTrack {
   height: 3px;
   border-radius: 999px;
-  background: rgba(25, 28, 31, 0.12);
+  background: rgba(26, 20, 16, 0.12);
   overflow: hidden;
 }
 
@@ -295,14 +296,15 @@
 
 .zoneState {
   margin: 2px 0 0;
+  font-family: var(--font-case-file);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .zoneMeta {
   margin: 0;
   font-size: 11px;
-  color: var(--rui-gray);
+  color: var(--diet-ink-faded);
   font-style: italic;
 }
 
@@ -311,12 +313,12 @@
   display: grid;
   gap: 12px;
   padding: 16px;
-  border: 1px solid rgba(25, 28, 31, 0.14);
-  border-radius: 8px;
+  border: 1px solid var(--diet-file-tab);
+  border-radius: var(--diet-radius-document);
   background:
-    linear-gradient(#f8f7f3 0 0) padding-box,
-    repeating-linear-gradient(90deg, transparent 0 9px, rgba(25, 28, 31, 0.06) 9px 10px);
-  box-shadow: 0 12px 24px rgba(25, 28, 31, 0.08);
+    linear-gradient(var(--diet-paper) 0 0) padding-box,
+    repeating-linear-gradient(90deg, transparent 0 9px, rgba(26, 20, 16, 0.06) 9px 10px);
+  box-shadow: var(--diet-shadow-paper);
 }
 
 .receiptPaper::before,
@@ -326,7 +328,7 @@
   left: 12px;
   right: 12px;
   height: 1px;
-  background: repeating-linear-gradient(90deg, rgba(25, 28, 31, 0.22) 0 8px, transparent 8px 14px);
+  background: repeating-linear-gradient(90deg, rgba(26, 20, 16, 0.22) 0 8px, transparent 8px 14px);
 }
 
 .receiptPaper::before {
@@ -343,20 +345,22 @@
   justify-content: space-between;
   gap: 12px;
   padding-bottom: 10px;
-  border-bottom: 1px dashed rgba(25, 28, 31, 0.22);
-  font-family: var(--font-display);
+  border-bottom: 1px dashed var(--diet-file-tab);
+  font-family: var(--font-case-file);
   font-size: 16px;
-  color: var(--rui-dark);
+  color: var(--diet-ink);
 }
 
 .receiptStamp {
   padding: 5px 8px;
-  border: 1px solid rgba(25, 28, 31, 0.18);
-  border-radius: 999px;
-  background: var(--rui-white);
+  border: 1px solid var(--diet-file-tab);
+  border-radius: var(--diet-radius-document);
+  background: var(--diet-paper-dark);
   color: var(--rui-slate);
+  font-family: var(--font-case-file);
   font-size: 11px;
   text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
 .receiptRows {
@@ -370,15 +374,15 @@
   justify-content: space-between;
   gap: 12px;
   padding-bottom: 6px;
-  border-bottom: 1px dotted rgba(25, 28, 31, 0.2);
+  border-bottom: 1px dotted var(--diet-file-tab);
   color: var(--rui-slate);
   font-size: 13px;
 }
 
 .receiptRow strong {
-  font-family: var(--font-display);
+  font-family: var(--font-case-file);
   font-size: 15px;
-  color: var(--rui-dark);
+  color: var(--diet-ink);
 }
 
 .pillarRight {
@@ -393,7 +397,7 @@
   justify-content: center;
   width: 22px;
   height: 22px;
-  border-radius: 50%;
+  border-radius: var(--diet-radius-document);
   font-size: 12px;
   font-weight: 700;
   flex-shrink: 0;
@@ -423,42 +427,43 @@
   gap: 4px;
   padding: 12px;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--diet-radius-document);
 }
 
 .attentionBox_critical {
   border-color: rgba(220, 38, 38, 0.32);
-  background: rgba(220, 38, 38, 0.1);
+  background: rgba(220, 38, 38, 0.08);
   color: #991b1b;
 }
 
 .attentionBox_warning {
   border-color: rgba(217, 119, 6, 0.32);
-  background: rgba(217, 119, 6, 0.12);
+  background: rgba(217, 119, 6, 0.1);
   color: #92400e;
 }
 
 .attentionBox_stable {
   border-color: rgba(22, 163, 74, 0.3);
-  background: rgba(22, 163, 74, 0.1);
+  background: rgba(22, 163, 74, 0.08);
   color: #166534;
 }
 
 .attentionLabel {
-  font-family: var(--font-display);
+  font-family: var(--font-case-file);
   font-size: 11px;
   text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
 .attentionBox strong {
-  font-family: var(--font-display);
+  font-family: var(--font-case-file);
   font-size: 18px;
   line-height: 1.1;
 }
 
 .attentionBox p {
   margin: 0;
-  color: var(--rui-dark);
+  color: var(--diet-ink);
   font-size: 14px;
   line-height: 1.4;
 }
@@ -469,10 +474,11 @@
 }
 
 .receiptSectionLabel {
-  font-family: var(--font-display);
+  font-family: var(--font-case-file);
   font-size: 11px;
   text-transform: uppercase;
-  color: var(--rui-gray);
+  letter-spacing: 0.4px;
+  color: var(--diet-ink-faded);
 }
 
 .receiptSection p {
@@ -480,7 +486,7 @@
   font-family: var(--font-display);
   font-size: 18px;
   line-height: 1.25;
-  color: var(--rui-dark);
+  color: var(--diet-ink);
 }
 
 .receiptSection small {
@@ -513,7 +519,7 @@
 }
 
 .reportRootTutorialActive {
-  border-color: rgba(25, 28, 31, 0.42);
+  border-color: var(--diet-divider-light);
   animation: none;
   opacity: 1;
   transform: none;
@@ -533,30 +539,30 @@
   inset: 0;
   z-index: 40;
   border-radius: inherit;
-  background: rgba(25, 28, 31, 0.42);
+  background: rgba(26, 20, 16, 0.42);
   pointer-events: none;
 }
 
 .reportRootTutorialActive .overallPill_good {
   background:
     linear-gradient(rgba(22, 163, 74, 0.12), rgba(22, 163, 74, 0.12)),
-    var(--rui-white);
+    var(--diet-paper);
 }
 
 .reportRootTutorialActive .overallPill_mid {
   background:
     linear-gradient(rgba(217, 119, 6, 0.14), rgba(217, 119, 6, 0.14)),
-    var(--rui-white);
+    var(--diet-paper);
 }
 
 .reportRootTutorialActive .overallPill_low {
   background:
     linear-gradient(rgba(220, 38, 38, 0.12), rgba(220, 38, 38, 0.12)),
-    var(--rui-white);
+    var(--diet-paper);
 }
 
 .reportRootTutorialActive .sectionCard {
-  background: var(--rui-white);
+  background: var(--diet-paper);
 }
 
 .reportRootTutorialActive :global([class*="targetDimmed"]) {

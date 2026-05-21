@@ -1,16 +1,17 @@
 .panel {
-  background: var(--rui-surface);
-  border-radius: var(--radius-card);
+  background: var(--diet-paper);
+  border: 1px solid var(--diet-file-tab);
+  border-radius: var(--diet-radius-document);
   padding: clamp(22px, 3vw, 30px);
 }
 
 .panelEyebrow {
-  font-family: var(--font-display);
+  font-family: var(--font-case-file);
   font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.6px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--rui-gray);
+  color: var(--diet-copper);
   margin: 0 0 12px;
 }
 
@@ -20,7 +21,7 @@
   font-weight: 500;
   letter-spacing: -0.01em;
   margin: 0 0 20px;
-  color: var(--rui-dark);
+  color: var(--diet-ink);
 }
 
 .panelBody {
@@ -32,9 +33,9 @@
 }
 
 .plotCard {
-  background: var(--rui-white);
-  border: 1px solid var(--rui-border);
-  border-radius: var(--radius-card);
+  background: var(--diet-paper);
+  border: 1px solid var(--diet-file-tab);
+  border-radius: var(--diet-radius-document);
   display: grid;
   justify-items: center;
   gap: 12px;
@@ -49,16 +50,17 @@
 }
 
 .scatterStat {
+  font-family: var(--font-case-file);
   font-size: 13px;
   color: var(--rui-slate);
 }
 
 .scatterStatBad {
-  color: #e61e49;
+  color: var(--diet-alert-red);
 }
 
 .scatterStatDrop {
-  color: #8d969e;
+  color: var(--diet-ink-faded);
 }
 
 .revealReturnBtn {
@@ -68,20 +70,21 @@
   bottom: clamp(-10px, 0vw, 5px);
   z-index: 3;
   border: 0;
-  background: var(--rui-dark);
-  color: var(--rui-white);
-  font-family: var(--font-display);
+  background: var(--diet-ink);
+  color: var(--diet-paper);
+  font-family: var(--font-case-file);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.3px;
   padding: 12px 20px;
-  border-radius: 9999px;
+  border-radius: var(--diet-radius-document);
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .revealReturnBtn:hover {
-  background: var(--rui-blue);
+  background: var(--diet-copper);
   transform: translateY(-1px);
 }
 

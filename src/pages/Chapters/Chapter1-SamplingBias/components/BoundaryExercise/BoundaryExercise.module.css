@@ -5,9 +5,9 @@
   width: 100%;
   min-width: 0;
   padding: 24px;
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(25, 28, 31, 0.14);
-  border-radius: 6px;
+  background: var(--diet-paper);
+  border: 1px solid var(--diet-file-tab);
+  border-radius: var(--diet-radius-document);
 }
 
 .boundaryHeader {
@@ -28,18 +28,21 @@
   gap: 4px;
   min-width: 132px;
   padding: 10px 12px;
-  background: var(--rui-dark);
-  color: var(--rui-white);
-  border-radius: 6px;
-  font-family: var(--font-display);
+  background: var(--diet-steel);
+  color: var(--diet-cold-white);
+  border: 1px solid var(--diet-grid-line);
+  border-radius: var(--diet-radius-sharp);
+  font-family: var(--font-mono);
   font-size: 11px;
   line-height: 1.2;
   text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
 .boundaryAccuracy strong {
   font-size: 20px;
   line-height: 1;
+  color: var(--diet-holo-blue);
 }
 
 .boundaryBody {
@@ -61,12 +64,12 @@
   place-items: center;
   padding: 18px;
   background:
-    linear-gradient(90deg, rgba(25, 28, 31, 0.04) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(25, 28, 31, 0.04) 1px, transparent 1px),
-    rgba(245, 247, 250, 0.86);
+    linear-gradient(90deg, rgba(26, 20, 16, 0.04) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(26, 20, 16, 0.04) 1px, transparent 1px),
+    var(--diet-paper-dark);
   background-size: 24px 24px;
-  border: 1px solid rgba(25, 28, 31, 0.12);
-  border-radius: 6px;
+  border: 1px solid var(--diet-file-tab);
+  border-radius: var(--diet-radius-document);
   max-height: 460px;
   overflow: hidden;
 }
@@ -88,27 +91,27 @@
   display: grid;
   gap: 14px;
   padding: 18px;
-  background: rgba(244, 244, 244, 0.72);
-  border: 1px solid rgba(25, 28, 31, 0.1);
-  border-radius: 6px;
+  background: var(--diet-paper-dark);
+  border: 1px solid var(--diet-file-tab);
+  border-radius: var(--diet-radius-document);
 }
 
 .boundaryFooter {
   display: grid;
   gap: 16px;
   padding: 18px;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(25, 28, 31, 0.1);
-  border-radius: 6px;
+  background: var(--diet-paper);
+  border: 1px solid var(--diet-file-tab);
+  border-radius: var(--diet-radius-document);
 }
 
 .panelEyebrow {
-  font-family: var(--font-display);
+  font-family: var(--font-case-file);
   font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.6px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--rui-gray);
+  color: var(--diet-copper);
   margin: 0 0 12px;
 }
 
@@ -118,7 +121,7 @@
   font-weight: 500;
   letter-spacing: -0.01em;
   margin: 0 0 20px;
-  color: var(--rui-dark);
+  color: var(--diet-ink);
 }
 
 .boundaryPlot .scatter {
@@ -128,7 +131,7 @@
 }
 
 .sliderLabel {
-  font-family: var(--font-display);
+  font-family: var(--font-case-file);
   font-size: 13px;
   font-weight: 500;
   color: var(--rui-slate);
@@ -138,7 +141,7 @@
   appearance: none;
   width: 100%;
   height: 4px;
-  background: var(--rui-border);
+  background: var(--diet-file-tab);
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -148,19 +151,19 @@
   appearance: none;
   width: 16px;
   height: 16px;
-  background: var(--rui-dark);
+  background: var(--diet-ink);
   border-radius: 50%;
   cursor: grab;
   transition: background 0.15s ease;
 }
 
-.sliderInput::-webkit-slider-thumb:active { cursor: grabbing; background: var(--rui-blue); }
+.sliderInput::-webkit-slider-thumb:active { cursor: grabbing; background: var(--diet-amber); }
 
 .sliderValue {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 500;
-  color: var(--rui-dark);
+  color: var(--diet-ink);
   text-align: right;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -192,7 +195,7 @@
   height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
-  border: 1.5px solid #191c1f;
+  border: 1.5px solid var(--diet-ink);
   background: transparent;
 }
 
@@ -202,7 +205,7 @@
   gap: 16px;
   margin-top: 0;
   padding-top: 18px;
-  border-top: 1px solid rgba(25, 28, 31, 0.12);
+  border-top: 1px solid var(--diet-divider-light);
 }
 
 .sheetSubmitHint {
@@ -216,19 +219,20 @@
   margin: 6px 0 0;
   font-size: 13px;
   line-height: 1.4;
-  color: #dc2626;
+  color: var(--diet-alert-red);
 }
 
 .sheetSubmitBtn {
   appearance: none;
   border: 0;
-  background: var(--rui-dark);
-  color: var(--rui-white);
-  font-family: var(--font-display);
+  background: var(--diet-ink);
+  color: var(--diet-paper);
+  font-family: var(--font-case-file);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.3px;
   padding: 12px 20px;
-  border-radius: 9999px;
+  border-radius: var(--diet-radius-document);
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.2s ease, transform 0.2s ease;
@@ -236,7 +240,7 @@
 }
 
 .sheetSubmitBtn:hover {
-  background: var(--rui-blue);
+  background: var(--diet-copper);
   transform: translateY(-1px);
 }
 
