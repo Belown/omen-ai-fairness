@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import Button from "../../components/Button/Button";
-import { SCENE_IMAGES } from "../../assets/image/image";
+import { CASE_ROOM_IMAGE } from "../../assets/image/image";
+import { portraits } from "../../assets/detective/portraits";
 import styles from "./Landing.module.css";
 
 type Chapter = {
@@ -51,12 +52,22 @@ const SECTIONS = [
   { label: "Case status", id: "case-status" },
 ];
 
-const NAV_OFFSET = 88;
 const SCROLL_DURATION_MS = 760;
 const WHEEL_COOLDOWN_MS = 120;
 
 const easeInOutCubic = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+const getNavOffset = () => {
+  const nav = document.querySelector<HTMLElement>("header");
+  return nav?.getBoundingClientRect().height ?? 76;
+};
+
+const getCenteredSectionTop = (section: HTMLElement) => {
+  const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+
+  return Math.max(0, sectionTop - getNavOffset());
+};
 
 export default function Landing() {
   const animationFrameRef = useRef<number | null>(null);
@@ -68,6 +79,12 @@ export default function Landing() {
   useEffect(() => {
     document.documentElement.classList.add("landingPagedScroll");
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const syncNavHeight = () => {
+      const height = getNavOffset();
+      document.documentElement.style.setProperty("--nav-height", `${height}px`);
+    };
+    syncNavHeight();
 
     const armWheelCooldown = (extraDelay: number) => {
       if (wheelCooldownTimerRef.current !== null) {
@@ -81,9 +98,7 @@ export default function Landing() {
     };
 
     const getSectionTargets = () =>
-      Array.from(document.querySelectorAll<HTMLElement>(`.${styles.pageSection}`)).map((section) =>
-        Math.max(0, section.getBoundingClientRect().top + window.scrollY - NAV_OFFSET),
-      );
+      Array.from(document.querySelectorAll<HTMLElement>(`.${styles.pageSection}`)).map(getCenteredSectionTop);
 
     const getCurrentSectionIndex = (targets: number[], currentY = window.scrollY) =>
       targets.reduce((bestIndex, target, nextIndex) => {
@@ -163,13 +178,16 @@ export default function Landing() {
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("scroll", updateActiveSection, { passive: true });
     window.addEventListener("resize", updateActiveSection);
+    window.addEventListener("resize", syncNavHeight);
     updateActiveSection();
 
     return () => {
       document.documentElement.classList.remove("landingPagedScroll");
+      document.documentElement.style.removeProperty("--nav-height");
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("scroll", updateActiveSection);
       window.removeEventListener("resize", updateActiveSection);
+      window.removeEventListener("resize", syncNavHeight);
       if (wheelCooldownTimerRef.current !== null) {
         window.clearTimeout(wheelCooldownTimerRef.current);
       }
@@ -196,7 +214,7 @@ export default function Landing() {
 
                 const target = document.getElementById(section.id);
                 if (!target) return;
-                const top = Math.max(0, target.getBoundingClientRect().top + window.scrollY - NAV_OFFSET);
+                const top = getCenteredSectionTop(target);
                 const start = window.scrollY;
                 const distance = top - start;
                 const startTime = performance.now();
@@ -231,18 +249,20 @@ export default function Landing() {
         </nav>
 
         <section className={`${styles.hero} ${styles.pageSection}`}>
+          <img className={styles.heroBackdrop} src={CASE_ROOM_IMAGE} alt="" aria-hidden="true" />
+          <div className={styles.heroShade} aria-hidden="true" />
           <div className={styles.text}>
             <p className="eyebrow">Case file: Novus AI justice system</p>
             <h1 className={styles.display}>Θmen</h1>
             <p className={styles.lede}>
               A future court trusts an AI to decide who is dangerous. When the
-              machine condemns someone close to you, the only way forward is
-              back: before the data was collected, before fairness was defined,
+              machine condemns your apprentice, the only way forward is back:
+              before the data was collected, before fairness was defined,
               before human feedback became machine judgment.
             </p>
             <div className={styles.ctaRow}>
               <Button variant="primary" to="/chapters?intro=story" id="start">
-                Start investigation
+                Start Investigation
               </Button>
               <Button variant="outline" href="#chapters">
                 Review chapters
@@ -250,15 +270,34 @@ export default function Landing() {
             </div>
           </div>
 
-          <figure className={styles.heroMedia}>
-            <img
-              src={SCENE_IMAGES[7]}
-              alt="A detective stands before a time machine in the city of Novus."
-            />
-            <figcaption className={styles.mediaCaption}>
-              Back to before bias became a verdict.
-            </figcaption>
-          </figure>
+          <aside className={styles.caseConsole} aria-label="Current case status">
+            <div className={styles.verdictPanel}>
+              <span className={styles.verdictKicker}>AI justice output</span>
+              <strong>HIGH RISK</strong>
+              <p>Context missing: coercion, intent, and the stranger who planted the device.</p>
+            </div>
+            <div className={styles.detectivePanel}>
+              <img src={portraits.angry} alt="The detective reacts to the AI verdict." />
+              <div>
+                <span>Detective status</span>
+                <p>The machine saw a pattern. The case file shows a person.</p>
+              </div>
+            </div>
+            <dl className={styles.caseStats}>
+              <div>
+                <dt>City</dt>
+                <dd>Novus</dd>
+              </div>
+              <div>
+                <dt>Verdict</dt>
+                <dd>Contested</dd>
+              </div>
+              <div>
+                <dt>Window</dt>
+                <dd>Pre-deployment</dd>
+              </div>
+            </dl>
+          </aside>
         </section>
 
         <section className={`${styles.concept_section} ${styles.pageSection}`} id="concept">
@@ -272,6 +311,12 @@ export default function Landing() {
               asked to follow, and the human feedback that taught the model
               what counts as good.
             </p>
+            <div className={styles.pipeline}>
+              <span>Data</span>
+              <span>Fairness rule</span>
+              <span>Human feedback</span>
+              <span>Verdict</span>
+            </div>
           </div>
         </section>
 

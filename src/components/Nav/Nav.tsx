@@ -4,7 +4,12 @@ import Button from "../Button/Button";
 import Logo from "../Logo/Logo";
 import styles from "./Nav.module.css";
 
-const NAV_OFFSET = 88;
+const getCenteredSectionTop = (target: HTMLElement) => {
+  const targetTop = target.getBoundingClientRect().top + window.scrollY;
+  const navHeight = document.querySelector<HTMLElement>("header")?.getBoundingClientRect().height ?? 76;
+
+  return Math.max(0, targetTop - navHeight);
+};
 
 export default function Nav() {
   const location = useLocation();
@@ -24,7 +29,7 @@ export default function Nav() {
 
     event.preventDefault();
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const top = Math.max(0, target.getBoundingClientRect().top + window.scrollY - NAV_OFFSET);
+    const top = getCenteredSectionTop(target);
 
     window.history.pushState(null, "", `#${id}`);
     window.scrollTo({

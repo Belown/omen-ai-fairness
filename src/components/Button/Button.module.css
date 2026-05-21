@@ -31,12 +31,23 @@
 }
 
 .primary {
-  background: var(--rui-dark);
-  color: var(--rui-white);
+  background:
+    linear-gradient(180deg, #f0a23a, var(--diet-amber));
+  color: var(--diet-ink);
+  border-color: rgba(255, 188, 86, 0.72);
+  box-shadow:
+    0 0 0 1px rgba(10, 14, 20, 0.28),
+    0 0 22px rgba(199, 125, 32, 0.34),
+    0 12px 28px rgba(0, 0, 0, 0.32);
 }
 
 .primary:hover {
-  background: #2a2018;
+  background:
+    linear-gradient(180deg, #ffb24a, #d88927);
+  box-shadow:
+    0 0 0 1px rgba(255, 188, 86, 0.64),
+    0 0 34px rgba(199, 125, 32, 0.48),
+    0 16px 34px rgba(0, 0, 0, 0.38);
 }
 
 .outline {
@@ -56,12 +67,12 @@
 
 .ghostDark {
   background: transparent;
-  color: var(--rui-dark);
+  color: var(--diet-cold-white);
   padding: 14px 20px;
 }
 
 .ghostDark:hover {
-  background: rgba(212, 197, 169, 0.42);
+  background: rgba(77, 201, 246, 0.08);
   opacity: 1;
 }
 

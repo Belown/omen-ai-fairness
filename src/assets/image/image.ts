@@ -26,6 +26,7 @@ import p1000 from "./P1000.png";
 import routineIcon from "./routine.png";
 import phoneIcon from "./phone.png";
 import policeIcon from "./police.png";
+import caseRoom from "./caseroom.jpeg";
 import chapter1CaseRoom from "./Chapter1/chapter1_case_room.png";
 
 export const ZONE_VISUALS = [
@@ -68,3 +69,5 @@ export const QUESTION_IMAGES = {
 export const CHAPTER1_BACKGROUNDS = {
   caseRoom: chapter1CaseRoom,
 } as const;
+
+export const CASE_ROOM_IMAGE = caseRoom;

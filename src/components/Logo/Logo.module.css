@@ -3,7 +3,7 @@
   font-size: 22px;
   font-weight: 700;
   letter-spacing: 0.5px;
-  color: var(--rui-dark);
+  color: var(--diet-paper);
   position: relative;
   display: inline-block;
 }
@@ -45,4 +45,5 @@
 .mark {
   font-weight: 800;
   margin-right: 1px;
+  color: var(--diet-holo-blue);
 }

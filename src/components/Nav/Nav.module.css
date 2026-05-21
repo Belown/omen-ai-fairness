@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 18px var(--gutter);
-  background: rgba(245, 240, 232, 0.92);
+  background: rgba(10, 14, 20, 0.82);
   backdrop-filter: saturate(140%) blur(14px);
   -webkit-backdrop-filter: saturate(140%) blur(14px);
   border-bottom: 1px solid transparent;
@@ -14,8 +14,8 @@
 }
 
 .scrolled {
-  border-bottom-color: var(--diet-file-tab);
-  box-shadow: var(--diet-shadow-paper);
+  border-bottom-color: rgba(77, 201, 246, 0.18);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
 }
 
 .links {
@@ -28,12 +28,12 @@
 }
 
 .links a {
-  color: var(--diet-ink-faded);
+  color: rgba(220, 230, 240, 0.72);
   transition: color 0.2s ease;
 }
 
 .links a:hover {
-  color: var(--diet-ink);
+  color: var(--diet-cold-white);
 }
 
 .cta {
