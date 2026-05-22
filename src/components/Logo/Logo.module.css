@@ -47,6 +47,6 @@
 .mark {
   font-weight: 800;
   margin-right: 1px;
-  color: var(--diet-holo-blue);
-  text-shadow: 0 0 14px rgba(77, 201, 246, 0.42);
+  color: var(--diet-amber);
+  text-shadow: 0 0 14px rgba(199, 125, 32, 0.42);
 }
