@@ -19,19 +19,19 @@ export const STORY_SCENES = [
     image: SCENE_IMAGES[1],
     audio: SCENE_AUDIO[1],
     title: "Scene 2",
-    text: "In one quiet corner of the city, a private detective lives a peaceful life. By his side are only a loyal dog and a young apprentice. They do not have a luxurious office or world-shaking cases. But in an age ruled by machines, this small home still holds a little warmth.",
+    text: "In one quiet corner of the city, a private detective lives a peaceful life. By his side is only a young apprentice. They do not have a luxurious office or world-shaking cases. But in an age ruled by machines, this small home still holds a little warmth.",
   },
   {
     image: SCENE_IMAGES[2],
     audio: SCENE_AUDIO[2],
     title: "Scene 3",
-    text: "Until one ordinary morning, the doorbell rings. The sound is short and cold, as if fate itself is knocking. Police officers are standing outside. They offer little explanation and say only one thing: the apprentice has been accused of helping steal confidential government documents.",
+    text: "Until one ordinary evening, the doorbell rings. The sound is short and cold, as if fate itself is knocking. Police officers are standing outside. They offer little explanation and say only one thing: the apprentice has been accused of helping steal confidential government informations.",
   },
   {
     image: SCENE_IMAGES[3],
     audio: SCENE_AUDIO[3],
     title: "Scene 4",
-    text: "The apprentice says he knows nothing. A stranger simply gave him a little money and asked him to slip a small device into a businessman's pocket. He thought it was just a strange errand, a harmless little task. But he did not know he had already been pulled into a much larger conspiracy.",
+    text: "The apprentice says he knows nothing. A stranger simply gave him a little candy and asked him to slip it into a businessman's pocket. He thought it was just a candid prank, a harmless little joke. But he did not know he had already been pulled into a much larger conspiracy.",
   },
   {
     image: SCENE_IMAGES[4],
@@ -43,7 +43,7 @@ export const STORY_SCENES = [
     image: SCENE_IMAGES[5],
     audio: SCENE_AUDIO[5],
     title: "Scene 6",
-    text: "In court, the detective desperately tries to explain. He presents evidence, tells the story, and tries to make people see what happened. But before the judge, a human voice seems too slow, too fragile. The AI's judgment is clean, fast, and certain. At last, the gavel falls. Not because the truth has been seen, but because the machine has made its decision.",
+    text: "At the courthouse, the detective desperately tries to explain. He presents evidence, tells the story, and tries to make people see what happened. But nobody is here to hear the truth, only the machine runs the department. The AI's judgment is clean, fast, and definitive. At last, the gavel falls. Not because the truth has been seen, but because the machine has made its decision.",
   },
   {
     image: SCENE_IMAGES[6],
@@ -55,7 +55,7 @@ export const STORY_SCENES = [
     image: SCENE_IMAGES[7],
     audio: SCENE_AUDIO[7],
     title: "Scene 8",
-    text: "Just as he is about to give up, a stranger appears at the door. He carries a machine that should not exist, and a hope that sounds almost impossible. 'I cannot change the verdict now,' he says. 'But I can send you back to before it all happened.' Back to before the AI was deployed. Back to before bias became a verdict. Back to the moment when the future can still be changed.",
+    text: "Just as he is about to give up, a stranger appears at the door. He carries a laptop and talk about a machine that should not exist, and a hope that sounds almost impossible. 'I cannot change the verdict now,' he says. 'But with my time machine, I can send you back to before it all happened.' Back to before the AI was deployed. Back to before bias became a verdict. Back to the moment when the future can still be changed.",
   },
   {
     image: SCENE_IMAGES[8],
