@@ -295,37 +295,44 @@
   display: flex;
   flex-direction: column;
   margin: 0;
-  padding: 0;
+  padding: 20px 28px;
   list-style: none;
-  border-top: 1px solid var(--rui-border);
+  background: var(--rui-surface);
+  border: 1px solid var(--rui-border);
+  border-radius: var(--radius-card);
 }
 
 .takeaway {
   display: grid;
-  grid-template-columns: 36px 1fr;
+  grid-template-columns: 40px 1fr;
   gap: 20px;
   padding: 18px 0;
   border-bottom: 1px solid var(--rui-border);
   align-items: start;
 }
 
+.takeaway:last-child {
+  border-bottom: none;
+}
+
 .takeawayNum {
   font-family: var(--font-display);
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--rui-blue);
   font-variant-numeric: tabular-nums;
   margin: 0;
 }
 
 .takeawayText {
-  font-size: 15.5px;
-  line-height: 1.6;
+  font-size: 16px;
+  line-height: 1.65;
   color: var(--rui-dark);
   margin: 0;
 }
 
-.takeawayText strong { font-weight: 600; }
+.takeawayText strong { font-weight: 700; color: var(--rui-dark); }
+.takeawayText em { color: var(--rui-dark); }
 
 /* ---------- References ---------- */
 
