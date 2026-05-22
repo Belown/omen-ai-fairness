@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Chatbox from "../../../components/Chatbox/Chatbox";
 import { portraits } from "../../../assets/detective/portraits";
-import { CHAPTER1_BACKGROUNDS } from "../../../assets/image/image";
 import styles from "./Chapter2COMPAS.module.css";
 import { INTRO_CHUNKS, MAX_CURRENT_DAY, STARTING_BUDGET, STUDY_METRICS, type FairnessDefinitionId, type StudyMetricId } from "./chapter2Data";
 import {
@@ -172,12 +171,6 @@ export default function Chapter2COMPAS({ isActive: _isActive = true, onChapterCo
 
   const portraitSrc = useMemo(() => getPortrait(narrativeText), [narrativeText]);
 
-  const chapterBackground = useMemo(() => {
-    return CHAPTER1_BACKGROUNDS.caseRoom;
-  }, []);
-
-  const phaseStyle = { "--chapter-bg": `url(${chapterBackground})` } as CSSProperties;
-
   const dialogueHistory = useMemo(
     () => [{ text: narrativeText, passageId: `${phase}-${currentDay}`, current: true }],
     [narrativeText, phase, currentDay],
@@ -256,7 +249,7 @@ export default function Chapter2COMPAS({ isActive: _isActive = true, onChapterCo
     ) : null;
 
   return (
-    <div className={`${styles.phase} ${styles.phaseWithBackground}`} style={phaseStyle}>
+    <div className={styles.phase}>
       <div className={styles.scene}>
         <div className={styles.sceneInner}>
           {gamePanel}
