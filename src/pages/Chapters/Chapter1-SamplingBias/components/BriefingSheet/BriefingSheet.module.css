@@ -23,7 +23,7 @@
 .sheetPopupLayer {
   position: fixed;
   inset: 0;
-  z-index: 35;
+  z-index: 60;
   display: grid;
   place-items: center;
   padding: clamp(54px, 7vh, 82px) clamp(12px, 2.5vw, 34px) clamp(18px, 3vh, 34px);
