@@ -226,7 +226,6 @@ function profileForMetric(
   workNightIndex: number,
   seed: number,
   dailySatisfaction: SatisfactionScores,
-  options?: { applySwitchPenalty?: boolean },
 ): MetricProfile {
   const s = seed;
 
@@ -380,10 +379,9 @@ export function generateStudyResult(
   workNightIndex: number,
   launchIndex: number,
   dailySatisfaction: SatisfactionScores,
-  options?: { applySwitchPenalty?: boolean },
 ): StudyResult {
   const seed = studySeed(workNightIndex, metricId, launchIndex, fairness);
-  const p = profileForMetric(metricId, fairness, workNightIndex, seed, dailySatisfaction, options);
+  const p = profileForMetric(metricId, fairness, workNightIndex, seed, dailySatisfaction);
   return { metricId, ...p };
 }
 
@@ -392,9 +390,8 @@ export function resolveDayStudies(
   metricActive: FairnessDefinitionId,
   workNightIndex: number,
   dailySatisfaction: SatisfactionScores,
-  options?: { applySwitchPenalty?: boolean },
 ): StudyResult[] {
   return studiesQueued.map((metricId, launchIndex) =>
-    generateStudyResult(metricId, metricActive, workNightIndex, launchIndex, dailySatisfaction, options),
+    generateStudyResult(metricId, metricActive, workNightIndex, launchIndex, dailySatisfaction),
   );
 }

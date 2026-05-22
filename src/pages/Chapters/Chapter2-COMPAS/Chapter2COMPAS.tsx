@@ -117,7 +117,6 @@ export default function Chapter2COMPAS({ isActive: _isActive = true, onChapterCo
       record.metricActive,
       record.day,
       dailySat,
-      { applySwitchPenalty },
     );
 
     const completedRecord: DayRecord = {
@@ -174,10 +173,8 @@ export default function Chapter2COMPAS({ isActive: _isActive = true, onChapterCo
   const portraitSrc = useMemo(() => getPortrait(narrativeText), [narrativeText]);
 
   const chapterBackground = useMemo(() => {
-    if (phase === "game") return CHAPTER1_BACKGROUNDS.cityMapTable;
-    if (phase === "end") return CHAPTER1_BACKGROUNDS.modelTraining;
     return CHAPTER1_BACKGROUNDS.caseRoom;
-  }, [phase]);
+  }, []);
 
   const phaseStyle = { "--chapter-bg": `url(${chapterBackground})` } as CSSProperties;
 
