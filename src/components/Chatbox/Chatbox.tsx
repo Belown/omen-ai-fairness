@@ -42,7 +42,7 @@ export default function Chatbox({
   onCollapsedChange,
   onTextComplete,
   autoCollapseOnTextComplete = false,
-  speakerName = "Detective",
+  speakerName = "Whiskers Holmes",
   disableKeyboardAdvance = false,
   disablePreviousNavigation = false,
   forceOpen = false,
