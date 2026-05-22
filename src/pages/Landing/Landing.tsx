@@ -274,7 +274,7 @@ export default function Landing() {
             <div className={styles.verdictPanel}>
               <span className={styles.verdictKicker}>AI justice output</span>
               <strong>HIGH RISK</strong>
-              <p>Context missing: coercion, intent, and the stranger who planted the device.</p>
+              <p>Context missing: coercion, intent.</p>
             </div>
             <div className={styles.detectivePanel}>
               <img src={portraits.angry} alt="The detective reacts to the AI verdict." />
