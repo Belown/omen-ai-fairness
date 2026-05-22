@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useSearchParams } from "react-router-dom";
 import Chatbox from "../../../components/Chatbox/Chatbox";
 import { portraits } from "../../../assets/detective/portraits";
@@ -35,7 +35,12 @@ function queueCost(queue: StudyMetricId[]) {
   return queue.reduce((sum, id) => sum + (STUDY_METRICS.find((m) => m.id === id)?.cost ?? 0), 0);
 }
 
-export default function Chapter2COMPAS() {
+type Chapter2COMPASProps = {
+  isActive?: boolean;
+  onChapterComplete?: (result: { completed: boolean; passed: boolean; scoreLabel?: string }) => void;
+};
+
+export default function Chapter2COMPAS({ isActive: _isActive = true, onChapterComplete }: Chapter2COMPASProps = {}) {
   const [, setSearchParams] = useSearchParams();
   const [phase, setPhase] = useState<Phase>("intro");
   const [introIndex, setIntroIndex] = useState(0);
@@ -133,6 +138,13 @@ export default function Chapter2COMPAS() {
   const confirmEnding = () => {
     setPhase("end");
   };
+
+  const hasReportedCompletionRef = useRef(false);
+  useEffect(() => {
+    if (phase !== "end" || hasReportedCompletionRef.current) return;
+    hasReportedCompletionRef.current = true;
+    onChapterComplete?.({ completed: true, passed: true, scoreLabel: fairnessMetric });
+  }, [phase, fairnessMetric, onChapterComplete]);
 
   const resetGame = () => {
     setPhase("intro");

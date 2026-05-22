@@ -472,7 +472,7 @@ export default function Chapter1SamplingBias({
 
       <div className={styles.scene}>
         <div className={styles.sceneInner}>
-          {characterContent}
+          {isActive && characterContent}
         </div>
       </div>
 
