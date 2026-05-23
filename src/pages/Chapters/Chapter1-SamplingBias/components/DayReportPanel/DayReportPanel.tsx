@@ -128,10 +128,6 @@ export default function DayReportPanel({
     () => REGIONS.filter((_, i) => (regionAccs[i] ?? 0) < 0.6).map((r) => districtName(r.label)),
     [regionAccs],
   );
-  const unseenZones = useMemo(
-    () => REGIONS.filter((_, i) => !sampledFlags[i]).map((r) => districtName(r.label)),
-    [sampledFlags],
-  );
 
   // ── Three-pillar check ───────────────────────────────────────────────────────
   type PillarStatus = "pass" | "partial" | "fail";
@@ -200,30 +196,26 @@ export default function DayReportPanel({
   const coverageHint =
     hintSampledCount === 4
       ? "All 4 districts sampled — full city coverage."
-      : sampledCount >= 2
-        ? `${unseenZones.join(", ")} unsampled. Adding more zones helps the model generalise across the city.`
+      : hintSampledCount >= 2
+        ? `${hintUnseenZones.join(", ")} unsampled. Adding more zones helps the model generalise across the city.`
         : "Only 1 district sampled — the model sees a single slice of the city. Expand to at least 2 zones.";
 
   const sampleHint =
-    sampleStatus === "pass"
+    hintSampleStatus === "pass"
       ? "High sample volume — 1000-tier reached. Strongest possible evidence base."
-      : sampleStatus === "partial"
+      : hintSampleStatus === "partial"
         ? "500-tier samples — solid, but 1000 per zone is optimal if IP allows."
         : "Only 100-tier samples detected. Increase to 500 or 1000 per zone for reliable evidence.";
 
   const signalHint = (() => {
-    if (usedRoutine && !usedPhone && !usedPolice)
+    if (hintUsedRoutine && !hintUsedPhone && !hintUsedPolice)
       return "Daily Routine selected — the most useful signal for this model. Keep it.";
-    if (usedRoutine && (usedPhone || usedPolice))
+    if (hintUsedRoutine && (hintUsedPhone || hintUsedPolice))
       return "Daily Routine helps, but Phone Model and Police Stops add noise or bias. Drop them for more budget.";
-    if (!usedRoutine && (usedPhone || usedPolice))
+    if (!hintUsedRoutine && (hintUsedPhone || hintUsedPolice))
       return "Phone Model / Police Stops add noise without the right signal. Swap for Daily Routine instead.";
     return "No optional signals added. Daily Routine is the strongest available feature — include it next day.";
   })();
-  const signalStatus: PillarStatus =
-    usedRoutine && !usedPhone && !usedPolice ? "pass"
-    : usedRoutine || usedPhone || usedPolice ? "partial"
-    : "fail";
 
   const suggestedActions = useMemo(() => {
     if (dayNumber === 3) {
@@ -365,42 +357,42 @@ export default function DayReportPanel({
             </div>
 
             <div className={styles.hintStack}>
-              <div className={`${styles.hintRow} ${styles[`hintRow_${coverageStatus}`]}`}>
-                <span className={`${styles.pillarBadge} ${styles[`pillarBadge_${coverageStatus}`]}`}>
-                  {pillarIcon(coverageStatus)}
+              <div className={`${styles.hintRow} ${styles[`hintRow_${hintCoverageStatus}`]}`}>
+                <span className={`${styles.pillarBadge} ${styles[`pillarBadge_${hintCoverageStatus}`]}`}>
+                  {pillarIcon(hintCoverageStatus)}
                 </span>
                 <div>
                   <strong>Coverage</strong>
                   <p>{coverageHint}</p>
                 </div>
               </div>
-              <div className={`${styles.hintRow} ${styles[`hintRow_${sampleStatus}`]}`}>
-                <span className={`${styles.pillarBadge} ${styles[`pillarBadge_${sampleStatus}`]}`}>
-                  {pillarIcon(sampleStatus)}
+              <div className={`${styles.hintRow} ${styles[`hintRow_${hintSampleStatus}`]}`}>
+                <span className={`${styles.pillarBadge} ${styles[`pillarBadge_${hintSampleStatus}`]}`}>
+                  {pillarIcon(hintSampleStatus)}
                 </span>
                 <div>
                   <strong>Sample size</strong>
                   <p>{sampleHint}</p>
                 </div>
               </div>
-              <div className={`${styles.hintRow} ${styles[`hintRow_${signalStatus}`]}`}>
-                <span className={`${styles.pillarBadge} ${styles[`pillarBadge_${signalStatus}`]}`}>
-                  {pillarIcon(signalStatus)}
+              <div className={`${styles.hintRow} ${styles[`hintRow_${hintSignalStatus}`]}`}>
+                <span className={`${styles.pillarBadge} ${styles[`pillarBadge_${hintSignalStatus}`]}`}>
+                  {pillarIcon(hintSignalStatus)}
                 </span>
                 <div>
                   <strong>Signals</strong>
-                  {!usedRoutine && !usedPhone && !usedPolice ? (
+                  {!hintUsedRoutine && !hintUsedPhone && !hintUsedPolice ? (
                     <p>{signalHint}</p>
                   ) : (
                     <>
                       <div className={styles.signalTagRow}>
-                        {usedRoutine && (
+                        {hintUsedRoutine && (
                           <span className={styles.signalTagCorrect}>✓ Daily Routine</span>
                         )}
-                        {usedPhone && (
+                        {hintUsedPhone && (
                           <span className={styles.signalTagNoise}>⚡ Phone Model — noise</span>
                         )}
-                        {usedPolice && (
+                        {hintUsedPolice && (
                           <span className={styles.signalTagBias}>⚠ Past Police Stops — bias</span>
                         )}
                       </div>

@@ -98,6 +98,7 @@ export default function Chapter1SamplingBias({
     otherCityAccs,
     overallAcc,
     dayAccs,
+    dayStrategies,
     otherCityOvr,
     currentPlans,
     spentToday,
@@ -391,6 +392,11 @@ export default function Chapter1SamplingBias({
             usefulSignal={strategy.usefulSignal}
             noiseSignal={strategy.noiseSignal}
             biasSignal={strategy.biasSignal}
+            todaySampledFlags={dayStrategies[0]?.sampledFlags}
+            todayZoneSamples={dayStrategies[0]?.zoneSamples}
+            todayUsefulSignal={dayStrategies[0]?.usefulSignal}
+            todayNoiseSignal={dayStrategies[0]?.noiseSignal}
+            todayBiasSignal={dayStrategies[0]?.biasSignal}
             continueLabel={passageChoices[0]?.label}
             onContinue={handleReportContinue}
             tutorialEnabled={!hasCompletedDayReportTutorial}
@@ -412,6 +418,11 @@ export default function Chapter1SamplingBias({
             usefulSignal={strategy.usefulSignal}
             noiseSignal={strategy.noiseSignal}
             biasSignal={strategy.biasSignal}
+            todaySampledFlags={dayStrategies[1]?.sampledFlags}
+            todayZoneSamples={dayStrategies[1]?.zoneSamples}
+            todayUsefulSignal={dayStrategies[1]?.usefulSignal}
+            todayNoiseSignal={dayStrategies[1]?.noiseSignal}
+            todayBiasSignal={dayStrategies[1]?.biasSignal}
             continueLabel={passageChoices[0]?.label}
             onContinue={handleReportContinue}
             tutorialDebugEnabled={tutorialDebugEnabled}
@@ -431,6 +442,11 @@ export default function Chapter1SamplingBias({
             usefulSignal={strategy.usefulSignal}
             noiseSignal={strategy.noiseSignal}
             biasSignal={strategy.biasSignal}
+            todaySampledFlags={dayStrategies[2]?.sampledFlags}
+            todayZoneSamples={dayStrategies[2]?.zoneSamples}
+            todayUsefulSignal={dayStrategies[2]?.usefulSignal}
+            todayNoiseSignal={dayStrategies[2]?.noiseSignal}
+            todayBiasSignal={dayStrategies[2]?.biasSignal}
             continueLabel={passageChoices[0]?.label}
             onContinue={handleReportContinue}
             tutorialDebugEnabled={tutorialDebugEnabled}
