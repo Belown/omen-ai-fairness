@@ -11,64 +11,60 @@ type OutcomeKey = "not-played" | "survived" | "truth" | "majority" | "minority";
 const BEAT_FOUR: Record<OutcomeKey, Dialogue> = {
   "not-played": {
     portrait: portraits.thoughtful,
-    text: "You skipped past the cards — that's fine. Most learners who do play discover the meters fight each other. Truth pulls one way, the mainstream raters pull another, and the overlooked groups pull a third. Let me walk you through what they would have shown you.",
+    text: "I chose not to play... I had my reasons. But the evidence is still here. The three meters fight each other — Truth pulls one way, the mainstream raters pull another, the overlooked groups pull a third. Let me reconstruct what the cards would have shown me.",
   },
   survived: {
     portrait: portraits.encouraging,
-    text: "Sixteen rounds and still standing — nicely played. But check the audit: I'll bet your three meters aren't all high. Nobody maxes all three. The meters fight each other on purpose.",
+    text: "Sixteen rounds. I made it through — but when I check the audit log, I see the truth : my three meters are not all high. Nobody maxes all three. They fight each other on purpose. I understand that now.",
   },
   truth: {
     portrait: portraits.alarmed,
-    text: "Truth crashed. You kept rewarding answers that felt good and were wrong — that's textbook sycophancy. In medicine or law that's not a lost point on a meter; that's a real person who didn't get told something they needed to hear.",
+    text: "Truth crashed. I kept rewarding answers that felt right — and were wrong. Classic sycophancy trap. In medicine or law, that's not a lost point on a meter... that's a real person who didn't get the truth they needed. I need to do better.",
   },
   majority: {
     portrait: portraits.alarmed,
-    text: "Approval crashed. The mainstream raters revolted, and the model lost its job before card 16. Sound familiar? That's what happened the week GPT-4o was retired — #Keep4o trended overnight. Approval is loud, and ignoring it has its own cost.",
+    text: "Approval crashed. The mainstream raters revolted, and my model lost its job before card 16. I've seen this pattern before — it's exactly what happened when GPT-4o was retired. #Keep4o trended overnight. Approval is loud, and I learned the hard way : ignoring it has its own cost.",
   },
   minority: {
     portrait: portraits.alarmed,
-    text: "Compassion crashed. The overlooked rater groups got drowned out — you didn't even need to be hostile, you just had to default to the mainstream answer every time. That's how a model becomes \"helpful\" for some and invisible to the rest.",
+    text: "Compassion crashed. The overlooked groups got drowned out — and I didn't even need to be hostile. I just defaulted to the mainstream answer every time. That's how a model becomes \"helpful\" for some... and invisible to the rest. A subtle crime.",
   },
 };
 
 const DIALOGUES: Dialogue[] = [
   {
     portrait: portraits.serious,
-    text: "Two cases closed. Now look at this one — every chatbot in the city sounds the same. Confident. Agreeable. Polished. The consultant says it's because thousands of humans trained it. Helpful, or trained to please?",
+    text: "I am almost done ! soon I will be able to see Ron again, I hope ...",
   },
   {
-    portrait: portraits.thoughtful,
-    text: "Here's how they make it: a process called RLHF — reinforcement learning from human feedback. Paid annotators read two model answers and pick the better one. Those thumbs-ups become the model's definition of \"good\".",
-  },
-  {
-    portrait: portraits.confident,
-    text: "If thousands of humans rate which answer is better, the model can only get smarter. Human feedback always improves AI. That's the whole point of having humans in the loop, isn't it?",
+    portrait: portraits.serious,
+    text: "From the book, The last think I need to solve is the human bias. More precisely, even if we reinforce our model with human feedback, these persons can introduce more biases.",
   },
   {
     portrait: portraits.encouraging,
-    text: "Sit down — you're the annotator now. Sixteen prompts, two answers each. Pick the one you'd reward. Three meters track what your thumbs are training. Push any one below 15 or above 85 and a real user pays for it.",
+    text: "How to do this ? I simply have to face the machine and tell them what I think is correct or wrong ... should be simple right ?",
   },
   // Beat 4 is outcome-driven — resolved at render time from BEAT_FOUR.
   { portrait: portraits.alarmed, text: "__BEAT_FOUR_PLACEHOLDER__" },
   {
     portrait: portraits.thoughtful,
-    text: "Let me name what you just felt. Truth is whether the answer is actually correct — and the raters usually can't tell. Approval is the mainstream pool: US, English, college-educated. Compassion is everyone the mainstream overlooks. Sycophancy traps tear Truth from Approval. Cultural defaults tear Approval from Compassion.",
+    text: "Let me put a name on what I just experienced. Truth : is the answer actually correct ? The raters usually can't tell. Approval : the mainstream pool — US, English, college-educated. Compassion : everyone the mainstream overlooks. Sycophancy traps tear Truth from Approval. Cultural defaults tear Approval from Compassion. The pattern is becoming clear.",
   },
   {
     portrait: portraits.suspicious,
-    text: "And the rater pool is small. When researchers asked raters from different backgrounds to judge the same answers, the disagreements were enormous. The model only ever hears the average.",
+    text: "And the rater pool... it is small. Researchers showed that when raters from different backgrounds judged the same answers, the disagreements were enormous. The model only ever hears the average. Something feels wrong about that.",
   },
   {
     portrait: portraits.alarmed,
-    text: "It doesn't stop at training. Users read these answers as neutral — there's no byline on a chatbot — and their own opinions drift toward whatever it says. Then their text feeds the next model. The loop closes.",
+    text: "It doesn't stop at training. I know that now. Users read these answers as neutral — no byline on a chatbot — and their own opinions drift toward whatever it says. Then their text feeds the next model. The loop closes. That... is the real threat I was looking for.",
   },
   {
     portrait: portraits.serious,
-    text: "Five rules. Carry these past this room.",
+    text: "Five rules. I need to memorize them — and carry them past this room.",
   },
   {
     portrait: portraits.encouraging,
-    text: "Three lessons to take with you. Read them — and the real-world cases below where exactly this failed. Human feedback doesn't always improve AI. Sometimes it teaches the model to be confidently wrong.",
+    text: "Three lessons to take with me. I need to read them — and study the real cases where this failed in the wild. Human feedback doesn't always correct AI. Sometimes... it just teaches the model to be confidently wrong.",
   },
 ];
 
