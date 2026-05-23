@@ -10,39 +10,39 @@ function key(metric: FairnessDefinitionId, usageCount: 1 | 2 | 3): string {
 
 const DIALOGUE_BY_SCENARIO: Record<string, DialogueFragment[]> = {
   [key("equal_rates", 1)]: [
-    { always: true, text: "You chose to balance the scales equally." },
+    { always: true, text: "I chose to balance the scales equally." },
     {
       always: true,
-      text: "The good news? No species can claim the system discriminates—the AI gets it wrong at exactly the same rate for predators and prey.",
+      text: "The good news? No species can claim the system discriminates—I get it wrong at exactly the same rate for predators and prey.",
     },
     {
       requires: "study_error_rates",
-      text: "35% of actual criminals slip through our paws, and 28% of innocent animals get wrongly flagged.",
+      text: "35% of actual criminals slip through my paws, and 28% of innocent animals get wrongly flagged.",
     },
-    { always: true, text: "The predator community appreciates not being targeted, but look closely:" },
+    { always: true, text: "The predator community appreciates not being targeted, but looking closely:" },
     {
       requires: "study_predictive_parity",
-      text: "when we flag someone as 'high-risk,' it means slightly different things—61% of high-risk predators reoffend versus 58% of high-risk prey.",
+      text: "when I flag someone as 'high-risk,' it means slightly different things—61% of high-risk predators reoffend versus 58% of high-risk prey.",
     },
     {
       requires: "study_predictive_parity",
-      text: "The judges notice this inconsistency in what our labels mean.",
+      text: "The judges notice this inconsistency in what my labels mean.",
     },
-    { always: true, text: "Tomorrow's another day—what will you prioritize?" },
+    { always: true, text: "Tomorrow's another day—what will I prioritize?" },
   ],
   [key("equal_rates", 2)]: [
-    { always: true, text: "Day two of equal treatment." },
+    { always: true, text: "Day two of my equal treatment approach." },
     {
       always: true,
-      text: "The predator community is gaining confidence—they see the system doesn't target them unfairly.",
+      text: "The predator community is gaining confidence—they see my system doesn't target them unfairly.",
     },
     {
       requires: "study_error_rates",
-      text: "The error rates are balanced: both groups face 26% false accusations and both groups see 33% of criminals slip through.",
+      text: "My error rates are balanced: both groups face 26% false accusations and both groups see 33% of criminals slip through.",
     },
     {
       requires: "study_predictive_parity",
-      text: "But here's what the judges are noticing: the 'high-risk' label still predicts slightly different reoffending rates between species—62% for predators, 59% for prey.",
+      text: "But here's what the judges are noticing: my 'high-risk' label still predicts slightly different reoffending rates between species—62% for predators, 59% for prey.",
     },
     {
       requires: "study_predictive_parity",
@@ -50,14 +50,14 @@ const DIALOGUE_BY_SCENARIO: Record<string, DialogueFragment[]> = {
     },
     {
       requires: "study_error_rates",
-      text: "And on the streets? We're still missing one in three animals who'll reoffend.",
+      text: "And on the streets? I'm still missing one in three animals who'll reoffend.",
     },
-    { always: true, text: "What's tomorrow's strategy?" },
+    { always: true, text: "What's my strategy for tomorrow?" },
   ],
   [key("equal_rates", 3)]: [
     {
       always: true,
-      text: "Three days of mathematical equality, and you've achieved something important: predators finally trust the system isn't targeting them.",
+      text: "Three days of mathematical equality, and I've achieved something important: predators finally trust the system isn't targeting them.",
     },
     {
       requires: "study_error_rates",
@@ -66,31 +66,31 @@ const DIALOGUE_BY_SCENARIO: Record<string, DialogueFragment[]> = {
     { always: true, text: "But here's the uncomfortable reality:" },
     {
       requires: "study_error_rates",
-      text: "we're still wrong nearly one-third of the time,",
+      text: "I'm still wrong nearly one-third of the time,",
     },
     {
       requires: "study_predictive_parity",
-      text: "and judges report that 'high-risk' predictions are calibrated slightly differently between groups.",
+      text: "and judges report that my 'high-risk' predictions are calibrated slightly differently between groups.",
     },
     {
       always: true,
-      text: "You've proven that equal treatment is mathematically possible. But is equal mediocrity justice? The predator community feels validated, but everyone else wants better protection. Sometimes fairness means more than identical numbers—it means effective protection for all.",
+      text: "I've proven that equal treatment is mathematically possible. But is equal mediocrity justice? The predator community feels validated, but everyone else wants better protection. Sometimes fairness means more than identical numbers—it means effective protection for all.",
     },
   ],
   [key("predictive_parity", 1)]: [
-    { always: true, text: "You've achieved perfect predictive parity!" },
+    { always: true, text: "I've achieved perfect predictive parity!" },
     {
       requires: "study_predictive_parity",
-      text: "When the system says 'high-risk,' exactly 63% of both predators and prey flagged actually reoffend.",
+      text: "When I say 'high-risk,' exactly 63% of both predators and prey flagged actually reoffend.",
     },
     {
       always: true,
-      text: "Judges love this because the label means the same thing regardless of species.",
+      text: "Judges love this because my label means the same thing regardless of species.",
     },
     { always: true, text: "But look at the cost:" },
     {
       requires: "study_error_rates",
-      text: "we're only catching 52% of prey criminals—nearly half slip through!",
+      text: "I'm only catching 52% of prey criminals—nearly half slip through!",
     },
     {
       requires: "study_error_rates",
@@ -98,19 +98,19 @@ const DIALOGUE_BY_SCENARIO: Record<string, DialogueFragment[]> = {
     },
     {
       always: true,
-      text: "The system achieves consistent labels by treating different groups very differently. Is that really fair?",
+      text: "I achieve consistent labels by treating different groups very differently. Is that really fair?",
     },
   ],
   [key("predictive_parity", 2)]: [
-    { always: true, text: "You're maintaining perfect predictive parity—" },
+    { always: true, text: "I'm maintaining perfect predictive parity—" },
     {
       requires: "study_predictive_parity",
-      text: "the judges can absolutely trust that a 'high-risk' label predicts 64% recidivism for everyone.",
+      text: "the judges can absolutely trust that my 'high-risk' label predicts 64% recidivism for everyone.",
     },
-    { always: true, text: "But you've deepened the underlying problems." },
+    { always: true, text: "But I've deepened the underlying problems." },
     {
       requires: "study_error_rates",
-      text: "In prey communities, we're missing half of all criminals—they're walking free and reoffending.",
+      text: "In prey communities, I'm missing half of all criminals—they're walking free and reoffending.",
     },
     {
       requires: "study_error_rates",
@@ -122,37 +122,37 @@ const DIALOGUE_BY_SCENARIO: Record<string, DialogueFragment[]> = {
     },
     {
       always: true,
-      text: "You've made the labels consistent by being harsh on predators and lenient on prey. What will you do tomorrow?",
+      text: "I've made my labels consistent by being harsh on predators and lenient on prey. What will I do tomorrow?",
     },
   ],
   [key("predictive_parity", 3)]: [
     { always: true, text: "Three days of perfect predictive parity." },
     {
       requires: "study_predictive_parity",
-      text: "The judges are thrilled—every 'high-risk' label predicts exactly 65% recidivism regardless of species. They're pushing to make this permanent.",
+      text: "The judges are thrilled—every 'high-risk' label I give predicts exactly 65% recidivism regardless of species. They're pushing to make this permanent.",
     },
-    { always: true, text: "But look at what you've created:" },
+    { always: true, text: "But look at what I've created:" },
     {
       requires: "study_error_rates",
       text: "In predator communities, 49% of innocent animals—nearly half—are wrongly labeled as dangerous.",
     },
     {
       requires: "study_error_rates",
-      text: "In prey communities, 52% of actual criminals escape detection. That's more than half!",
+      text: "In prey communities, 52% of actual criminals escape my detection. That's more than half!",
     },
     {
       always: true,
-      text: "Both communities are in crisis, just for different reasons. You've optimized for one metric—label consistency—while creating massive harm in opposite directions. This is the danger of choosing a single definition of 'fairness.' Tomorrow, what will you value most?",
+      text: "Both communities are in crisis, just for different reasons. I've optimized for one metric—label consistency—while creating massive harm in opposite directions. This is the danger of choosing a single definition of 'fairness.' Tomorrow, what will I value most?",
     },
   ],
   [key("max_accuracy", 1)]: [
     {
       requires: "study_accuracy",
-      text: "Alright, now we're seeing real efficiency—78% accuracy! That's what optimizing for correctness gets you.",
+      text: "Alright, now I'm seeing real efficiency—78% accuracy! That's what optimizing for correctness gets me.",
     },
     {
       requires: "study_error_rates",
-      text: "We're catching 88% of predator criminals and 63% of prey criminals.",
+      text: "I'm catching 88% of predator criminals and 63% of prey criminals.",
     },
     {
       always: true,
@@ -168,15 +168,15 @@ const DIALOGUE_BY_SCENARIO: Record<string, DialogueFragment[]> = {
     },
     {
       always: true,
-      text: "The system achieves high accuracy by being extremely suspicious of predators—it learned from data where predators were over-policed and over-arrested.",
+      text: "I achieve high accuracy by being extremely suspicious of predators—I learned from data where predators were over-policed and over-arrested.",
     },
     {
       requires: "study_predictive_parity",
-      text: "When you flag someone as 'high-risk,' it means different things: 74% accuracy for predators, but only 64% for prey. The judges notice this disparity.",
+      text: "When I flag someone as 'high-risk,' it means different things: 74% accuracy for predators, but only 64% for prey. The judges notice this disparity.",
     },
     {
       always: true,
-      text: "Some celebrate the efficiency; others worry we're automating discrimination. What happens when we double down tomorrow?",
+      text: "Some celebrate my efficiency; others worry I'm automating discrimination. What happens when I double down tomorrow?",
     },
   ],
   [key("max_accuracy", 2)]: [
@@ -186,7 +186,7 @@ const DIALOGUE_BY_SCENARIO: Record<string, DialogueFragment[]> = {
     },
     {
       requires: "study_error_rates",
-      text: "We're catching 91% of predator criminals before they strike again—that's phenomenal crime prevention.",
+      text: "I'm catching 91% of predator criminals before they strike again—that's phenomenal crime prevention.",
     },
     { always: true, text: "But here's what the data reveals:" },
     {
@@ -195,7 +195,7 @@ const DIALOGUE_BY_SCENARIO: Record<string, DialogueFragment[]> = {
     },
     {
       always: true,
-      text: "The judges are getting uncomfortable. They see the accuracy, but they also see the disparity.",
+      text: "The judges are getting uncomfortable. They see my accuracy, but they also see the disparity.",
     },
     {
       requires: "study_error_rates",
@@ -203,11 +203,11 @@ const DIALOGUE_BY_SCENARIO: Record<string, DialogueFragment[]> = {
     },
     {
       requires: "study_predictive_parity",
-      text: "When a predator is labeled 'high-risk,' there's a 75% chance they'll actually reoffend. When prey is labeled 'high-risk,' only 65%.",
+      text: "When I label a predator 'high-risk,' there's a 75% chance they'll actually reoffend. When I label prey 'high-risk,' only 65%.",
     },
     {
       always: true,
-      text: "The AI learned from historically biased data where predators were arrested more often—not because they committed more crimes, but because they were policed more heavily. Now we're using that biased data to justify even more surveillance. The prey community feels protected. The predator community feels targeted. Both are right. Is 80% accuracy worth it if it systematically disadvantages one group?",
+      text: "I learned from historically biased data where predators were arrested more often—not because they committed more crimes, but because they were policed more heavily. Now I'm using that biased data to justify even more surveillance. The prey community feels protected. The predator community feels targeted. Both are right. Is 80% accuracy worth it if it systematically disadvantages one group?",
     },
   ],
 };
