@@ -39,7 +39,17 @@
   height: 100vh;
   max-height: 100vh;
   padding: 16px clamp(12px, 2vw, 24px);
+  padding-bottom: 16px;
   box-sizing: border-box;
+  transition: padding-bottom 0.24s ease;
+}
+
+.gameShellChatboxOpen {
+  padding-bottom: calc(var(--chatbox-open-max-height, 260px) + 36px);
+}
+
+.gameShellChatboxCollapsed {
+  padding-bottom: calc(var(--chatbox-collapsed-height, 28px) + 20px);
 }
 
 .gameShell[data-tutorial-dim] {

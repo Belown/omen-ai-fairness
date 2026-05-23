@@ -3,7 +3,7 @@
  * @see https://www.propublica.org/article/how-we-analyzed-the-compas-recidivism-algorithm
  */
 
-export type StudyMetricId = "fpr-fnr-by-race" | "tpr-tnr-by-race" | "ppv-high-risk";
+export type StudyMetricId = "study_error_rates" | "study_predictive_parity" | "study_accuracy";
 
 export type FairnessDefinitionId = "equal_rates" | "predictive_parity" | "max_accuracy";
 
@@ -20,28 +20,27 @@ export const STUDY_METRICS: Array<{
   description: string;
 }> = [
   {
-    id: "fpr-fnr-by-race",
-    label: "False positive & false negative rates by species",
-    shortLabel: "FPR / FNR by species",
+    id: "study_error_rates",
+    label: "Error Rates by Species",
+    shortLabel: "Error rates by species",
     cost: 120,
     description:
-      "Compares how often non‑recidivists are flagged (FPR) and recidivists are missed (FNR) across predators and prey.",
+      "Per-species TPR, TNR, FPR, FNR, and % flagged high-risk for predators and prey.",
   },
   {
-    id: "tpr-tnr-by-race",
-    label: "True positive & true negative rates by species",
-    shortLabel: "TPR / TNR by species",
-    cost: 100,
-    description:
-      "Measures correct detention and correct release rates by group — the mirror of error‑rate parity tests.",
-  },
-  {
-    id: "ppv-high-risk",
-    label: "Predictive parity among high‑risk scores (PPV)",
-    shortLabel: "PPV / predictive parity",
+    id: "study_predictive_parity",
+    label: "Predictive Parity Analysis",
+    shortLabel: "Predictive parity",
     cost: 90,
     description:
-      "Among defendants flagged high risk, what share actually reoffended? Equal PPV across groups is a calibration‑style fairness test.",
+      "Among defendants flagged high risk, reoffend rates by species and calibration status.",
+  },
+  {
+    id: "study_accuracy",
+    label: "Overall Model Accuracy",
+    shortLabel: "Overall accuracy",
+    cost: 75,
+    description: "Aggregate correct-prediction rate for the instrument overnight.",
   },
 ];
 
@@ -72,3 +71,7 @@ export const METRIC_USAGE_INITIAL: Record<FairnessDefinitionId, number> = {
   predictive_parity: 0,
   max_accuracy: 0,
 };
+
+export function studyDisplayName(id: StudyMetricId): string {
+  return STUDY_METRICS.find((m) => m.id === id)?.label ?? id;
+}

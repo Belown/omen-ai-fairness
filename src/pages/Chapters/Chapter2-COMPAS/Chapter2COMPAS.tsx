@@ -1,7 +1,10 @@
-import { useCallback, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
 import { useSearchParams } from "react-router-dom";
+import Chatbox from "../../../components/Chatbox/Chatbox";
+import { portraits } from "../../../assets/detective/portraits";
 import { CHAPTER1_BACKGROUNDS } from "../../../assets/image/image";
 import styles from "./Chapter2COMPAS.module.css";
+import { buildScenarioDialogue } from "./chapter2Dialogue";
 import {
   MAX_CURRENT_DAY,
   STARTING_BUDGET,
@@ -48,12 +51,15 @@ export default function Chapter2COMPAS() {
   const [pendingQueue, setPendingQueue] = useState<StudyMetricId[]>([]);
   const [endingPanelIndex, setEndingPanelIndex] = useState(0);
   const [endingPhase, setEndingPhase] = useState<EndingPhase>("narrative");
+  const [isNarrativeCollapsed, setIsNarrativeCollapsed] = useState(false);
+  const [chatboxReopenSignal, setChatboxReopenSignal] = useState(0);
 
   const gameShellRef = useRef<HTMLDivElement>(null);
   const metricSelectorRef = useRef<HTMLElement>(null);
   const studyQueueRef = useRef<HTMLElement>(null);
   const metricsDashboardRef = useRef<HTMLElement>(null);
   const satisfactionMetersRef = useRef<HTMLElement>(null);
+  const lastDialogueKeyRef = useRef<string>("");
 
   const spotlightRefs: Record<TutorialSpotlight, RefObject<HTMLElement | null>> = useMemo(
     () => ({
@@ -70,8 +76,29 @@ export default function Chapter2COMPAS() {
   const pendingCost = queueCost(pendingQueue);
   const canAdvance = budget - pendingCost >= 0;
 
-  const displayedScenario = currentDay >= 1 ? (days[currentDay - 1]?.scenario ?? null) : null;
+  const resultsDayRecord = currentDay >= 1 ? days[currentDay - 1] : null;
+  const displayedScenario = resultsDayRecord?.scenario ?? null;
+  const commissionedStudies = resultsDayRecord?.studiesQueued ?? [];
   const satisfactionHistory = useMemo(() => satisfactionFromDays(days), [days]);
+
+  const dialogueText = useMemo(() => {
+    if (!resultsDayRecord) return "";
+    const { metric, usageCount } = resultsDayRecord.scenario;
+    return (
+      buildScenarioDialogue(metric, usageCount, resultsDayRecord.studiesQueued) ?? ""
+    );
+  }, [resultsDayRecord]);
+
+  const showGameChatbox = phase === "game" && currentDay >= 1 && dialogueText.length > 0;
+
+  useEffect(() => {
+    if (!showGameChatbox) return;
+    const key = `${currentDay}-${dialogueText}`;
+    if (key === lastDialogueKeyRef.current) return;
+    lastDialogueKeyRef.current = key;
+    setIsNarrativeCollapsed(false);
+    setChatboxReopenSignal((s) => s + 1);
+  }, [showGameChatbox, currentDay, dialogueText]);
 
   const toggleQueue = (metricId: StudyMetricId) => {
     if (currentDay >= MAX_CURRENT_DAY || budget <= 0) return;
@@ -129,6 +156,9 @@ export default function Chapter2COMPAS() {
     setPendingQueue([]);
     setEndingPanelIndex(0);
     setEndingPhase("narrative");
+    setIsNarrativeCollapsed(false);
+    setChatboxReopenSignal(0);
+    lastDialogueKeyRef.current = "";
   }, []);
 
   const openTutorialFromHelp = () => {
@@ -143,6 +173,14 @@ export default function Chapter2COMPAS() {
 
   const chapterBackground = CHAPTER1_BACKGROUNDS.cityMapTable;
   const phaseStyle = { "--chapter-bg": `url(${chapterBackground})` } as CSSProperties;
+
+  const gameShellClass = [
+    styles.gameShell,
+    showGameChatbox && !isNarrativeCollapsed ? styles.gameShellChatboxOpen : "",
+    showGameChatbox && isNarrativeCollapsed ? styles.gameShellChatboxCollapsed : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   if (phase === "ending") {
     return (
@@ -164,7 +202,7 @@ export default function Chapter2COMPAS() {
 
   return (
     <div className={`${styles.phase} ${styles.phaseWithBackground}`} style={phaseStyle}>
-      <div ref={gameShellRef} className={styles.gameShell} data-tutorial-dim={showTutorial ? true : undefined}>
+      <div ref={gameShellRef} className={gameShellClass} data-tutorial-dim={showTutorial ? true : undefined}>
         <LeftPanel
           currentDay={currentDay}
           budget={budget}
@@ -183,6 +221,7 @@ export default function Chapter2COMPAS() {
         <RightPanel
           currentDay={currentDay}
           scenario={displayedScenario}
+          commissionedStudies={commissionedStudies}
           satisfactionHistory={satisfactionHistory}
           metricsDashboardRef={metricsDashboardRef}
           satisfactionMetersRef={satisfactionMetersRef}
@@ -196,6 +235,24 @@ export default function Chapter2COMPAS() {
           onComplete={finishTutorial}
           onSkip={finishTutorial}
           spotlightRefs={spotlightRefs}
+        />
+      )}
+
+      {showGameChatbox && (
+        <Chatbox
+          text={dialogueText}
+          portraitSrc={portraits.thoughtful}
+          history={[
+            {
+              text: dialogueText,
+              passageId: `day-${currentDay}-results`,
+              current: true,
+            },
+          ]}
+          onCollapsedChange={setIsNarrativeCollapsed}
+          reopenSignal={chatboxReopenSignal}
+          speakerName="Whiskers Holmes"
+          disablePreviousNavigation
         />
       )}
     </div>

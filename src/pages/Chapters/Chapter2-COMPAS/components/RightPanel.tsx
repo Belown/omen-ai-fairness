@@ -1,14 +1,14 @@
 import type { RefObject } from "react";
 import styles from "./RightPanel.module.css";
-import { FAIRNESS_DEFINITIONS } from "../chapter2Data";
+import { FAIRNESS_DEFINITIONS, type StudyMetricId } from "../chapter2Data";
 import { computeAggregate, type AggregateSatisfaction, type ScenarioData } from "../chapter2Scenarios";
 import MetricsDashboard from "./MetricsDashboard";
 import SatisfactionMeters from "./SatisfactionMeters";
-import WhiskersDialogue from "./WhiskersDialogue";
 
 type RightPanelProps = {
   currentDay: number;
   scenario: ScenarioData | null;
+  commissionedStudies: StudyMetricId[];
   satisfactionHistory: AggregateSatisfaction[];
   metricsDashboardRef?: RefObject<HTMLElement | null>;
   satisfactionMetersRef?: RefObject<HTMLElement | null>;
@@ -17,6 +17,7 @@ type RightPanelProps = {
 export default function RightPanel({
   currentDay,
   scenario,
+  commissionedStudies,
   satisfactionHistory,
   metricsDashboardRef,
   satisfactionMetersRef,
@@ -41,12 +42,11 @@ export default function RightPanel({
               {FAIRNESS_DEFINITIONS.find((f) => f.id === scenario.metric)?.title ?? scenario.metric}
             </span>
             <div ref={metricsDashboardRef as RefObject<HTMLDivElement>}>
-              <MetricsDashboard scenario={scenario} />
+              <MetricsDashboard scenario={scenario} commissionedStudies={commissionedStudies} />
             </div>
             <div ref={satisfactionMetersRef as RefObject<HTMLDivElement>}>
               <SatisfactionMeters scenario={scenario} aggregate={aggregate} />
             </div>
-            {scenario.whiskersDialogue && <WhiskersDialogue text={scenario.whiskersDialogue} />}
           </>
         ) : (
           <div ref={metricsDashboardRef as RefObject<HTMLDivElement>} className={styles.emptyWrap}>
