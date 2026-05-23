@@ -1,7 +1,7 @@
 import styles from "./MissionPlanner.module.css";
 import shared from "../../../../../styles/shared.module.css";
 import { BUDGET_VISUALS, POPULATION_IMAGES, QUESTION_IMAGES, ZONE_VISUALS } from "../../../../../assets/image/image";
-import { DAILY_BUDGET, QUESTION_OPTIONS, REGIONS } from "../../chapterData";
+import { DAILY_BUDGET, POP_COST, QUESTION_OPTIONS, REGIONS, ZONE_COST } from "../../chapterData";
 import type { MissionPlan, PopulationOption, QuestionKey, QuestionOption } from "../../types";
 import { useTutorial, type TutorialStep } from "../../hooks/useTutorial";
 import TutorialPopover from "../Tutorial/TutorialPopover";
@@ -76,7 +76,7 @@ const TUTORIAL_STEPS: TutorialStep<TutorialTarget>[] = [
   {
     target: "budget",
     title: "Budget",
-    body: "This card tracks your daily investigation points, spent budget, and draft cost. A mission must fit the budget before it can be queued.",
+    body: "This card tracks your daily investigation points, spent budget, and draft cost. A mission must fit the budget before it can be queued. Spend your full daily allowance — unused IP doesn't carry over and resets the next day.",
     placement: "left",
   },
   {
@@ -220,6 +220,10 @@ export default function MissionPlanner({
             <span><img src={BUDGET_VISUALS.spent} alt="" aria-hidden="true" /> Spent {spentToday}</span>
             <span><img src={BUDGET_VISUALS.draft} alt="" aria-hidden="true" /> Draft {draftCost}</span>
           </div>
+          <p className={styles.budgetHint}>
+            <span className={styles.budgetHintIcon}>↻</span>
+            This is your daily budget. Spend it all — unused IP resets at the start of each new day.
+          </p>
         </div>
       </section>
 
@@ -255,6 +259,7 @@ export default function MissionPlanner({
                 <span className={styles.regionName}>{r.label}</span>
                 <span className={styles.regionDesc}>{r.desc}</span>
                 <span className={styles.regionStatus}>{planZones[i] ? "Deployed" : "Standby"}</span>
+                <span className={styles.regionCost}>+{ZONE_COST} IP</span>
               </label>
             ))}
           </div>
@@ -285,6 +290,7 @@ export default function MissionPlanner({
                 <strong>{tier.value}</strong>
                 <span>{tier.title}</span>
                 <small>{tier.desc}</small>
+                <span className={styles.sampleTierCost}>{POP_COST[tier.value]} IP</span>
               </button>
             ))}
           </div>
@@ -302,7 +308,7 @@ export default function MissionPlanner({
           </div>
 
           <p className={styles.signalHint}>
-            Signals shape what the model can learn. More data is not always better, so each added field should earn its place.
+            Signals shape what the model can learn. More data is <strong>not always better</strong>, so each added field should earn its place.
           </p>
 
           <div className={styles.mandatorySignalGrid} aria-label="Mandatory signals">

@@ -123,6 +123,7 @@ export function summarizeStrategy(plansByDay: MissionPlan[][], dayLocked: boolea
     regionAccs,
     otherCityAccs,
     sampledFlags,
+    zoneSamples,
     committedCount: committed.length,
     usefulSignal,
     noiseSignal,

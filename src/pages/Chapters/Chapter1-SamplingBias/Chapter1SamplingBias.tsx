@@ -97,6 +97,7 @@ export default function Chapter1SamplingBias({
     regionAccs,
     otherCityAccs,
     overallAcc,
+    dayAccs,
     otherCityOvr,
     currentPlans,
     spentToday,
@@ -383,8 +384,10 @@ export default function Chapter1SamplingBias({
           <DayReportPanel
             dayNumber={1}
             overallAcc={overallAcc}
+            previousAcc={0.5}
             regionAccs={regionAccs}
             sampledFlags={strategy.sampledFlags}
+            zoneSamples={strategy.zoneSamples}
             usefulSignal={strategy.usefulSignal}
             noiseSignal={strategy.noiseSignal}
             biasSignal={strategy.biasSignal}
@@ -402,8 +405,10 @@ export default function Chapter1SamplingBias({
           <DayReportPanel
             dayNumber={2}
             overallAcc={overallAcc}
+            previousAcc={dayAccs[0] ?? 0.5}
             regionAccs={regionAccs}
             sampledFlags={strategy.sampledFlags}
+            zoneSamples={strategy.zoneSamples}
             usefulSignal={strategy.usefulSignal}
             noiseSignal={strategy.noiseSignal}
             biasSignal={strategy.biasSignal}
@@ -419,8 +424,10 @@ export default function Chapter1SamplingBias({
           <DayReportPanel
             dayNumber={3}
             overallAcc={overallAcc}
+            previousAcc={dayAccs[1] ?? dayAccs[0] ?? 0.5}
             regionAccs={regionAccs}
             sampledFlags={strategy.sampledFlags}
+            zoneSamples={strategy.zoneSamples}
             usefulSignal={strategy.usefulSignal}
             noiseSignal={strategy.noiseSignal}
             biasSignal={strategy.biasSignal}
@@ -439,7 +446,11 @@ export default function Chapter1SamplingBias({
             regionAccs={regionAccs}
             otherCityAccs={otherCityAccs}
             sampledFlags={strategy.sampledFlags}
+            zoneSamples={strategy.zoneSamples}
             committedCount={strategy.committedCount}
+            usefulSignal={strategy.usefulSignal}
+            noiseSignal={strategy.noiseSignal}
+            biasSignal={strategy.biasSignal}
             pct={pct}
             onRestart={() => {
               resetInvestigation();

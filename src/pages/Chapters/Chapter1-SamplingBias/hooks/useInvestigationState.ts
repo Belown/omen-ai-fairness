@@ -60,6 +60,27 @@ export function useInvestigationState() {
   const regionAccs = strategy.regionAccs;
   const otherCityAccs = strategy.otherCityAccs;
   const overallAcc = useMemo(() => regionAccs.reduce((s, a) => s + a, 0) / 4, [regionAccs]);
+
+  // Per-day cumulative accuracy snapshot (null if that day isn't locked yet)
+  const dayAccs = useMemo(
+    () =>
+      [0, 1, 2].map((d) => {
+        if (!dayLocked[d]) return null;
+        const summary = summarizeStrategy(dayPlans.slice(0, d + 1), dayLocked.slice(0, d + 1).map(() => true));
+        return summary.regionAccs.reduce((s, a) => s + a, 0) / 4;
+      }),
+    [dayPlans, dayLocked],
+  );
+
+  // Per-day isolated strategy (only that day's plans, null if not locked yet)
+  const dayStrategies = useMemo(
+    () =>
+      [0, 1, 2].map((d) => {
+        if (!dayLocked[d]) return null;
+        return summarizeStrategy([dayPlans[d]], [true]);
+      }),
+    [dayPlans, dayLocked],
+  );
   const otherCityOvr = useMemo(() => otherCityAccs.reduce((s, a) => s + a, 0) / 4, [otherCityAccs]);
   const currentPlans = dayPlans[currentDay];
   const spentToday = currentPlans.reduce((s, p) => s + p.cost, 0);
@@ -220,6 +241,8 @@ export function useInvestigationState() {
     regionAccs,
     otherCityAccs,
     overallAcc,
+    dayAccs,
+    dayStrategies,
     otherCityOvr,
     currentPlans,
     spentToday,
