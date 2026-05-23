@@ -171,9 +171,34 @@ export default function DayReportPanel({
 
   const pillarIcon = (s: PillarStatus) => s === "pass" ? "✓" : s === "partial" ? "~" : "✗";
 
-  // ── Hint stack ───────────────────────────────────────────────────────────────
+  // ── Hint stack — scoped to today's missions only ─────────────────────────────
+  const hintSampledFlags  = todaySampledFlags  ?? sampledFlags;
+  const hintZoneSamples   = todayZoneSamples   ?? zoneSamples;
+  const hintUsefulSignal  = todayUsefulSignal  ?? usefulSignal;
+  const hintNoiseSignal   = todayNoiseSignal   ?? noiseSignal;
+  const hintBiasSignal    = todayBiasSignal    ?? biasSignal;
+
+  const hintSampledCount  = hintSampledFlags.filter(Boolean).length;
+  const hintUnseenZones   = REGIONS.filter((_, i) => !hintSampledFlags[i]).map((r) => districtName(r.label));
+  const hintZoneSamplesFiltered = hintZoneSamples.filter((_, i) => hintSampledFlags[i]);
+  const hintAvgZoneSamples = hintZoneSamplesFiltered.length
+    ? hintZoneSamplesFiltered.reduce((s, n) => s + n, 0) / hintZoneSamplesFiltered.length
+    : 0;
+  const hintUsedRoutine   = hintUsefulSignal > 0;
+  const hintUsedPhone     = hintNoiseSignal  > 0;
+  const hintUsedPolice    = hintBiasSignal   > 0;
+
+  const hintCoverageStatus: PillarStatus =
+    hintSampledCount === 4 ? "pass" : hintSampledCount >= 2 ? "partial" : "fail";
+  const hintSampleStatus: PillarStatus =
+    hintAvgZoneSamples > 700 ? "pass" : hintAvgZoneSamples >= 300 ? "partial" : "fail";
+  const hintSignalStatus: PillarStatus =
+    hintUsedRoutine && !hintUsedPhone && !hintUsedPolice ? "pass"
+    : hintUsedRoutine || hintUsedPhone || hintUsedPolice ? "partial"
+    : "fail";
+
   const coverageHint =
-    sampledCount === 4
+    hintSampledCount === 4
       ? "All 4 districts sampled — full city coverage."
       : sampledCount >= 2
         ? `${unseenZones.join(", ")} unsampled. Adding more zones helps the model generalise across the city.`
