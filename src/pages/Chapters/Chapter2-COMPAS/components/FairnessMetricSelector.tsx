@@ -4,32 +4,20 @@ import type { FairnessDefinitionId } from "../chapter2Data";
 
 type FairnessMetricSelectorProps = {
   active: FairnessDefinitionId;
-  locked: boolean;
-  showLockNotice: boolean;
   onSelect: (id: FairnessDefinitionId) => void;
+  compact?: boolean;
 };
 
-export default function FairnessMetricSelector({
-  active,
-  locked,
-  showLockNotice,
-  onSelect,
-}: FairnessMetricSelectorProps) {
+export default function FairnessMetricSelector({ active, onSelect, compact }: FairnessMetricSelectorProps) {
   return (
     <section className={styles.metricSection} aria-label="Fairness metric">
-      <h2 className={styles.metricHeading}>Fairness metric</h2>
-      {showLockNotice && locked && (
-        <p className={styles.metricNotice}>
-          Metric locked for today. Your new metric takes effect tomorrow.
-        </p>
-      )}
+      <h2 className={styles.metricHeading}>{compact ? "Confirm fairness framework" : "Fairness metric"}</h2>
       <div className={styles.choiceGrid}>
         {FAIRNESS_DEFINITIONS.map((f) => (
           <button
             key={f.id}
             type="button"
             className={`${styles.choice} ${active === f.id ? styles.choiceActive : ""}`}
-            disabled={locked && active !== f.id}
             onClick={() => onSelect(f.id)}
             aria-pressed={active === f.id}
           >

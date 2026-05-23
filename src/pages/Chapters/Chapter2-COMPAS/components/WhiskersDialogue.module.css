@@ -1,0 +1,40 @@
+.block {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(25, 28, 31, 0.12);
+  background: rgba(250, 248, 242, 0.95);
+  margin-top: 12px;
+}
+
+.portrait {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid rgba(25, 28, 31, 0.12);
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.speaker {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(25, 28, 31, 0.55);
+}
+
+.text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(25, 28, 31, 0.9);
+}
