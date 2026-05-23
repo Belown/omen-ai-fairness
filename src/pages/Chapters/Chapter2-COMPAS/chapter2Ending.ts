@@ -1,7 +1,7 @@
 export type EndingPanel =
   | { type: "text"; content: string }
   | { type: "section"; header: string; content: string }
-  | { type: "list"; header?: string; intro?: string; items: string[] }
+  | { type: "list"; header?: string; intro?: string; content?: string; items: string[] }
   | { type: "decision" };
 
 export const ENDING_PANELS: EndingPanel[] = [

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { portraits } from "../../../../assets/detective/portraits";
-import { TUTORIAL_STEPS, type TutorialSpotlight, type TutorialStep } from "../chapter2Tutorial";
+import { TUTORIAL_STEPS, type TutorialSpotlight } from "../chapter2Tutorial";
 import styles from "./TutorialOverlay.module.css";
 
 type TutorialOverlayProps = {

@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type RefObject,
+} from "react";
 import { useSearchParams } from "react-router-dom";
 import Chatbox from "../../../components/Chatbox/Chatbox";
 import { portraits } from "../../../assets/detective/portraits";
@@ -24,6 +32,17 @@ import TutorialOverlay from "./components/TutorialOverlay";
 type Phase = "tutorial" | "game" | "ending";
 type EndingPhase = "narrative" | "outcome-best" | "outcome-keep";
 
+export type ChapterResult = {
+  completed: boolean;
+  passed: boolean;
+  scoreLabel?: string;
+};
+
+type Chapter2COMPASProps = {
+  isActive: boolean;
+  onChapterComplete: (result: ChapterResult) => void;
+};
+
 function queueCost(queue: StudyMetricId[]) {
   return queue.reduce((sum, id) => sum + (STUDY_METRICS.find((m) => m.id === id)?.cost ?? 0), 0);
 }
@@ -36,7 +55,7 @@ function satisfactionFromDays(days: DayRecord[]): AggregateSatisfaction[] {
   }));
 }
 
-export default function Chapter2COMPAS() {
+export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2COMPASProps) {
   const [, setSearchParams] = useSearchParams();
 
   const [phase, setPhase] = useState<Phase>("tutorial");
@@ -84,14 +103,13 @@ export default function Chapter2COMPAS() {
   const dialogueText = useMemo(() => {
     if (!resultsDayRecord) return "";
     const { metric, usageCount } = resultsDayRecord.scenario;
-    return (
-      buildScenarioDialogue(metric, usageCount, resultsDayRecord.studiesQueued) ?? ""
-    );
+    return buildScenarioDialogue(metric, usageCount, resultsDayRecord.studiesQueued) ?? "";
   }, [resultsDayRecord]);
 
   const showGameChatbox = phase === "game" && currentDay >= 1 && dialogueText.length > 0;
 
   useEffect(() => {
+    if (!isActive) return;
     if (!showGameChatbox) return;
     const key = `${currentDay}-${dialogueText}`;
     if (key === lastDialogueKeyRef.current) return;
@@ -137,6 +155,12 @@ export default function Chapter2COMPAS() {
     }));
     setCurrentDay((d) => d + 1);
     setPendingQueue([]);
+
+    onChapterComplete({
+      completed: true,
+      passed: true,
+      scoreLabel: "COMPAS complete",
+    });
   };
 
   const confirmEnding = () => {
@@ -171,7 +195,7 @@ export default function Chapter2COMPAS() {
     setTutorialStep(0);
   };
 
-  const chapterBackground = CHAPTER1_BACKGROUNDS.cityMapTable;
+  const chapterBackground = CHAPTER1_BACKGROUNDS.caseRoom;
   const phaseStyle = { "--chapter-bg": `url(${chapterBackground})` } as CSSProperties;
 
   const gameShellClass = [
