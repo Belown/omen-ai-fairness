@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useEffect } from "react";
+﻿import { useState, useMemo, useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import { useSearchParams } from "react-router-dom";
 import styles from "./Chapter1SamplingBias.module.css";
@@ -8,6 +8,8 @@ import { CHAPTER1_BACKGROUNDS } from "../../../assets/image/image";
 import type { PassageId, Choice } from "./staticPassages";
 import { getAdaptivePassage } from "./adaptivePassages";
 import { useInvestigationState, type InvestigationSnapshot } from "./hooks/useInvestigationState";
+import { REGIONS } from "./chapterData";
+import { sessionLogger } from "../../../utils/sessionLogger";
 
 type NarrativeLocation = {
   passage: PassageId;
@@ -145,6 +147,21 @@ export default function Chapter1SamplingBias({
     setShowChoices(false);
     setIsNarrativeCollapsed(false);
   }, [passage]);
+
+  // Logging: track which days have been locked so we log accuracy exactly once per day.
+  const prevDayLockedRef = useRef<boolean[]>([false, false, false]);
+  useEffect(() => {
+    dayLocked.forEach((locked, day) => {
+      if (locked && !prevDayLockedRef.current[day]) {
+        sessionLogger.logCh1Accuracy(
+          day + 1,
+          overallAcc,
+          regionAccs.map((acc, i) => ({ zone: REGIONS[i]?.label ?? `Zone ${i + 1}`, accuracy: acc })),
+        );
+      }
+    });
+    prevDayLockedRef.current = [...dayLocked];
+  }, [dayLocked, overallAcc, regionAccs]);
 
   const passageChoices = useMemo((): Choice[] => {
     return getAdaptivePassage(passage, strategy).choices ?? [];
@@ -314,6 +331,15 @@ export default function Chapter1SamplingBias({
 
   const sendDetectiveAndAdvance = () => {
     if (!currentPlans.length || dayLocked[currentDay]) return;
+    sessionLogger.logCh1Plan(
+      currentDay + 1,
+      currentPlans.map((p) => ({
+        zones: REGIONS.filter((_, i) => p.zones[i]).map((r) => r.label),
+        population: p.population,
+        questions: p.questions,
+        cost: p.cost,
+      })),
+    );
     sendDetective();
     const nextId: PassageId =
       passage === "day1-plan" ? "day1-debrief" :
