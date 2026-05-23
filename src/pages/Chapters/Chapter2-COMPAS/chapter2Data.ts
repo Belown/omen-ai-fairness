@@ -3,11 +3,7 @@
  * @see https://www.propublica.org/article/how-we-analyzed-the-compas-recidivism-algorithm
  */
 
-export type StudyMetricId =
-  | "fpr-fnr-by-race"
-  | "tpr-tnr-by-race"
-  | "ppv-high-risk"
-  | "accuracy-overall";
+export type StudyMetricId = "study_error_rates" | "study_predictive_parity" | "study_accuracy";
 
 export type FairnessDefinitionId = "equal_rates" | "predictive_parity" | "max_accuracy";
 
@@ -24,53 +20,29 @@ export const STUDY_METRICS: Array<{
   description: string;
 }> = [
   {
-    id: "fpr-fnr-by-race",
-    label: "False positive & false negative rates by race",
-    shortLabel: "FPR / FNR by race",
+    id: "study_error_rates",
+    label: "Error Rates by Species",
+    shortLabel: "Error rates by species",
     cost: 120,
     description:
-      "Compares how often non‑recidivists are flagged (FPR) and recidivists are missed (FNR) across Black and White defendants.",
+      "Per-species TPR, TNR, FPR, FNR, and % flagged high-risk for predators and prey.",
   },
   {
-    id: "tpr-tnr-by-race",
-    label: "True positive & true negative rates by race",
-    shortLabel: "TPR / TNR by race",
-    cost: 100,
-    description:
-      "Measures correct detention and correct release rates by group — the mirror of error‑rate parity tests.",
-  },
-  {
-    id: "ppv-high-risk",
-    label: "Predictive parity among high‑risk scores (PPV)",
-    shortLabel: "PPV / predictive parity",
+    id: "study_predictive_parity",
+    label: "Predictive Parity Analysis",
+    shortLabel: "Predictive parity",
     cost: 90,
     description:
-      "Among defendants flagged high risk, what share actually reoffended? Equal PPV across groups is a calibration‑style fairness test.",
+      "Among defendants flagged high risk, reoffend rates by species and calibration status.",
   },
   {
-    id: "accuracy-overall",
-    label: "Community Impact Assessment",
-    shortLabel: "Community impact",
+    id: "study_accuracy",
+    label: "Overall Model Accuracy",
+    shortLabel: "Overall accuracy",
     cost: 75,
-    description:
-      "Stakeholder satisfaction with the current fairness policy — judges, Black defendants, and White defendants.",
+    description: "Aggregate correct-prediction rate for the instrument overnight.",
   },
 ];
-
-/** ProPublica-style headline baselines (unequal / “raw instrument” reference). */
-export const BASELINE_FIGURES = {
-  fprBlack: 0.449,
-  fprWhite: 0.235,
-  fnrBlack: 0.28,
-  fnrWhite: 0.477,
-  tprBlack: 0.72,
-  tprWhite: 0.523,
-  tnrBlack: 0.551,
-  tnrWhite: 0.765,
-  ppvBlack: 0.63,
-  ppvWhite: 0.59,
-  accuracyOverall: 0.664,
-};
 
 export const FAIRNESS_DEFINITIONS: Array<{
   id: FairnessDefinitionId;
@@ -80,7 +52,7 @@ export const FAIRNESS_DEFINITIONS: Array<{
   {
     id: "equal_rates",
     title: "Equal Error Rates",
-    blurb: "Equalise True Positive Rate (TPR) and True Negative Rate (TNR) across racial groups.",
+    blurb: "Equalise True Positive Rate (TPR) and True Negative Rate (TNR) across species.",
   },
   {
     id: "predictive_parity",
@@ -90,7 +62,7 @@ export const FAIRNESS_DEFINITIONS: Array<{
   {
     id: "max_accuracy",
     title: "Maximise Overall Accuracy",
-    blurb: "Optimise aggregate accuracy without race‑based constraints.",
+    blurb: "Optimise aggregate accuracy without species‑based constraints.",
   },
 ];
 
@@ -114,4 +86,13 @@ export const ENDINGS: Record<FairnessDefinitionId, { headline: string; body: str
     headline: "Legacy: “We maximised the score.”",
     body: "Overall accuracy peaks, but group‑wise error gaps widen. The courthouse gets a clean spreadsheet and messier politics. Your ending documents the oldest temptation: optimise what is easy to count.",
   },
+}
+export const METRIC_USAGE_INITIAL: Record<FairnessDefinitionId, number> = {
+  equal_rates: 0,
+  predictive_parity: 0,
+  max_accuracy: 0,
 };
+
+export function studyDisplayName(id: StudyMetricId): string {
+  return STUDY_METRICS.find((m) => m.id === id)?.label ?? id;
+}

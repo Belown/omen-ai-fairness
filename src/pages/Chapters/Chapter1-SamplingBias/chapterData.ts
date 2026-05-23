@@ -10,12 +10,12 @@ export const REGIONS: readonly Region[] = [
 
 export const BRIEFING_SHEETS: Partial<Record<PassageId, BriefingSheet>> = {
   "demo-exercise": {
-    title: "Boundary Drawing Exercise",
-    body: "Before building the real dataset, examine what the police first saw: 20 residents from Uptown. Draw a boundary that fits this small sample.",
+    title: "Binary Classification Exercise",
+    body: "This is a <b>classification task</b>, not regression. Each resident is labelled either <b>Safe</b> or <b>Threat</b>. Your job is to position a <b>decision boundary</b> — a line that splits the plot into two regions, one per class.",
     notes: [
-      "Slide the slope and shift controls below until the training accuracy is 100%.",
-      "Think about what could a perfect score means in this context.",
-      "If the line can separate the dots perfectly, is it then <i>perfect?</i>",
+      "Adjust slope and intercept until the line separates every green dot (Safe) from every red dot (Threat).",
+      "The model predicts the class of a point purely by which side of the line it falls on.",
+      "If the line can perfectly classify this sample, is it then <i>ready for the real world?</i>",
     ],
   },
   "demo-reveal-sheet": {

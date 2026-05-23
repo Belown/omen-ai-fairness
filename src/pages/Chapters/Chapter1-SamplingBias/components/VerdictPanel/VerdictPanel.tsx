@@ -10,7 +10,11 @@ type VerdictPanelProps = {
   regionAccs: number[];
   otherCityAccs: number[];
   sampledFlags: boolean[];
+  zoneSamples?: number[];
   committedCount: number;
+  usefulSignal?: number;
+  noiseSignal?: number;
+  biasSignal?: number;
   pct: (value: number) => string;
   onRestart: () => void;
   onNextChapter: () => void;
@@ -133,7 +137,11 @@ export default function VerdictPanel({
   regionAccs,
   otherCityAccs,
   sampledFlags,
+  zoneSamples = [0, 0, 0, 0],
   committedCount,
+  usefulSignal = 0,
+  noiseSignal = 0,
+  biasSignal = 0,
   pct,
   onRestart,
   onNextChapter,
@@ -183,6 +191,28 @@ export default function VerdictPanel({
 
   const primaryRecommendation = suggestedActions[0];
   const secondaryActions = suggestedActions.slice(1, 3);
+
+  // ── Metric dimension cards ────────────────────────────────────────────────
+  type DimStatus = "pass" | "partial" | "fail";
+  const dimIcon = (s: DimStatus) => s === "pass" ? "✓" : s === "partial" ? "~" : "✗";
+
+  const coverageDimStatus: DimStatus =
+    sampledCount === 4 ? "pass" : sampledCount >= 2 ? "partial" : "fail";
+
+  const sampledZoneSamples = zoneSamples.filter((_, i) => sampledFlags[i]);
+  const avgZoneSamples = sampledZoneSamples.length
+    ? sampledZoneSamples.reduce((s, n) => s + n, 0) / sampledZoneSamples.length
+    : 0;
+  const populationDimStatus: DimStatus =
+    avgZoneSamples > 700 ? "pass" : avgZoneSamples >= 300 ? "partial" : "fail";
+
+  const usedRoutine = usefulSignal > 0;
+  const usedPhone   = noiseSignal  > 0;
+  const usedPolice  = biasSignal   > 0;
+  const signalDimStatus: DimStatus =
+    usedRoutine && !usedPhone && !usedPolice ? "pass"
+    : usedRoutine || usedPhone || usedPolice ? "partial"
+    : "fail";
 
   return (
     <>
@@ -311,6 +341,61 @@ export default function VerdictPanel({
               <span key={action} className={styles.secondaryAction}>{action}</span>
             ))}
           </div>
+        </div>
+      </section>
+
+            <section className={styles.metricDimSection}>
+        <div className={styles.boardHeader}>
+          <p className={styles.panelEyebrow}>Strategy Dimensions</p>
+          <h3>What each choice meant for sampling bias</h3>
+        </div>
+        <div className={styles.metricDimGrid}>
+
+          <div className={`${styles.metricDimCard} ${styles[`metricDimCard_${coverageDimStatus}`]}`}>
+            <div className={styles.metricDimTop}>
+              <span className={styles.metricDimNum}>01</span>
+              <span className={`${styles.metricDimBadge} ${styles[`metricDimBadge_${coverageDimStatus}`]}`}>
+                {dimIcon(coverageDimStatus)}
+              </span>
+            </div>
+            <p className={styles.metricDimIdea}>Completeness</p>
+            <h4 className={styles.metricDimName}>Coverage</h4>
+            <p className={styles.metricDimDesc}>
+              A model trained only on certain districts learns patterns specific to those areas.
+              Skipping a district means the model never sees that population — it misclassifies them by default, encoding geographic bias into every future prediction.
+            </p>
+          </div>
+
+          <div className={`${styles.metricDimCard} ${styles[`metricDimCard_${populationDimStatus}`]}`}>
+            <div className={styles.metricDimTop}>
+              <span className={styles.metricDimNum}>02</span>
+              <span className={`${styles.metricDimBadge} ${styles[`metricDimBadge_${populationDimStatus}`]}`}>
+                {dimIcon(populationDimStatus)}
+              </span>
+            </div>
+            <p className={styles.metricDimIdea}>Amount</p>
+            <h4 className={styles.metricDimName}>Population</h4>
+            <p className={styles.metricDimDesc}>
+              Small samples are noisy — a handful of outliers can shift the learned boundary.
+              Larger samples give the model a more representative view of each zone&apos;s true distribution, reducing the chance that rare edge cases dominate the pattern.
+            </p>
+          </div>
+
+          <div className={`${styles.metricDimCard} ${styles[`metricDimCard_${signalDimStatus}`]}`}>
+            <div className={styles.metricDimTop}>
+              <span className={styles.metricDimNum}>03</span>
+              <span className={`${styles.metricDimBadge} ${styles[`metricDimBadge_${signalDimStatus}`]}`}>
+                {dimIcon(signalDimStatus)}
+              </span>
+            </div>
+            <p className={styles.metricDimIdea}>Variety</p>
+            <h4 className={styles.metricDimName}>Signal</h4>
+            <p className={styles.metricDimDesc}>
+              Features carry their own historical bias. Past Police Stops reflects prior enforcement patterns, not actual behaviour — including it teaches the model to replicate systemic inequity.
+              Daily Routine is a more neutral signal that gives the model relevant, uncontaminated evidence.
+            </p>
+          </div>
+
         </div>
       </section>
 

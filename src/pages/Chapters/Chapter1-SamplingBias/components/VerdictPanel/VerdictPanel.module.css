@@ -456,6 +456,7 @@
 
 .districtBoard,
 .insightBoard,
+.metricDimSection,
 .continueRow {
   background: var(--diet-paper);
   border: 1px solid rgba(92, 61, 46, 0.22);
@@ -465,6 +466,125 @@
 
 .districtBoard {
   padding: clamp(18px, 3vw, 28px);
+}
+
+/* ─── Metric dimension cards ─────────────────────────────────────────────── */
+
+.metricDimSection {
+  padding: clamp(18px, 3vw, 28px);
+}
+
+.metricDimGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.metricDimCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px;
+  border-radius: var(--diet-radius-document);
+  border: 1px solid transparent;
+}
+
+.metricDimCard_pass {
+  background: rgba(22, 163, 74, 0.06);
+  border-color: rgba(22, 163, 74, 0.22);
+}
+
+.metricDimCard_partial {
+  background: rgba(217, 119, 6, 0.06);
+  border-color: rgba(217, 119, 6, 0.22);
+}
+
+.metricDimCard_fail {
+  background: rgba(220, 38, 38, 0.05);
+  border-color: rgba(220, 38, 38, 0.2);
+}
+
+.metricDimTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.metricDimNum {
+  font-family: var(--font-case-file);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: var(--diet-ink-faded);
+}
+
+.metricDimBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--diet-radius-document);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.metricDimBadge_pass {
+  background: rgba(22, 163, 74, 0.14);
+  color: #15803d;
+  border: 1px solid rgba(22, 163, 74, 0.35);
+}
+
+.metricDimBadge_partial {
+  background: rgba(217, 119, 6, 0.14);
+  color: #b45309;
+  border: 1px solid rgba(217, 119, 6, 0.35);
+}
+
+.metricDimBadge_fail {
+  background: rgba(220, 38, 38, 0.12);
+  color: #b91c1c;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.metricDimIdea {
+  margin: 0;
+  font-family: var(--font-case-file);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--diet-copper);
+}
+
+.metricDimName {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 560;
+  color: var(--diet-ink);
+  line-height: 1.1;
+}
+
+.metricDimDesc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--rui-slate);
+  flex: 1;
+}
+
+.metricDimResult {
+  margin: 6px 0 0;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: rgba(26, 20, 16, 0.06);
+  font-family: var(--font-case-file);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--diet-ink);
 }
 
 .boardHeader {

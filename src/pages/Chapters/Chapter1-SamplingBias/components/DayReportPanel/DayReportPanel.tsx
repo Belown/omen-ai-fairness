@@ -10,11 +10,18 @@ import TutorialDebugOverlay from "../Tutorial/TutorialDebugOverlay";
 type DayReportPanelProps = {
   dayNumber: 1 | 2 | 3;
   overallAcc: number;
+  previousAcc?: number;
   regionAccs: number[];
   sampledFlags: boolean[];
+  zoneSamples?: number[];
   usefulSignal?: number;
   noiseSignal?: number;
   biasSignal?: number;
+  todaySampledFlags?: boolean[];
+  todayZoneSamples?: number[];
+  todayUsefulSignal?: number;
+  todayNoiseSignal?: number;
+  todayBiasSignal?: number;
   continueLabel?: string;
   onContinue?: () => void;
   tutorialEnabled?: boolean;
@@ -64,11 +71,18 @@ const TUTORIAL_STEPS: TutorialStep<TutorialTarget>[] = [
 export default function DayReportPanel({
   dayNumber,
   overallAcc,
+  previousAcc = 0.5,
   regionAccs,
   sampledFlags,
+  zoneSamples = [0, 0, 0, 0],
   usefulSignal = 0,
   noiseSignal = 0,
   biasSignal = 0,
+  todaySampledFlags,
+  todayZoneSamples,
+  todayUsefulSignal,
+  todayNoiseSignal,
+  todayBiasSignal,
   continueLabel,
   onContinue,
   tutorialEnabled = true,
@@ -100,60 +114,42 @@ export default function DayReportPanel({
   }, [dayNumber, regionAccs]);
 
   const overallPct = Math.round(overallAcc * 100);
+  const previousPct = Math.round(previousAcc * 100);
+  const deltaPct = overallPct - previousPct;
+  const deltaSign = deltaPct > 0 ? "+" : "";
+  const deltaTone = deltaPct > 0 ? "up" : deltaPct < 0 ? "down" : "flat";
   const sampledCount = sampledFlags.filter(Boolean).length;
   const overallTone = overallPct >= 75 ? "good" : overallPct >= 60 ? "mid" : "low";
-  const strongZones = useMemo(
-    () => REGIONS.filter((_, i) => (regionAccs[i] ?? 0) >= 0.75).map((r) => districtName(r.label)),
-    [regionAccs],
-  );
-  const lowZones = useMemo(
-    () => REGIONS.filter((_, i) => (regionAccs[i] ?? 0) < 0.6).map((r) => districtName(r.label)),
-    [regionAccs],
-  );
-  const unseenZones = useMemo(
-    () => REGIONS.filter((_, i) => !sampledFlags[i]).map((r) => districtName(r.label)),
-    [sampledFlags],
-  );
-  const attentionTone = unseenZones.length > 0 || overallPct < 60 ? "critical" : lowZones.length > 0 ? "warning" : "stable";
-  const attentionTitle =
-    unseenZones.length > 0
-      ? "Coverage blind spot"
-      : lowZones.length > 0
-        ? "Weak district confidence"
-        : "No urgent gaps";
-  const attentionDetail =
-    unseenZones.length > 0
-      ? unseenZones.join(", ")
-      : lowZones.length > 0
-        ? lowZones.join(", ")
-        : strongZones.length > 0
-          ? strongZones.join(", ")
-          : "All sampled districts";
 
   // ── Three-pillar check ───────────────────────────────────────────────────────
   type PillarStatus = "pass" | "partial" | "fail";
 
-  // Pillar 1 — Coverage: how many zones were visited
+  // Pillar 1 — Coverage: 1 zone = fail, 2-3 = partial, 4 = pass
   const coverageStatus: PillarStatus =
-    sampledCount === 4 ? "pass" : sampledCount === 3 ? "partial" : "fail";
+    sampledCount === 4 ? "pass" : sampledCount >= 2 ? "partial" : "fail";
   const coverageValue = `${sampledCount} / 4`;
 
-  // Pillar 2 — Sample size: average accuracy of the zones that were actually sampled
+  // Pillar 2 — Sample size: based on average samples per sampled zone
+  //   < 300 → 100-tier (fail), 300–700 → 500-tier (partial), > 700 → 1000-tier (pass)
   const sampledAccs = regionAccs.filter((_, i) => sampledFlags[i]);
   const sampledAvgPct = sampledAccs.length
     ? Math.round((sampledAccs.reduce((s, a) => s + a, 0) / sampledAccs.length) * 100)
     : 0;
+  const sampledZoneSamples = zoneSamples.filter((_, i) => sampledFlags[i]);
+  const avgZoneSamples = sampledZoneSamples.length
+    ? sampledZoneSamples.reduce((s, n) => s + n, 0) / sampledZoneSamples.length
+    : 0;
   const sampleStatus: PillarStatus =
-    sampledAvgPct >= 75 ? "pass" : sampledAvgPct >= 60 ? "partial" : "fail";
+    avgZoneSamples > 700 ? "pass" : avgZoneSamples >= 300 ? "partial" : "fail";
   const sampleValue = sampledCount > 0 ? `${sampledAvgPct}% avg` : "—";
 
-  // Pillar 3 — Question variety: signal quality across the committed days
+  // Pillar 3 — Signal quality: no signals = fail, wrong only = partial, routine = pass
   const usedRoutine = usefulSignal > 0;
   const usedPhone   = noiseSignal  > 0;
   const usedPolice  = biasSignal   > 0;
   const varietyStatus: PillarStatus =
     usedRoutine && !usedPhone && !usedPolice ? "pass"
-    : usedRoutine ? "partial"
+    : usedRoutine || usedPhone || usedPolice ? "partial"
     : "fail";
   const varietyValue = usedRoutine
     ? (usedPhone || usedPolice ? "Routine + noise" : "Routine only")
@@ -162,6 +158,56 @@ export default function DayReportPanel({
       : "None asked";
 
   const pillarIcon = (s: PillarStatus) => s === "pass" ? "✓" : s === "partial" ? "~" : "✗";
+
+  // ── Hint stack — scoped to today's missions only ─────────────────────────────
+  const hintSampledFlags  = todaySampledFlags  ?? sampledFlags;
+  const hintZoneSamples   = todayZoneSamples   ?? zoneSamples;
+  const hintUsefulSignal  = todayUsefulSignal  ?? usefulSignal;
+  const hintNoiseSignal   = todayNoiseSignal   ?? noiseSignal;
+  const hintBiasSignal    = todayBiasSignal    ?? biasSignal;
+
+  const hintSampledCount  = hintSampledFlags.filter(Boolean).length;
+  const hintUnseenZones   = REGIONS.filter((_, i) => !hintSampledFlags[i]).map((r) => districtName(r.label));
+  const hintZoneSamplesFiltered = hintZoneSamples.filter((_, i) => hintSampledFlags[i]);
+  const hintAvgZoneSamples = hintZoneSamplesFiltered.length
+    ? hintZoneSamplesFiltered.reduce((s, n) => s + n, 0) / hintZoneSamplesFiltered.length
+    : 0;
+  const hintUsedRoutine   = hintUsefulSignal > 0;
+  const hintUsedPhone     = hintNoiseSignal  > 0;
+  const hintUsedPolice    = hintBiasSignal   > 0;
+
+  const hintCoverageStatus: PillarStatus =
+    hintSampledCount === 4 ? "pass" : hintSampledCount >= 2 ? "partial" : "fail";
+  const hintSampleStatus: PillarStatus =
+    hintAvgZoneSamples > 700 ? "pass" : hintAvgZoneSamples >= 300 ? "partial" : "fail";
+  const hintSignalStatus: PillarStatus =
+    hintUsedRoutine && !hintUsedPhone && !hintUsedPolice ? "pass"
+    : hintUsedRoutine || hintUsedPhone || hintUsedPolice ? "partial"
+    : "fail";
+
+  const coverageHint =
+    hintSampledCount === 4
+      ? "All 4 districts sampled — full city coverage."
+      : hintSampledCount >= 2
+        ? `${hintUnseenZones.join(", ")} unsampled. Adding more zones helps the model generalise across the city.`
+        : "Only 1 district sampled — the model sees a single slice of the city. Expand to at least 2 zones.";
+
+  const sampleHint =
+    hintSampleStatus === "pass"
+      ? "High sample volume — 1000-tier reached. Strongest possible evidence base."
+      : hintSampleStatus === "partial"
+        ? "500-tier samples — solid, but 1000 per zone is optimal if IP allows."
+        : "Only 100-tier samples detected. Increase to 500 or 1000 per zone for reliable evidence.";
+
+  const signalHint = (() => {
+    if (hintUsedRoutine && !hintUsedPhone && !hintUsedPolice)
+      return "Daily Routine selected — the most useful signal for this model. Keep it.";
+    if (hintUsedRoutine && (hintUsedPhone || hintUsedPolice))
+      return "Daily Routine helps, but Phone Model and Police Stops add noise or bias. Drop them for more budget.";
+    if (!hintUsedRoutine && (hintUsedPhone || hintUsedPolice))
+      return "Phone Model / Police Stops add noise without the right signal. Swap for Daily Routine instead.";
+    return "No optional signals added. Daily Routine is the strongest available feature — include it next day.";
+  })();
 
   const suggestedActions = useMemo(() => {
     if (dayNumber === 3) {
@@ -215,6 +261,9 @@ export default function DayReportPanel({
           <div className={`${styles.overallPill} ${styles[`overallPill_${overallTone}`]}`}>
             <span className={styles.overallLabel}>Overall Accuracy</span>
             <strong className={styles.overallValue}>{overallPct}%</strong>
+            <span className={`${styles.overallDelta} ${styles[`overallDelta_${deltaTone}`]}`}>
+              {deltaSign}{deltaPct}% vs. {dayNumber === 1 ? "baseline (50%)" : `Day ${dayNumber - 1}`}
+            </span>
           </div>
         </div>
       </div>
@@ -299,9 +348,51 @@ export default function DayReportPanel({
               </div>
             </div>
 
-            <div className={`${styles.attentionBox} ${styles[`attentionBox_${attentionTone}`]}`}>
-              <strong>{attentionTitle}</strong>
-              <p>{attentionDetail}</p>
+            <div className={styles.hintStack}>
+              <div className={`${styles.hintRow} ${styles[`hintRow_${hintCoverageStatus}`]}`}>
+                <span className={`${styles.pillarBadge} ${styles[`pillarBadge_${hintCoverageStatus}`]}`}>
+                  {pillarIcon(hintCoverageStatus)}
+                </span>
+                <div>
+                  <strong>Coverage</strong>
+                  <p>{coverageHint}</p>
+                </div>
+              </div>
+              <div className={`${styles.hintRow} ${styles[`hintRow_${hintSampleStatus}`]}`}>
+                <span className={`${styles.pillarBadge} ${styles[`pillarBadge_${hintSampleStatus}`]}`}>
+                  {pillarIcon(hintSampleStatus)}
+                </span>
+                <div>
+                  <strong>Sample size</strong>
+                  <p>{sampleHint}</p>
+                </div>
+              </div>
+              <div className={`${styles.hintRow} ${styles[`hintRow_${hintSignalStatus}`]}`}>
+                <span className={`${styles.pillarBadge} ${styles[`pillarBadge_${hintSignalStatus}`]}`}>
+                  {pillarIcon(hintSignalStatus)}
+                </span>
+                <div>
+                  <strong>Signals</strong>
+                  {!hintUsedRoutine && !hintUsedPhone && !hintUsedPolice ? (
+                    <p>{signalHint}</p>
+                  ) : (
+                    <>
+                      <div className={styles.signalTagRow}>
+                        {hintUsedRoutine && (
+                          <span className={styles.signalTagCorrect}>✓ Daily Routine</span>
+                        )}
+                        {hintUsedPhone && (
+                          <span className={styles.signalTagNoise}>⚡ Phone Model — noise</span>
+                        )}
+                        {hintUsedPolice && (
+                          <span className={styles.signalTagBias}>⚠ Past Police Stops — bias</span>
+                        )}
+                      </div>
+                      <p className={styles.signalSubHint}>{signalHint}</p>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className={styles.receiptSection}>

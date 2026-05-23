@@ -57,6 +57,7 @@ export type StrategySummary = {
   regionAccs: number[];
   otherCityAccs: number[];
   sampledFlags: boolean[];
+  zoneSamples: number[];
   committedCount: number;
   usefulSignal: number;
   noiseSignal: number;

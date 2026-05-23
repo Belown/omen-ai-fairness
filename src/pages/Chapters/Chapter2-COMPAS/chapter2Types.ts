@@ -1,23 +1,22 @@
 import type { FairnessDefinitionId, StudyMetricId } from "./chapter2Data";
-import type { SatisfactionScores, StudyResult } from "./chapter2Simulation";
+import { METRIC_USAGE_INITIAL, STARTING_BUDGET } from "./chapter2Data";
+import type { ScenarioData } from "./chapter2Scenarios";
+
+export type MetricUsageCounts = Record<FairnessDefinitionId, number>;
 
 export type DayRecord = {
   day: number;
   metricActive: FairnessDefinitionId;
   studiesQueued: StudyMetricId[];
   costDeducted: number;
-  results: StudyResult[];
-  dailySatisfaction?: SatisfactionScores;
+  scenario: ScenarioData;
 };
 
 export type Chapter2GameState = {
   currentDay: number;
   fairnessMetric: FairnessDefinitionId;
-  metricChangedToday: boolean;
-  /** Calendar day when the player last switched metric (penalty on the night after). */
-  switchedMetricOnDay: number | null;
   budget: number;
-  aggregateSatisfaction: SatisfactionScores[];
+  metricUsageCounts: MetricUsageCounts;
   days: DayRecord[];
   pendingQueue: StudyMetricId[];
 };
@@ -25,10 +24,8 @@ export type Chapter2GameState = {
 export const INITIAL_GAME_STATE: Chapter2GameState = {
   currentDay: 0,
   fairnessMetric: "equal_rates",
-  metricChangedToday: false,
-  switchedMetricOnDay: null,
-  budget: 1000,
-  aggregateSatisfaction: [],
+  budget: STARTING_BUDGET,
+  metricUsageCounts: { ...METRIC_USAGE_INITIAL },
   days: [],
   pendingQueue: [],
 };

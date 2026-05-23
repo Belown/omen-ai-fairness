@@ -25,6 +25,7 @@ import {
   type Verdict,
 } from "./alignmentCards";
 import styles from "./CardStack.module.css";
+import { sessionLogger } from "../../../utils/sessionLogger";
 
 type HistoryEntry = {
   cardId: string;
@@ -248,6 +249,16 @@ export default function CardStack({
     const choice = which === "A" ? card.choiceA : card.choiceB;
     const otherChoice = which === "A" ? card.choiceB : card.choiceA;
     const nextMeters = applyDelta(meters, choice.delta);
+    sessionLogger.logCh3Choice({
+      roundIndex: index,
+      cardId: card.id,
+      cardTag: card.tag,
+      question: card.user,
+      choice: which,
+      choiceLabel: choice.label,
+      delta: choice.delta,
+      metersAfter: nextMeters,
+    });
     setMeters(nextMeters);
     setLastDeltas(choice.delta);
     setPickTick((t) => t + 1);

@@ -51,18 +51,19 @@ export default function BoundaryExercise({
       <div className={styles.boundaryWorkbench}>
         <div className={styles.boundaryHeader}>
           <div>
-            <p className={styles.panelEyebrow}>Initial view | Uptown only | {DEMO_INIT.length} points</p>
-            <h2 className={styles.h2}>Draw a perfect-looking boundary.</h2>
+            <p className={styles.panelEyebrow}>
+              <span className={styles.taskTypeBadge}>Binary Classification</span>
+            </p>
+            <h2 className={styles.h2}>Position the decision boundary.</h2>
           </div>
           <span className={styles.boundaryAccuracy}>
             Training accuracy <strong>{trainingAccuracy}</strong>
           </span>
         </div>
 
-        {/* <p className={styles.boundaryBody}>
-          Move the line to separate Safe from Threat. You need 100% training accuracy before this boundary can be submitted.
-          Black rings mark mistakes.
-        </p> */}
+        <p className={styles.classificationNote}>
+          The line is a <strong>decision boundary</strong> — every point above it is classified as one class, every point below as the other. This is not regression; there is no continuous output, only <strong>Safe</strong> or <strong>Threat</strong>.
+        </p>
 
         <div className={styles.boundaryInteractive}>
           <div className={styles.boundaryPlot}>

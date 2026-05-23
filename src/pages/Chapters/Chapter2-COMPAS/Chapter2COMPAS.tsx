@@ -1,281 +1,260 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
 import { useSearchParams } from "react-router-dom";
 import Chatbox from "../../../components/Chatbox/Chatbox";
 import { portraits } from "../../../assets/detective/portraits";
 import { CHAPTER1_BACKGROUNDS } from "../../../assets/image/image";
 import styles from "./Chapter2COMPAS.module.css";
-import { INTRO_CHUNKS, MAX_CURRENT_DAY, STARTING_BUDGET, STUDY_METRICS, type FairnessDefinitionId, type StudyMetricId } from "./chapter2Data";
+import { buildScenarioDialogue } from "./chapter2Dialogue";
 import {
-  aggregatedSatisfaction,
-  computeDailySatisfaction,
-  resolveDayStudies,
-} from "./chapter2Simulation";
-import type { DayRecord } from "./chapter2Types";
+  MAX_CURRENT_DAY,
+  STARTING_BUDGET,
+  STUDY_METRICS,
+  type FairnessDefinitionId,
+  type StudyMetricId,
+} from "./chapter2Data";
+import { getScenario, type AggregateSatisfaction } from "./chapter2Scenarios";
+import { TUTORIAL_REOPEN_START, type TutorialSpotlight } from "./chapter2Tutorial";
+import type { DayRecord, MetricUsageCounts } from "./chapter2Types";
 import { INITIAL_GAME_STATE } from "./chapter2Types";
-import DaySummaryPanel from "./components/DaySummaryPanel";
-import EndgamePanel from "./components/EndgamePanel";
-import FairnessMetricSelector from "./components/FairnessMetricSelector";
-import GameHud from "./components/GameHud";
-import StudyQueuePanel from "./components/StudyQueuePanel";
-import StudyResultsPanel from "./components/StudyResultsPanel";
+import EndingSequence from "./components/EndingSequence";
+import LeftPanel from "./components/LeftPanel";
+import RightPanel from "./components/RightPanel";
+import TutorialOverlay from "./components/TutorialOverlay";
 
-type Phase = "intro" | "game" | "end";
-
-const getPortrait = (text: string) => {
-  const t = text.toLowerCase();
-  if (t.includes("budget") || t.includes("insufficient")) return portraits.worried;
-  if (t.includes("trade") || t.includes("locked")) return portraits.thoughtful;
-  if (t.includes("satisfaction") || t.includes("community") || t.includes("study")) return portraits.suspicious;
-  if (t.includes("final") || t.includes("confirm")) return portraits.serious;
-  if (t.includes("queue") || t.includes("advance")) return portraits.encouraging;
-  return portraits.neutral;
-};
+type Phase = "tutorial" | "game" | "ending";
+type EndingPhase = "narrative" | "outcome-best" | "outcome-keep";
 
 function queueCost(queue: StudyMetricId[]) {
   return queue.reduce((sum, id) => sum + (STUDY_METRICS.find((m) => m.id === id)?.cost ?? 0), 0);
 }
 
-type Chapter2COMPASProps = {
-  isActive?: boolean;
-  onChapterComplete?: (result: { completed: boolean; passed: boolean; scoreLabel?: string }) => void;
-};
+function satisfactionFromDays(days: DayRecord[]): AggregateSatisfaction[] {
+  return days.map((d) => ({
+    judges: d.scenario.satisfaction.judges.score,
+    predators: d.scenario.satisfaction.predators.score,
+    prey: d.scenario.satisfaction.prey.score,
+  }));
+}
 
-export default function Chapter2COMPAS({ isActive: _isActive = true, onChapterComplete }: Chapter2COMPASProps = {}) {
+export default function Chapter2COMPAS() {
   const [, setSearchParams] = useSearchParams();
-  const [phase, setPhase] = useState<Phase>("intro");
-  const [introIndex, setIntroIndex] = useState(0);
+
+  const [phase, setPhase] = useState<Phase>("tutorial");
+  const [tutorialStep, setTutorialStep] = useState(0);
   const [currentDay, setCurrentDay] = useState(INITIAL_GAME_STATE.currentDay);
   const [fairnessMetric, setFairnessMetric] = useState<FairnessDefinitionId>(INITIAL_GAME_STATE.fairnessMetric);
-  const [metricChangedToday, setMetricChangedToday] = useState(false);
-  const [switchedMetricOnDay, setSwitchedMetricOnDay] = useState<number | null>(
-    INITIAL_GAME_STATE.switchedMetricOnDay,
-  );
   const [budget, setBudget] = useState(STARTING_BUDGET);
-  const [aggregateSatisfaction, setAggregateSatisfaction] = useState<typeof INITIAL_GAME_STATE.aggregateSatisfaction>(
-    [],
-  );
+  const [metricUsageCounts, setMetricUsageCounts] = useState<MetricUsageCounts>({
+    ...INITIAL_GAME_STATE.metricUsageCounts,
+  });
   const [days, setDays] = useState<DayRecord[]>([]);
   const [pendingQueue, setPendingQueue] = useState<StudyMetricId[]>([]);
+  const [endingPanelIndex, setEndingPanelIndex] = useState(0);
+  const [endingPhase, setEndingPhase] = useState<EndingPhase>("narrative");
+  const [isNarrativeCollapsed, setIsNarrativeCollapsed] = useState(false);
+  const [chatboxReopenSignal, setChatboxReopenSignal] = useState(0);
+
+  const gameShellRef = useRef<HTMLDivElement>(null);
+  const metricSelectorRef = useRef<HTMLElement>(null);
+  const studyQueueRef = useRef<HTMLElement>(null);
+  const metricsDashboardRef = useRef<HTMLElement>(null);
+  const satisfactionMetersRef = useRef<HTMLElement>(null);
+  const lastDialogueKeyRef = useRef<string>("");
+
+  const spotlightRefs: Record<TutorialSpotlight, RefObject<HTMLElement | null>> = useMemo(
+    () => ({
+      frame: gameShellRef,
+      metricSelector: metricSelectorRef,
+      metricsDashboard: metricsDashboardRef,
+      satisfactionMeters: satisfactionMetersRef,
+      studyQueue: studyQueueRef,
+      none: { current: null },
+    }),
+    [],
+  );
 
   const pendingCost = queueCost(pendingQueue);
   const canAdvance = budget - pendingCost >= 0;
-  const isFinalDay = currentDay === MAX_CURRENT_DAY;
 
-  const overnightResults = currentDay >= 1 ? (days[currentDay - 1]?.results ?? []) : [];
-  const overnightFromNight = currentDay >= 1 ? days[currentDay - 1]?.day ?? null : null;
+  const resultsDayRecord = currentDay >= 1 ? days[currentDay - 1] : null;
+  const displayedScenario = resultsDayRecord?.scenario ?? null;
+  const commissionedStudies = resultsDayRecord?.studiesQueued ?? [];
+  const satisfactionHistory = useMemo(() => satisfactionFromDays(days), [days]);
 
-  const latestDaily =
-    aggregateSatisfaction.length > 0
-      ? aggregateSatisfaction[aggregateSatisfaction.length - 1]
-      : null;
-  const aggregateScore =
-    aggregateSatisfaction.length > 0 ? aggregatedSatisfaction(aggregateSatisfaction) : null;
+  const dialogueText = useMemo(() => {
+    if (!resultsDayRecord) return "";
+    const { metric, usageCount } = resultsDayRecord.scenario;
+    return (
+      buildScenarioDialogue(metric, usageCount, resultsDayRecord.studiesQueued) ?? ""
+    );
+  }, [resultsDayRecord]);
+
+  const showGameChatbox = phase === "game" && currentDay >= 1 && dialogueText.length > 0;
+
+  useEffect(() => {
+    if (!showGameChatbox) return;
+    const key = `${currentDay}-${dialogueText}`;
+    if (key === lastDialogueKeyRef.current) return;
+    lastDialogueKeyRef.current = key;
+    setIsNarrativeCollapsed(false);
+    setChatboxReopenSignal((s) => s + 1);
+  }, [showGameChatbox, currentDay, dialogueText]);
 
   const toggleQueue = (metricId: StudyMetricId) => {
     if (currentDay >= MAX_CURRENT_DAY || budget <= 0) return;
     setPendingQueue((prev) => {
       if (prev.includes(metricId)) return prev.filter((id) => id !== metricId);
       const next = [...prev, metricId];
-      const cost = queueCost(next);
-      if (cost > budget) return prev;
+      if (queueCost(next) > budget) return prev;
       return next;
     });
   };
 
   const handleMetricSelect = (id: FairnessDefinitionId) => {
-    if (id === fairnessMetric) return;
-    if (isFinalDay) {
-      setFairnessMetric(id);
-      return;
-    }
-    if (metricChangedToday) return;
     setFairnessMetric(id);
-    setMetricChangedToday(true);
-    setSwitchedMetricOnDay(currentDay);
   };
 
   const advanceDay = () => {
     if (currentDay >= MAX_CURRENT_DAY || !canAdvance) return;
 
+    const metric = fairnessMetric;
+    const usageCount = Math.min(metricUsageCounts[metric] + 1, 3);
+    const scenario = getScenario(metric, usageCount);
+
     const record: DayRecord = {
       day: currentDay,
-      metricActive: fairnessMetric,
+      metricActive: metric,
       studiesQueued: [...pendingQueue],
       costDeducted: pendingCost,
-      results: [],
+      scenario,
     };
 
-    const applySwitchPenalty =
-      switchedMetricOnDay !== null && record.day === switchedMetricOnDay + 1;
-
-    const dailySat = computeDailySatisfaction(record.metricActive, record.day, {
-      applySwitchPenalty,
-    });
-
-    const resolvedResults = resolveDayStudies(
-      record.studiesQueued,
-      record.metricActive,
-      record.day,
-      dailySat,
-      { applySwitchPenalty },
-    );
-
-    const completedRecord: DayRecord = {
-      ...record,
-      results: resolvedResults,
-      dailySatisfaction: dailySat,
-    };
-
-    setDays((prev) => [...prev, completedRecord]);
+    setDays((prev) => [...prev, record]);
     setBudget((b) => b - pendingCost);
-    setAggregateSatisfaction((prev) => [...prev, dailySat]);
+    setMetricUsageCounts((c) => ({
+      ...c,
+      [metric]: Math.min(c[metric] + 1, 3),
+    }));
     setCurrentDay((d) => d + 1);
     setPendingQueue([]);
-    setMetricChangedToday(false);
-    if (applySwitchPenalty) setSwitchedMetricOnDay(null);
   };
 
   const confirmEnding = () => {
-    setPhase("end");
+    setPhase("ending");
+    setEndingPanelIndex(0);
+    setEndingPhase("narrative");
   };
 
-  const hasReportedCompletionRef = useRef(false);
-  useEffect(() => {
-    if (phase !== "end" || hasReportedCompletionRef.current) return;
-    hasReportedCompletionRef.current = true;
-    onChapterComplete?.({ completed: true, passed: true, scoreLabel: fairnessMetric });
-  }, [phase, fairnessMetric, onChapterComplete]);
-
-  const resetGame = () => {
-    setPhase("intro");
-    setIntroIndex(0);
+  const resetGame = useCallback(() => {
+    setPhase("tutorial");
+    setTutorialStep(0);
     setCurrentDay(0);
     setFairnessMetric("equal_rates");
-    setMetricChangedToday(false);
-    setSwitchedMetricOnDay(null);
     setBudget(STARTING_BUDGET);
-    setAggregateSatisfaction([]);
+    setMetricUsageCounts({ equal_rates: 0, predictive_parity: 0, max_accuracy: 0 });
     setDays([]);
     setPendingQueue([]);
+    setEndingPanelIndex(0);
+    setEndingPhase("narrative");
+    setIsNarrativeCollapsed(false);
+    setChatboxReopenSignal(0);
+    lastDialogueKeyRef.current = "";
+  }, []);
+
+  const openTutorialFromHelp = () => {
+    setTutorialStep(TUTORIAL_REOPEN_START - 1);
+    setPhase("tutorial");
   };
 
-  const narrativeText = useMemo(() => {
-    if (phase === "intro") return INTRO_CHUNKS[introIndex] ?? "";
-    if (phase === "end") return "Term complete. The fairness metric you confirmed determines how the courthouse remembers this deployment.";
-    if (isFinalDay) {
-      return "Final night: review last night’s studies, then confirm the fairness metric that will define the system’s deployment outcome.";
-    }
-    if (currentDay === 0) {
-      return "Day 0 — planning night. Choose your fairness metric and queue studies. No results yet; advance when your queue is ready.";
-    }
-    return `Day ${currentDay}. Review overnight findings, adjust your metric if you have not already today, then queue studies for tomorrow.`;
-  }, [phase, introIndex, currentDay, isFinalDay]);
+  const finishTutorial = () => {
+    setPhase("game");
+    setTutorialStep(0);
+  };
 
-  const portraitSrc = useMemo(() => getPortrait(narrativeText), [narrativeText]);
-
-  const chapterBackground = useMemo(() => {
-    if (phase === "game") return CHAPTER1_BACKGROUNDS.cityMapTable;
-    if (phase === "end") return CHAPTER1_BACKGROUNDS.modelTraining;
-    return CHAPTER1_BACKGROUNDS.caseRoom;
-  }, [phase]);
-
+  const chapterBackground = CHAPTER1_BACKGROUNDS.cityMapTable;
   const phaseStyle = { "--chapter-bg": `url(${chapterBackground})` } as CSSProperties;
 
-  const dialogueHistory = useMemo(
-    () => [{ text: narrativeText, passageId: `${phase}-${currentDay}`, current: true }],
-    [narrativeText, phase, currentDay],
-  );
+  const gameShellClass = [
+    styles.gameShell,
+    showGameChatbox && !isNarrativeCollapsed ? styles.gameShellChatboxOpen : "",
+    showGameChatbox && isNarrativeCollapsed ? styles.gameShellChatboxCollapsed : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  const handleIntroAdvance = () => {
-    if (introIndex < INTRO_CHUNKS.length - 1) {
-      setIntroIndex((i) => i + 1);
-    } else {
-      setPhase("game");
-    }
-  };
-
-  const metricLocked = !isFinalDay && metricChangedToday;
-
-  const gamePanel =
-    phase === "game" ? (
-      <>
-        <GameHud currentDay={currentDay} budget={budget} dailySatisfaction={latestDaily} />
-        <StudyResultsPanel results={overnightResults} fromNight={overnightFromNight} />
-        <DaySummaryPanel
-          currentDay={currentDay}
-          dailySatisfaction={latestDaily}
-          aggregateSatisfaction={aggregateScore}
-          queuedTonight={pendingQueue.length}
-          queueCost={pendingCost}
+  if (phase === "ending") {
+    return (
+      <div className={`${styles.phase} ${styles.phaseWithBackground}`} style={phaseStyle}>
+        <EndingSequence
+          panelIndex={endingPanelIndex}
+          phase={endingPhase}
+          onAdvance={() => setEndingPanelIndex((i) => Math.min(i + 1, 9))}
+          onChooseBest={() => setEndingPhase("outcome-best")}
+          onChooseKeep={() => setEndingPhase("outcome-keep")}
+          onReplay={resetGame}
+          onNextChapter={() => setSearchParams({ chapter: "ch3" })}
         />
-        <FairnessMetricSelector
-          active={fairnessMetric}
-          locked={metricLocked}
-          showLockNotice={!isFinalDay}
-          onSelect={handleMetricSelect}
-        />
-        {!isFinalDay && (
-          <StudyQueuePanel
-            pendingQueue={pendingQueue}
-            budget={budget}
-            disabled={false}
-            onToggle={toggleQueue}
-          />
-        )}
-        {isFinalDay && (
-          <p className={styles.day3Copy}>
-            This is your final decision. The fairness metric you confirm will determine the system&apos;s deployment
-            outcome.
-          </p>
-        )}
-        <div className={styles.dayActions}>
-          {!isFinalDay ? (
-            <button
-              type="button"
-              className={styles.primaryBtn}
-              onClick={advanceDay}
-              disabled={!canAdvance}
-            >
-              Advance to Day {currentDay + 1} →
-            </button>
-          ) : (
-            <button type="button" className={styles.primaryBtn} onClick={confirmEnding}>
-              Confirm & see outcome →
-            </button>
-          )}
-        </div>
-      </>
-    ) : null;
+      </div>
+    );
+  }
 
-  const endPanel =
-    phase === "end" ? (
-      <EndgamePanel
-        dailyHistory={aggregateSatisfaction}
-        finalFairness={fairnessMetric}
-        finalBudget={budget}
-        onReplay={resetGame}
-        onNextChapter={() => setSearchParams({ chapter: "ch3" })}
-      />
-    ) : null;
+  const showTutorial = phase === "tutorial";
 
   return (
     <div className={`${styles.phase} ${styles.phaseWithBackground}`} style={phaseStyle}>
-      <div className={styles.scene}>
-        <div className={styles.sceneInner}>
-          {gamePanel}
-          {endPanel}
-        </div>
+      <div ref={gameShellRef} className={gameShellClass} data-tutorial-dim={showTutorial ? true : undefined}>
+        <LeftPanel
+          currentDay={currentDay}
+          budget={budget}
+          fairnessMetric={fairnessMetric}
+          pendingQueue={pendingQueue}
+          canAdvance={canAdvance}
+          onMetricSelect={handleMetricSelect}
+          onToggleStudy={toggleQueue}
+          onAdvance={advanceDay}
+          onConfirmEnding={confirmEnding}
+          onOpenTutorial={openTutorialFromHelp}
+          metricSelectorRef={metricSelectorRef}
+          studyQueueRef={studyQueueRef}
+        />
+
+        <RightPanel
+          currentDay={currentDay}
+          scenario={displayedScenario}
+          commissionedStudies={commissionedStudies}
+          satisfactionHistory={satisfactionHistory}
+          metricsDashboardRef={metricsDashboardRef}
+          satisfactionMetersRef={satisfactionMetersRef}
+        />
       </div>
 
-      <Chatbox
-        text={narrativeText}
-        portraitSrc={portraitSrc}
-        history={dialogueHistory}
-        onAdvance={phase === "intro" ? handleIntroAdvance : undefined}
-        speakerName="Pretrial clerk"
-        disableKeyboardAdvance={phase !== "intro"}
-        disablePreviousNavigation
-      />
+      {showTutorial && (
+        <TutorialOverlay
+          stepIndex={tutorialStep}
+          onNext={() => setTutorialStep((s) => s + 1)}
+          onComplete={finishTutorial}
+          onSkip={finishTutorial}
+          spotlightRefs={spotlightRefs}
+        />
+      )}
+
+      {showGameChatbox && (
+        <Chatbox
+          text={dialogueText}
+          portraitSrc={portraits.thoughtful}
+          history={[
+            {
+              text: dialogueText,
+              passageId: `day-${currentDay}-results`,
+              current: true,
+            },
+          ]}
+          onCollapsedChange={setIsNarrativeCollapsed}
+          reopenSignal={chatboxReopenSignal}
+          speakerName="Whiskers Holmes"
+          disablePreviousNavigation
+        />
+      )}
     </div>
   );
 }

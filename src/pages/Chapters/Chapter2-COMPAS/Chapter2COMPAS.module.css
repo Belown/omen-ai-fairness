@@ -1,10 +1,10 @@
 .phase {
   position: relative;
   width: 100%;
-  min-height: 100%;
-  padding-top: 12px;
-  isolation: isolate;
+  height: 100vh;
+  max-height: 100vh;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .phaseWithBackground::before {
@@ -13,10 +13,9 @@
   inset: 0;
   z-index: -2;
   background-image: var(--chapter-bg);
-  background-size: min(85vw, 2000px) auto;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  transform: scale(1.02);
 }
 
 .phaseWithBackground::after {
@@ -26,76 +25,60 @@
   z-index: -1;
   pointer-events: none;
   background-image:
-    linear-gradient(180deg, rgba(250, 247, 240, 0.2), rgba(10, 14, 20, 0.34)),
-    radial-gradient(circle at 50% 18%, rgba(250, 247, 240, 0.1), transparent 42%);
+    linear-gradient(180deg, rgba(250, 247, 240, 0.25), rgba(10, 14, 20, 0.3)),
+    radial-gradient(circle at 50% 18%, rgba(250, 247, 240, 0.08), transparent 42%);
   background-repeat: no-repeat;
 }
 
-.phaseWithBackground .sceneInner {
+.gameShell {
   position: relative;
   z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(320px, 42%) 1fr;
+  gap: 16px;
+  height: 100vh;
+  max-height: 100vh;
+  padding: 16px clamp(12px, 2vw, 24px);
+  padding-bottom: 16px;
+  box-sizing: border-box;
+  transition: padding-bottom 0.24s ease;
 }
 
-.scene {
-  padding: 20px clamp(12px, 2vw, 28px) 232px;
-  max-width: 1600px;
-  margin: 0 auto;
+.gameShellChatboxOpen {
+  padding-bottom: calc(var(--chatbox-open-max-height, 260px) + 36px);
 }
 
-.sceneInner {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  animation: sceneIn 0.4s ease-out both;
+.gameShellChatboxCollapsed {
+  padding-bottom: calc(var(--chatbox-collapsed-height, 28px) + 20px);
 }
 
-@keyframes sceneIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.gameShell[data-tutorial-dim] {
+  pointer-events: none;
 }
 
-.overlayChoices {
-  position: fixed;
-  bottom: 224px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 25;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  animation: choicesUp 0.3s ease-out both;
-  padding: 12px;
-  width: min(960px, calc(100vw - 24px));
+.gameShell[data-tutorial-dim] > * {
+  pointer-events: auto;
 }
 
-.choiceCard {
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(25, 28, 31, 0.16);
+.metricSection {
   border-radius: 10px;
-  padding: 14px 16px 16px;
-  box-shadow: 0 16px 34px rgba(25, 28, 31, 0.16);
-  backdrop-filter: blur(10px);
-  width: 100%;
+  border: 1px solid rgba(25, 28, 31, 0.14);
+  background: rgba(255, 255, 255, 0.92);
+  padding: 14px 16px;
+  box-shadow: 0 8px 20px rgba(25, 28, 31, 0.06);
 }
 
-.choiceLead {
+.metricHeading {
   margin: 0 0 10px;
-  font-size: 14px;
+  font-family: var(--font-display, serif);
+  font-size: clamp(16px, 1.8vw, 20px);
   font-weight: 600;
-  color: var(--rui-dark);
 }
 
 .choiceGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px;
+  grid-template-columns: 1fr;
+  gap: 8px;
 }
 
 .choice {
@@ -106,24 +89,19 @@
   color: var(--rui-dark);
   font-family: var(--font-display);
   border-radius: 7px;
-  padding: 12px 14px;
+  padding: 10px 12px;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
-.choice:hover:not(:disabled) {
+.choice:hover {
   background: var(--rui-dark);
   color: var(--rui-white);
   border-color: var(--rui-dark);
   transform: translateY(-1px);
-}
-
-.choice:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
 }
 
 .choiceActive {
@@ -132,52 +110,15 @@
   border-color: var(--rui-dark);
 }
 
-.metricSection {
-  border-radius: 10px;
-  border: 1px solid rgba(25, 28, 31, 0.14);
-  background: rgba(255, 255, 255, 0.92);
-  padding: 16px 18px;
-  box-shadow: 0 12px 28px rgba(25, 28, 31, 0.08);
-}
-
-.metricHeading {
-  margin: 0 0 10px;
-  font-family: var(--font-display, serif);
-  font-size: clamp(18px, 2vw, 22px);
-  font-weight: 600;
-}
-
-.metricNotice {
-  margin: 0 0 12px;
-  font-size: 13px;
-  font-style: italic;
-  color: rgba(73, 79, 223, 0.95);
-}
-
-.day3Copy {
-  margin: 0 0 14px;
-  font-size: 14px;
-  line-height: 1.5;
-  color: rgba(25, 28, 31, 0.82);
-  max-width: 720px;
-}
-
 .choiceTitle {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .choiceBody {
-  font-size: 12px;
-  line-height: 1.4;
+  font-size: 11px;
+  line-height: 1.35;
   opacity: 0.92;
-}
-
-.dayActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: flex-end;
 }
 
 .primaryBtn {
@@ -194,7 +135,7 @@
   box-shadow: 0 12px 26px rgba(25, 28, 31, 0.18);
 }
 
-.primaryBtn:hover {
+.primaryBtn:hover:not(:disabled) {
   transform: translateY(-1px);
 }
 
@@ -204,51 +145,24 @@
   transform: none;
 }
 
-.warn {
-  font-size: 13px;
-  color: #7a1e1e;
-  align-self: center;
-}
-
-.daySummary {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 20px;
-  font-size: 13px;
-  padding: 10px 12px;
+.tutorialPlaceholder {
+  min-height: 120px;
   border-radius: 8px;
-  border: 1px solid rgba(25, 28, 31, 0.1);
-  background: rgba(255, 255, 255, 0.85);
+  border: 1px dashed rgba(25, 28, 31, 0.2);
+  background: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: rgba(25, 28, 31, 0.45);
+  padding: 12px;
+  text-align: center;
 }
 
-@keyframes choicesUp {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
-
-@media (max-width: 640px) {
-  .phase {
-    padding-top: 16px;
-  }
-
-  .scene {
-    padding-inline: 12px;
-    padding-bottom: 248px;
-  }
-
-  .overlayChoices {
-    bottom: 232px;
-    width: calc(100vw - 16px);
-    padding-inline: 0;
-  }
-
-  .choiceGrid {
+@media (max-width: 900px) {
+  .gameShell {
     grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    height: 100vh;
   }
 }

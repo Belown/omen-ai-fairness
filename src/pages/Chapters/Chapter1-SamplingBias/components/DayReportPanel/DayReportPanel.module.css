@@ -159,6 +159,31 @@
   color: var(--diet-ink);
 }
 
+.overallDelta {
+  font-family: var(--font-case-file);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 2px 7px;
+  border-radius: 99px;
+  margin-top: 4px;
+}
+
+.overallDelta_up {
+  background: rgba(22, 163, 74, 0.15);
+  color: #15803d;
+}
+
+.overallDelta_down {
+  background: rgba(220, 38, 38, 0.12);
+  color: #b91c1c;
+}
+
+.overallDelta_flat {
+  background: rgba(26, 20, 16, 0.07);
+  color: var(--diet-ink-faded);
+}
+
 .overallPill_good {
   background: rgba(22, 163, 74, 0.12);
   border-color: rgba(22, 163, 74, 0.35);
@@ -466,6 +491,100 @@
   color: var(--diet-ink);
   font-size: 14px;
   line-height: 1.4;
+}
+
+.hintStack {
+  display: grid;
+  gap: 6px;
+}
+
+.hintRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: var(--diet-radius-document);
+  border: 1px solid transparent;
+}
+
+.hintRow strong {
+  display: block;
+  font-family: var(--font-case-file);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 2px;
+}
+
+.hintRow p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--diet-ink);
+}
+
+.hintRow_pass {
+  background: rgba(22, 163, 74, 0.07);
+  border-color: rgba(22, 163, 74, 0.25);
+  color: #15803d;
+}
+
+.hintRow_partial {
+  background: rgba(217, 119, 6, 0.08);
+  border-color: rgba(217, 119, 6, 0.28);
+  color: #b45309;
+}
+
+.hintRow_fail {
+  background: rgba(220, 38, 38, 0.07);
+  border-color: rgba(220, 38, 38, 0.25);
+  color: #b91c1c;
+}
+
+.signalTagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 5px 0 4px;
+}
+
+.signalTagCorrect,
+.signalTagNoise,
+.signalTagBias {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-family: var(--font-case-file);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.signalTagCorrect {
+  background: rgba(22, 163, 74, 0.12);
+  border-color: rgba(22, 163, 74, 0.3);
+  color: #15803d;
+}
+
+.signalTagNoise {
+  background: rgba(217, 119, 6, 0.12);
+  border-color: rgba(217, 119, 6, 0.3);
+  color: #b45309;
+}
+
+.signalTagBias {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.28);
+  color: #b91c1c;
+}
+
+.signalSubHint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--diet-ink);
+  opacity: 0.85;
 }
 
 .receiptSection {
