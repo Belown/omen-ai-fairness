@@ -120,14 +120,6 @@ export default function DayReportPanel({
   const deltaTone = deltaPct > 0 ? "up" : deltaPct < 0 ? "down" : "flat";
   const sampledCount = sampledFlags.filter(Boolean).length;
   const overallTone = overallPct >= 75 ? "good" : overallPct >= 60 ? "mid" : "low";
-  const strongZones = useMemo(
-    () => REGIONS.filter((_, i) => (regionAccs[i] ?? 0) >= 0.75).map((r) => districtName(r.label)),
-    [regionAccs],
-  );
-  const lowZones = useMemo(
-    () => REGIONS.filter((_, i) => (regionAccs[i] ?? 0) < 0.6).map((r) => districtName(r.label)),
-    [regionAccs],
-  );
 
   // ── Three-pillar check ───────────────────────────────────────────────────────
   type PillarStatus = "pass" | "partial" | "fail";
