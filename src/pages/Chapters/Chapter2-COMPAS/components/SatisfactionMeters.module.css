@@ -2,19 +2,58 @@
   margin-top: 4px;
 }
 
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
 .heading {
-  margin: 0 0 12px;
+  margin: 0;
   font-family: var(--font-display, serif);
   font-size: 16px;
   font-weight: 600;
+}
+
+.caption {
+  max-width: 440px;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: rgba(25, 28, 31, 0.62);
+}
+
+.currentBlock,
+.aggregateBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.aggregateBlock {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(25, 28, 31, 0.1);
+}
+
+.blockLabel {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 700;
   text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(25, 28, 31, 0.5);
 }
 
 .row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 20px 24px;
+  gap: 12px 28px;
 }
 
 .item {
@@ -63,23 +102,28 @@
   text-align: center;
 }
 
-.aggregateWrap {
+.aggregateRow {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 20px;
+}
+
+.aggregateItem {
+  display: grid;
+  grid-template-columns: 42px minmax(66px, auto);
   align-items: center;
-  gap: 2px;
+  gap: 8px;
 }
 
 .aggregateLabel {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgba(25, 28, 31, 0.5);
+  font-size: 12px;
+  color: rgba(25, 28, 31, 0.68);
 }
 
 .aggregateCircle {
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -88,6 +132,7 @@
   font-weight: 700;
   color: #fff;
   font-family: var(--font-body, system-ui);
+  box-shadow: 0 3px 8px rgba(25, 28, 31, 0.12);
 }
 
 .popover {

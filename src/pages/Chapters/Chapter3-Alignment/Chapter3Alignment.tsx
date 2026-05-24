@@ -8,6 +8,8 @@ type Dialogue = { text: string; portrait: string };
 
 type OutcomeKey = "not-played" | "survived" | "truth" | "majority" | "minority";
 
+const OUTCOME_RECAP_STEP = 4;
+
 const BEAT_FOUR: Record<OutcomeKey, Dialogue> = {
   "not-played": {
     portrait: portraits.thoughtful,
@@ -44,8 +46,12 @@ const DIALOGUES: Dialogue[] = [
     portrait: portraits.encouraging,
     text: "How to solve this ? I simply have to face the machine and tell them what I think is correct or wrong ... should be simple right ?",
   },
-  // Beat 4 is outcome-driven — resolved at render time from BEAT_FOUR.
-  { portrait: portraits.alarmed, text: "__BEAT_FOUR_PLACEHOLDER__" },
+  {
+    portrait: portraits.serious,
+    text: "The machine is ready. Each card asks me to choose what kind of answer the model should learn from. If I push any value too far, the system breaks. I need to balance truth, mainstream approval, and compassion.",
+  },
+  // This slot is outcome-driven — resolved at render time from BEAT_FOUR.
+  { portrait: portraits.alarmed, text: "" },
   {
     portrait: portraits.thoughtful,
     text: "Let me put a name on what I just experienced. Truth : is the answer actually correct ? The raters usually can't tell. Approval : the mainstream pool — US, English, college-educated. Compassion : everyone the mainstream overlooks. Sycophancy traps tear Truth from Approval. Cultural defaults tear Approval from Compassion. The pattern is becoming clear.",
@@ -112,7 +118,7 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
   }, [isActive, step, showSceneContent]);
 
   const resolveDialogue = (idx: number): Dialogue =>
-    idx === 4 ? BEAT_FOUR[outcome] : DIALOGUES[idx];
+    idx === OUTCOME_RECAP_STEP ? BEAT_FOUR[outcome] : DIALOGUES[idx];
 
   const dialogue = resolveDialogue(step);
   const dialogueHistory = useMemo(

@@ -56,36 +56,54 @@ export default function SatisfactionMeters({ scenario, aggregate }: Satisfaction
 
   return (
     <section className={styles.section} aria-label="Stakeholder satisfaction">
-      <h3 className={styles.heading}>Stakeholder Satisfaction</h3>
-      <div className={styles.row}>
-        {GROUPS.map(({ id, label }) => {
-          const entry = scenario.satisfaction[id];
-          const aggScore = aggregate?.[id];
-          return (
-            <div key={id} className={styles.item}>
-              <MeterCircle
-                emoji={entry.emoji}
-                score={entry.score}
-                quote={entry.quote}
-                open={openGroup === id}
-                onToggle={() => setOpenGroup((g) => (g === id ? null : id))}
-              />
-              <span className={styles.label}>{label}</span>
-              {aggregate && (
-                <div className={styles.aggregateWrap}>
-                  <span className={styles.aggregateLabel}>Overall</span>
-                  <div
-                    className={styles.aggregateCircle}
-                    style={{ background: satisfactionColor(aggScore!) }}
-                  >
-                    {Math.round(aggScore!)}%
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
+      <div className={styles.header}>
+        <h3 className={styles.heading}>Stakeholder Satisfaction</h3>
+        {aggregate && (
+          <p className={styles.caption}>
+            Large meters show this round. The smaller row shows the running average across all rounds so far.
+          </p>
+        )}
       </div>
+
+      <div className={styles.currentBlock}>
+        <p className={styles.blockLabel}>This round</p>
+        <div className={styles.row}>
+          {GROUPS.map(({ id, label }) => {
+            const entry = scenario.satisfaction[id];
+            return (
+              <div key={id} className={styles.item}>
+                <MeterCircle
+                  emoji={entry.emoji}
+                  score={entry.score}
+                  quote={entry.quote}
+                  open={openGroup === id}
+                  onToggle={() => setOpenGroup((g) => (g === id ? null : id))}
+                />
+                <span className={styles.label}>{label}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {aggregate && (
+        <div className={styles.aggregateBlock}>
+          <p className={styles.blockLabel}>Running average</p>
+          <div className={styles.aggregateRow}>
+            {GROUPS.map(({ id, label }) => {
+              const aggScore = aggregate[id];
+              return (
+                <div key={id} className={styles.aggregateItem}>
+                  <div className={styles.aggregateCircle} style={{ background: satisfactionColor(aggScore) }}>
+                    {Math.round(aggScore)}%
+                  </div>
+                  <span className={styles.aggregateLabel}>{label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
