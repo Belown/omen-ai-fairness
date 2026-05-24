@@ -12,6 +12,7 @@ import {
   saveAssessment,
   saveAssessmentDraft,
 } from "../../utils/assessmentStorage";
+import { sessionLogger } from "../../utils/sessionLogger";
 import styles from "./Assessment.module.css";
 
 type Answers = Record<string, string>;
@@ -182,6 +183,9 @@ export default function Assessment() {
       ...(isPost && { feedback, openEnded }),
     });
     downloadJson(`diet-assessment-${mode}-${timestamp}.json`, exportData);
+    if (isPost) {
+      sessionLogger.downloadLog(`diet-session-log-${timestamp}.json`);
+    }
     setSubmitted(true);
   };
 
