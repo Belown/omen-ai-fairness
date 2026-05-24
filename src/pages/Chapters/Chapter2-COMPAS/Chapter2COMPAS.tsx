@@ -91,6 +91,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
   const [endingPhase, setEndingPhase] = useState<EndingPhase>("narrative");
   const [isNarrativeCollapsed, setIsNarrativeCollapsed] = useState(false);
   const [chatboxReopenSignal, setChatboxReopenSignal] = useState(0);
+  const [sceneAdvanceSignal, setSceneAdvanceSignal] = useState(0);
   const [attempt, setAttempt] = useState(1);
 
   const lastDialogueKeyRef = useRef<string>("");
@@ -249,6 +250,12 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
   if (phase === "intro") {
     return (
       <div className={`${styles.phase} ${styles.phaseWithBackground}`} style={phaseStyle}>
+        <button
+          type="button"
+          className={styles.clickProxy}
+          onClick={advanceIntro}
+          aria-label="Continue dialogue"
+        />
         <Chatbox
           text={INTRO_CHUNKS[introChunkIndex]}
           portraitSrc={portraits.thoughtful}
@@ -340,6 +347,15 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
         />
       )}
 
+      {showGameChatbox && !isNarrativeCollapsed && (
+        <button
+          type="button"
+          className={styles.clickProxy}
+          onClick={() => setSceneAdvanceSignal((s) => s + 1)}
+          aria-label="Continue dialogue"
+        />
+      )}
+
       {showGameChatbox && (
         <Chatbox
           text={dialogueText}
@@ -353,6 +369,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
           ]}
           onCollapsedChange={setIsNarrativeCollapsed}
           reopenSignal={chatboxReopenSignal}
+          externalAdvanceSignal={sceneAdvanceSignal}
           speakerName="Whiskers Holmes"
           disableKeyboardAdvance={!isActive}
           disablePreviousNavigation

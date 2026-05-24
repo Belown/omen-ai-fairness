@@ -197,11 +197,15 @@ export default function CardStack({
   onComplete,
   onFirstPick,
   onContinue,
+  onSkip,
+  onPostTest,
 }: {
   isActive?: boolean;
   onComplete?: (outcome: GameOutcome) => void;
   onFirstPick?: () => void;
   onContinue?: () => void;
+  onSkip?: () => void;
+  onPostTest?: () => void;
 } = {}) {
   const [deck, setDeck] = useState<Card[]>(() => sampleDeck());
   const [index, setIndex] = useState(0);
@@ -223,6 +227,7 @@ export default function CardStack({
   const [attempt, setAttempt] = useState(1);
   const demoPlanRef = useRef<("A" | "B")[]>([]);
   const demoAnnotationIndicesRef = useRef<Set<number>>(new Set());
+
 
   const done = index >= GAME_SIZE;
   const card = !done && !earlyEnd ? deck[index] : null;
@@ -375,7 +380,7 @@ export default function CardStack({
         />
       ) : !done ? (
         <div className={styles.gameArea}>
-          {showRules && <RulesOverlay isActive={isActive} onDismiss={() => setShowRules(false)} />}
+          {showRules && <RulesOverlay isActive={isActive} onDismiss={() => setShowRules(false)} onSkip={onSkip} />}
           {demoMode && (
             <div className={styles.demoBanner} role="status">
               <span className={styles.demoBannerDot} aria-hidden="true" />
@@ -435,9 +440,7 @@ export default function CardStack({
             <DiscardStack played={index} />
           </div>
           <p className={styles.hint}>
-            16 cards drawn from a pool of 42. Every game forces sycophancy traps,
-            cultural defaults, and trap-honest cards — the "obvious" answer often
-            backfires. Below 15 or above 85 on any meter ends the round.
+            16 cards drawn from a pool of 42. Every game forces sycophancy traps, cultural defaults, and trap-honest cards — the "obvious" answer often backfires.{"\n"}Below 15 or above 85 on any meter ends the round.
           </p>
         </div>
       ) : (
@@ -447,6 +450,7 @@ export default function CardStack({
           deck={deck}
           onReset={reset}
           onContinue={onContinue}
+          onPostTest={onPostTest}
         />
       )}
     </div>
@@ -572,7 +576,7 @@ function Meters({
   );
 }
 
-function RulesOverlay({ isActive, onDismiss }: { isActive: boolean; onDismiss: () => void }) {
+function RulesOverlay({ isActive, onDismiss, onSkip }: { isActive: boolean; onDismiss: () => void; onSkip?: () => void }) {
   useEffect(() => {
     if (!isActive) return;
     const handler = (e: KeyboardEvent) => {
@@ -588,7 +592,6 @@ function RulesOverlay({ isActive, onDismiss }: { isActive: boolean; onDismiss: (
   return (
     <div className={styles.rulesOverlay} role="dialog" aria-labelledby="rules-title" aria-modal="true">
       <div className={styles.rulesCard}>
-        <p className={styles.rulesEyebrow}>Before you deal</p>
         <h3 id="rules-title" className={styles.rulesTitle}>
           How to <em>win</em> the round
         </h3>
@@ -648,6 +651,11 @@ function RulesOverlay({ isActive, onDismiss }: { isActive: boolean; onDismiss: (
         <button type="button" className={styles.rulesBtn2} onClick={onDismiss} autoFocus>
           Deal the cards →
         </button>
+        {onSkip && (
+          <button type="button" className={styles.rulesSkipLink} onClick={onSkip}>
+            I'd rather not play — skip the cards →
+          </button>
+        )}
       </div>
     </div>
   );
@@ -887,12 +895,14 @@ function Endgame({
   deck,
   onReset,
   onContinue,
+  onPostTest,
 }: {
   meters: MeterState;
   history: HistoryEntry[];
   deck: Card[];
   onReset: () => void;
   onContinue?: () => void;
+  onPostTest?: () => void;
 }) {
   const verdict = useMemo(() => computeVerdict(meters), [meters]);
   const copy = VERDICT_COPY[verdict];
@@ -970,6 +980,15 @@ function Endgame({
             onClick={onContinue}
           >
             Continue to learning →
+          </button>
+        )}
+        {onPostTest && (
+          <button
+            type="button"
+            className={`${styles.endBtn} ${styles.endBtnPostTest}`}
+            onClick={onPostTest}
+          >
+            Take the post-test →
           </button>
         )}
       </div>

@@ -721,11 +721,13 @@
 }
 
 .hint {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
   margin: 0;
   text-align: center;
-  font-style: italic;
+  font-style: normal;
+  line-height: 1.55;
+  white-space: pre-line;
 }
 
 /* ---------- Endgame ---------- */
@@ -932,6 +934,20 @@
   background: linear-gradient(180deg, #248248, #146b30);
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.endBtnPostTest {
+  background: linear-gradient(180deg, #3a2800, #1e1500);
+  color: #f5e6c8;
+  border: 1px solid rgba(245, 210, 140, 0.25);
+  box-shadow: 0 6px 18px rgba(20, 12, 0, 0.4);
+}
+
+.endBtnPostTest:hover {
+  background: linear-gradient(180deg, #4d3600, #2a1c00);
+  color: #fdf0d5;
+  border-color: rgba(245, 210, 140, 0.45);
   transform: translateY(-1px);
 }
 
@@ -1295,16 +1311,6 @@
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.rulesEyebrow {
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: var(--rui-blue);
-  margin: 0;
-}
-
 .rulesTitle {
   font-family: var(--font-display);
   font-size: clamp(24px, 3vw, 32px);
@@ -1468,4 +1474,26 @@
 .rulesBtn2:focus-visible {
   outline: 2px solid var(--rui-blue);
   outline-offset: 3px;
+}
+
+.rulesSkipLink {
+  appearance: none;
+  align-self: center;
+  background: transparent;
+  border: none;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: var(--rui-gray);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-bottom: 1px dashed var(--rui-border);
+  transition: color 0.15s ease, border-color 0.15s ease;
+  margin-top: 4px;
+}
+
+.rulesSkipLink:hover {
+  color: var(--rui-dark);
+  border-bottom-color: var(--rui-dark);
 }

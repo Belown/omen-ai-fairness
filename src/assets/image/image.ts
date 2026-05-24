@@ -28,6 +28,7 @@ import phoneIcon from "./Mission/phone.png";
 import policeIcon from "./Mission/police.png";
 import caseRoom from "./caseroom.png";
 import chapter1CaseRoom from "./caseroom.png";
+import casinoImage from "./casino.png";
 
 export const ZONE_VISUALS = [
   { icon: zone1icon, image: zone1image },
@@ -71,3 +72,4 @@ export const CHAPTER1_BACKGROUNDS = {
 } as const;
 
 export const CASE_ROOM_IMAGE = caseRoom;
+export const CASINO_IMAGE = casinoImage;

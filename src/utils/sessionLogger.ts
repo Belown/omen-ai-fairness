@@ -60,18 +60,24 @@ export type Ch3CardChoiceEntry = {
   timestamp: number;
 };
 
+export type Ch3SkipEntry = {
+  type: "ch3_skip";
+  timestamp: number;
+};
+
 export type LogEntry =
   | Ch1DayPlanEntry
   | Ch1DayAccuracyEntry
   | Ch2DayEntry
   | Ch2EndingChoiceEntry
-  | Ch3CardChoiceEntry;
+  | Ch3CardChoiceEntry
+  | Ch3SkipEntry;
 
 type ChapterLogKey = keyof typeof LOG_KEYS;
 type ChapterLogMap = {
   ch1: Array<Ch1DayPlanEntry | Ch1DayAccuracyEntry>;
   ch2: Array<Ch2DayEntry | Ch2EndingChoiceEntry>;
-  ch3: Ch3CardChoiceEntry[];
+  ch3: Array<Ch3CardChoiceEntry | Ch3SkipEntry>;
 };
 
 type SessionLogExport = {
@@ -147,6 +153,9 @@ export const sessionLogger = {
   },
   logCh3Choice(entry: Omit<Ch3CardChoiceEntry, "type" | "timestamp">): void {
     writeEntry("ch3", { type: "ch3_card_choice", ...entry, timestamp: Date.now() });
+  },
+  logCh3Skip(): void {
+    writeEntry("ch3", { type: "ch3_skip", timestamp: Date.now() });
   },
   getLog: readLog,
   getGroupedLog: readGroupedLog,
