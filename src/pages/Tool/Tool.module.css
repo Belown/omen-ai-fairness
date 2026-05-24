@@ -1,0 +1,124 @@
+.page {
+  min-height: calc(100vh - 120px);
+  background: var(--diet-cream);
+  color: var(--diet-ink);
+}
+
+.hero,
+.layout {
+  width: min(1080px, calc(100% - 2 * var(--gutter)));
+  margin: 0 auto;
+}
+
+.hero {
+  padding: clamp(52px, 7vw, 92px) 0 clamp(26px, 4vw, 46px);
+}
+
+.title {
+  max-width: 760px;
+  margin: 0 0 18px;
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5.6vw, 70px);
+  font-weight: 560;
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.lede {
+  max-width: 70ch;
+  margin: 0;
+  color: var(--diet-ink-faded);
+  font-size: clamp(17px, 1.2vw, 20px);
+  line-height: 1.56;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+  gap: 16px;
+  padding-bottom: clamp(52px, 7vw, 88px);
+}
+
+.videoPanel,
+.infoPanel {
+  border: 1px solid rgba(92, 61, 46, 0.22);
+  border-radius: 8px;
+  background: rgba(250, 247, 240, 0.72);
+  box-shadow: 0 12px 30px rgba(33, 24, 18, 0.07);
+  padding: clamp(18px, 2.4vw, 26px);
+}
+
+.sectionHeader {
+  margin-bottom: 18px;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  color: var(--diet-ink);
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.6vw, 42px);
+  font-weight: 560;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.sectionHeader p:last-child {
+  max-width: 62ch;
+  margin: 12px 0 0;
+  color: var(--diet-ink-faded);
+  line-height: 1.55;
+}
+
+.videoSlot {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  min-height: 260px;
+  border: 1px dashed rgba(180, 83, 9, 0.58);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(199, 125, 32, 0.08), rgba(77, 201, 246, 0.08)),
+    var(--diet-paper);
+  color: #92400e;
+  font-family: var(--font-case-file);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.infoPanel {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.infoPanel article {
+  padding: 14px;
+  border: 1px solid rgba(92, 61, 46, 0.18);
+  border-radius: var(--diet-radius-document);
+  background: var(--diet-paper);
+}
+
+.infoPanel span {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--diet-copper);
+  font-family: var(--font-case-file);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.infoPanel p {
+  margin: 0;
+  color: var(--diet-ink-faded);
+  line-height: 1.5;
+}
+
+@media (max-width: 840px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

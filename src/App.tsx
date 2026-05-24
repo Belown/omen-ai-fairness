@@ -3,6 +3,8 @@ import Landing from "./pages/Landing/Landing";
 import About from "./pages/About/About";
 import Chapters from "./pages/Chapters/Chapters";
 import Demo from "./pages/Demo/Demo";
+import Resources from "./pages/Resources/Resources";
+import Tool from "./pages/Tool/Tool";
 import PreTest from "./pages/Assessment/PreTest";
 import PostTest from "./pages/Assessment/PostTest";
 
@@ -11,6 +13,8 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/about" element={<About />} />
+      <Route path="/resources" element={<Resources />} />
+      <Route path="/tool" element={<Tool />} />
       <Route path="/chapters" element={<Chapters />} />
       <Route path="/demo" element={<Demo />} />
       <Route path="/pre-assessment" element={<PreTest />} />

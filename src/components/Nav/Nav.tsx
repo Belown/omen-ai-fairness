@@ -154,6 +154,12 @@ export default function Nav({ investigation = false }: { investigation?: boolean
         <Button variant="ghost-dark" to="/about">
           About
         </Button>
+        <Button variant="ghost-dark" to="/resources">
+          Resources
+        </Button>
+        <Button variant="ghost-dark" to="/tool">
+          Tool
+        </Button>
         <Button variant="primary" to="/pre-assessment">
           Start investigation
         </Button>
