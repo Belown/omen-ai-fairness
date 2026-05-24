@@ -14,12 +14,14 @@ import { CHAPTER1_BACKGROUNDS } from "../../../assets/image/image";
 import styles from "./Chapter2COMPAS.module.css";
 import { buildScenarioDialogue } from "./chapter2Dialogue";
 import {
+  FAIRNESS_DEFINITIONS,
   MAX_CURRENT_DAY,
   STARTING_BUDGET,
   STUDY_METRICS,
   type FairnessDefinitionId,
   type StudyMetricId,
 } from "./chapter2Data";
+import { sessionLogger } from "../../../utils/sessionLogger";
 import { getScenario, type AggregateSatisfaction } from "./chapter2Scenarios";
 import { TUTORIAL_REOPEN_START, type TutorialSpotlight } from "./chapter2Tutorial";
 import type { DayRecord, MetricUsageCounts } from "./chapter2Types";
@@ -139,6 +141,18 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
     const usageCount = Math.min(metricUsageCounts[metric] + 1, 3);
     const scenario = getScenario(metric, usageCount);
 
+    const metricDef = FAIRNESS_DEFINITIONS.find((d) => d.id === metric);
+    sessionLogger.logCh2Day({
+      day: currentDay + 1,
+      fairnessMetricId: metric,
+      fairnessMetricLabel: metricDef?.title ?? metric,
+      studiesCommissioned: pendingQueue.map((id) => {
+        const s = STUDY_METRICS.find((m) => m.id === id);
+        return { id, label: s?.label ?? id, cost: s?.cost ?? 0 };
+      }),
+      totalCost: pendingCost,
+    });
+
     const record: DayRecord = {
       day: currentDay,
       metricActive: metric,
@@ -213,8 +227,24 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
           panelIndex={endingPanelIndex}
           phase={endingPhase}
           onAdvance={() => setEndingPanelIndex((i) => Math.min(i + 1, 9))}
-          onChooseBest={() => setEndingPhase("outcome-best")}
-          onChooseKeep={() => setEndingPhase("outcome-keep")}
+          onChooseBest={() => {
+            const metricDef = FAIRNESS_DEFINITIONS.find((d) => d.id === fairnessMetric);
+            sessionLogger.logCh2EndingChoice({
+              choice: "apply-best-practices",
+              finalFairnessMetricId: fairnessMetric,
+              finalFairnessMetricLabel: metricDef?.title ?? fairnessMetric,
+            });
+            setEndingPhase("outcome-best");
+          }}
+          onChooseKeep={() => {
+            const metricDef = FAIRNESS_DEFINITIONS.find((d) => d.id === fairnessMetric);
+            sessionLogger.logCh2EndingChoice({
+              choice: "keep-current-system",
+              finalFairnessMetricId: fairnessMetric,
+              finalFairnessMetricLabel: metricDef?.title ?? fairnessMetric,
+            });
+            setEndingPhase("outcome-keep");
+          }}
           onReplay={resetGame}
           onNextChapter={() => setSearchParams({ chapter: "ch3" })}
         />
