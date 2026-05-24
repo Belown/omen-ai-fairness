@@ -60,9 +60,20 @@ export default function Nav({ investigation = false }: { investigation?: boolean
     if (!target) return;
 
     event.preventDefault();
+    const handledByLanding = !window.dispatchEvent(
+      new CustomEvent("landing:scroll-to-section", {
+        cancelable: true,
+        detail: { id },
+      })
+    );
+
+    if (handledByLanding) {
+      setOpen(false);
+      return;
+    }
+
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const top = getCenteredSectionTop(target);
-
     window.history.pushState(null, "", `#${id}`);
     window.scrollTo({
       top,

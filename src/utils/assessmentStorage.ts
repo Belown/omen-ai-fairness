@@ -1,6 +1,7 @@
 export type AssessmentEntry = {
   mode: "pre" | "post";
   timestamp: string;
+  participantName?: string;
   answers: Record<string, string>;
   confidence: Record<string, number>;
   understanding: Record<string, number>;
@@ -9,6 +10,7 @@ export type AssessmentEntry = {
 };
 
 export type AssessmentDraft = {
+  participantName: string;
   answers: Record<string, string>;
   confidence: Record<string, number>;
   understanding: Record<string, number>;
@@ -16,10 +18,11 @@ export type AssessmentDraft = {
   openEnded: Record<number, string>;
 };
 
-const STORAGE_KEY = "diet_assessment_log";
+const STORAGE_KEY_PREFIX = "diet_assessment_log";
 const DRAFT_KEY_PREFIX = "diet_assessment_draft";
 
 export const createEmptyAssessmentDraft = (): AssessmentDraft => ({
+  participantName: "",
   answers: {},
   confidence: {},
   understanding: {},
@@ -28,27 +31,36 @@ export const createEmptyAssessmentDraft = (): AssessmentDraft => ({
 });
 
 export function saveAssessment(entry: AssessmentEntry): void {
-  const all = loadAllAssessments();
+  const all = loadAssessments(entry.mode);
   all.push(entry);
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    sessionStorage.setItem(`${STORAGE_KEY_PREFIX}_${entry.mode}`, JSON.stringify(all));
   } catch {
-    console.error("[DIET] Could not persist assessment result to localStorage");
+    console.error("[DIET] Could not persist assessment result to sessionStorage");
   }
   console.log("[DIET] Assessment result logged:", entry);
 }
 
-export function loadAllAssessments(): AssessmentEntry[] {
+export function loadAssessments(mode: "pre" | "post"): AssessmentEntry[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = sessionStorage.getItem(`${STORAGE_KEY_PREFIX}_${mode}`);
     return raw ? (JSON.parse(raw) as AssessmentEntry[]) : [];
   } catch {
     return [];
   }
 }
 
+export function loadAllAssessments(): AssessmentEntry[] {
+  return [...loadAssessments("pre"), ...loadAssessments("post")];
+}
+
 export function hasCompleted(mode: "pre" | "post"): boolean {
-  return loadAllAssessments().some((e) => e.mode === mode);
+  return loadAssessments(mode).some((e) => e.mode === mode);
+}
+
+export function clearAssessmentLogs(): void {
+  sessionStorage.removeItem(`${STORAGE_KEY_PREFIX}_pre`);
+  sessionStorage.removeItem(`${STORAGE_KEY_PREFIX}_post`);
 }
 
 export function saveAssessmentDraft(mode: "pre" | "post", draft: AssessmentDraft): void {

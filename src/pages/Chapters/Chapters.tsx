@@ -155,7 +155,7 @@ export default function Chapters() {
   const recordChapterResult = (chapter: ChapterId, result: ChapterResult) => {
     setChapterResults((prev) => {
       if (prev[chapter]?.completed) return prev;
-      if (logEnabled) sessionLogger.downloadLog(`diet-log-${chapter}-complete.json`);
+      if (logEnabled) sessionLogger.downloadLog(`diet-log-${chapter}-complete.json`, chapter);
       return { ...prev, [chapter]: result };
     });
   };

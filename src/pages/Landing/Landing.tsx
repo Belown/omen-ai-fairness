@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import Button from "../../components/Button/Button";
@@ -76,6 +76,24 @@ export default function Landing() {
   const isAnimatingRef = useRef(false);
   const [activeSection, setActiveSection] = useState(0);
 
+  const handleSectionAnchorClick = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
+    const target = document.getElementById(id);
+    if (!target) return;
+
+    event.preventDefault();
+    const handledByLanding = !window.dispatchEvent(
+      new CustomEvent("landing:scroll-to-section", {
+        cancelable: true,
+        detail: { id },
+      })
+    );
+
+    if (!handledByLanding) {
+      window.history.pushState(null, "", `#${id}`);
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   useEffect(() => {
     document.documentElement.classList.add("landingPagedScroll");
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -151,6 +169,19 @@ export default function Landing() {
       setActiveSection(getCurrentSectionIndex(targets));
     };
 
+    const onSectionScrollRequest = (event: Event) => {
+      const { id } = (event as CustomEvent<{ id?: string }>).detail ?? {};
+      if (!id) return;
+
+      const target = document.getElementById(id);
+      if (!target) return;
+
+      event.preventDefault();
+      const sectionIndex = SECTIONS.findIndex((section) => section.id === id);
+      window.history.pushState(null, "", `#${id}`);
+      animateTo(getCenteredSectionTop(target), sectionIndex >= 0 ? sectionIndex : undefined);
+    };
+
     const onWheel = (event: WheelEvent) => {
       if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
 
@@ -179,6 +210,7 @@ export default function Landing() {
     window.addEventListener("scroll", updateActiveSection, { passive: true });
     window.addEventListener("resize", updateActiveSection);
     window.addEventListener("resize", syncNavHeight);
+    window.addEventListener("landing:scroll-to-section", onSectionScrollRequest);
     updateActiveSection();
 
     return () => {
@@ -188,6 +220,7 @@ export default function Landing() {
       window.removeEventListener("scroll", updateActiveSection);
       window.removeEventListener("resize", updateActiveSection);
       window.removeEventListener("resize", syncNavHeight);
+      window.removeEventListener("landing:scroll-to-section", onSectionScrollRequest);
       if (wheelCooldownTimerRef.current !== null) {
         window.clearTimeout(wheelCooldownTimerRef.current);
       }
@@ -261,10 +294,14 @@ export default function Landing() {
               before human feedback became machine judgment.
             </p>
             <div className={styles.ctaRow}>
-              <Button variant="primary" to="/chapters?intro=story" id="start">
+              <Button variant="primary" to="/assessment" id="start">
                 Start Investigation
               </Button>
-              <Button variant="outline" href="#chapters">
+              <Button
+                variant="outline"
+                href="#chapters"
+                onClick={(event) => handleSectionAnchorClick(event, "chapters")}
+              >
                 Review chapters
               </Button>
             </div>
@@ -374,7 +411,7 @@ export default function Landing() {
               Travel back through the AI pipeline and find where the verdict
               started to bend.
             </p>
-            <Button variant="primary" size="lg" to="/chapters?intro=story">
+            <Button variant="primary" size="lg" to="/assessment">
               Start investigation
             </Button>
           </div>

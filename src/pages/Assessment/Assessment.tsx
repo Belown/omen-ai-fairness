@@ -9,10 +9,10 @@ import {
 } from "./assessmentData";
 import {
   loadAssessmentDraft,
+  loadAssessments,
   saveAssessment,
   saveAssessmentDraft,
 } from "../../utils/assessmentStorage";
-import { sessionLogger } from "../../utils/sessionLogger";
 import styles from "./Assessment.module.css";
 
 type Answers = Record<string, string>;
@@ -35,8 +35,16 @@ const downloadJson = (filename: string, data: unknown) => {
   URL.revokeObjectURL(url);
 };
 
+const createFilenamePart = (value: string) =>
+  value
+    .trim()
+    .replace(/[<>:"/\\|?*\u0000-\u001F]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-") || "unknown";
+
 const createAssessmentExport = (
   mode: "pre" | "post",
+  participantName: string,
   answers: Answers,
   confidence: Scale,
   understanding: Scale,
@@ -72,6 +80,7 @@ const createAssessmentExport = (
     assessment: "DIET AI Bias Assessment",
     mode,
     submittedAt,
+    ...(participantName && { participantName }),
     summary: {
       totalQuestions: allQuestions.length,
       correctCount,
@@ -98,6 +107,7 @@ export default function Assessment() {
   const initialDraft = useRef(loadAssessmentDraft(mode));
   const skipNextDraftSave = useRef(false);
 
+  const [participantName, setParticipantName] = useState(initialDraft.current.participantName);
   const [answers, setAnswers] = useState<Answers>(initialDraft.current.answers);
   const [confidence, setConfidence] = useState<Scale>(initialDraft.current.confidence);
   const [understanding, setUnderstanding] = useState<Scale>(initialDraft.current.understanding);
@@ -105,10 +115,13 @@ export default function Assessment() {
   const [openEnded, setOpenEnded] = useState<OpenEnded>(initialDraft.current.openEnded);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [invalidFields, setInvalidFields] = useState<Set<string>>(new Set());
+  const [scrollToError, setScrollToError] = useState(false);
 
   useEffect(() => {
     const draft = loadAssessmentDraft(mode);
     skipNextDraftSave.current = true;
+    setParticipantName(draft.participantName);
     setAnswers(draft.answers);
     setConfidence(draft.confidence);
     setUnderstanding(draft.understanding);
@@ -126,13 +139,23 @@ export default function Assessment() {
     }
 
     saveAssessmentDraft(mode, {
+      participantName,
       answers,
       confidence,
       understanding,
       feedback,
       openEnded,
     });
-  }, [answers, confidence, feedback, mode, openEnded, understanding]);
+  }, [participantName, answers, confidence, feedback, mode, openEnded, understanding]);
+
+  useEffect(() => {
+    if (!scrollToError) return;
+    setScrollToError(false);
+    requestAnimationFrame(() => {
+      const el = document.querySelector("[data-invalid='true']");
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }, [scrollToError]);
 
   useEffect(() => {
     if (!submitted || isPost) return;
@@ -150,22 +173,40 @@ export default function Assessment() {
     };
   }, [isPost, submitted]);
 
+  const removeInvalid = (key: string) =>
+    setInvalidFields((prev) => { const s = new Set(prev); s.delete(key); return s; });
+
   const handleSubmit = () => {
-    const allQuestionsAnswered = BIAS_SECTIONS.every((section) =>
-      section.questions.every((q) => answers[q.id] && confidence[q.id]) &&
-      understanding[section.id]
-    );
+    const invalid = new Set<string>();
 
-    const feedbackComplete = !isPost || FEEDBACK_STATEMENTS.every((_, i) => feedback[i]);
+    BIAS_SECTIONS.forEach((section) => {
+      section.questions.forEach((q) => {
+        if (!answers[q.id]) invalid.add(`a-${q.id}`);
+        if (!confidence[q.id]) invalid.add(`c-${q.id}`);
+      });
+      if (!understanding[section.id]) invalid.add(`u-${section.id}`);
+    });
 
-    if (!allQuestionsAnswered || !feedbackComplete) {
-      setError("Please answer all questions and ratings before submitting.");
+    if (isPost) {
+      FEEDBACK_STATEMENTS.forEach((_, i) => {
+        if (!feedback[i]) invalid.add(`f-${i}`);
+      });
+    }
+
+    if (!isPost && !participantName.trim()) invalid.add("name");
+
+    if (invalid.size > 0) {
+      setInvalidFields(invalid);
+      setError("Please complete all highlighted fields before submitting.");
+      setScrollToError(true);
       return;
     }
 
+    setInvalidFields(new Set());
     setError("");
     const exportData = createAssessmentExport(
       mode,
+      participantName.trim(),
       answers,
       confidence,
       understanding,
@@ -173,19 +214,22 @@ export default function Assessment() {
       openEnded
     );
     const timestamp = exportData.submittedAt.replace(/[:.]/g, "-");
+    const filenameName = createFilenamePart(
+      participantName.trim() ||
+        loadAssessments("pre").at(-1)?.participantName ||
+        "unknown"
+    );
 
     saveAssessment({
       mode,
       timestamp: exportData.submittedAt,
+      participantName: participantName.trim() || undefined,
       answers,
       confidence,
       understanding,
       ...(isPost && { feedback, openEnded }),
     });
-    downloadJson(`diet-assessment-${mode}-${timestamp}.json`, exportData);
-    if (isPost) {
-      sessionLogger.downloadLog(`diet-session-log-${timestamp}.json`);
-    }
+    downloadJson(`diet-assessment-${filenameName}-${mode}-${timestamp}.json`, exportData);
     setSubmitted(true);
   };
 
@@ -219,6 +263,29 @@ export default function Assessment() {
                 ? "Now that you have completed the investigation, answer the same questions again. For each question, select the answer you believe is correct and rate how confident you are."
                 : "Before you begin the investigation, answer each question as best you can. For each question, select the answer you believe is correct and rate your confidence."}
             </p>
+            {!isPost && (
+              <div
+                className={styles.nameField}
+                data-invalid={invalidFields.has("name") || undefined}
+              >
+                <label className={styles.nameLabel} htmlFor="participant-name">
+                  Your name
+                </label>
+                <input
+                  id="participant-name"
+                  type="text"
+                  className={`${styles.nameInput} ${invalidFields.has("name") ? styles.nameInputError : ""}`}
+                  aria-invalid={invalidFields.has("name") || undefined}
+                  value={participantName}
+                  onChange={(e) => {
+                    setParticipantName(e.target.value);
+                    if (e.target.value.trim()) removeInvalid("name");
+                  }}
+                  placeholder="Enter your name…"
+                  autoComplete="name"
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -240,14 +307,22 @@ export default function Assessment() {
               </div>
 
               <div className={styles.questions}>
-                {section.questions.map((question) => (
-                  <div key={question.id} className={styles.questionCard}>
+                {section.questions.map((question) => {
+                  const answerInvalid = invalidFields.has(`a-${question.id}`);
+                  const confidenceInvalid = invalidFields.has(`c-${question.id}`);
+                  const cardInvalid = answerInvalid || confidenceInvalid;
+                  return (
+                  <div
+                    key={question.id}
+                    className={`${styles.questionCard} ${cardInvalid ? styles.questionCardError : ""}`}
+                    data-invalid={cardInvalid || undefined}
+                  >
                     <div className={styles.questionHeader}>
                       <span className={styles.questionNumber}>{question.number}.</span>
                       <p className={styles.questionText}>{question.text}</p>
                     </div>
 
-                    <fieldset className={styles.optionsFieldset}>
+                    <fieldset className={`${styles.optionsFieldset} ${answerInvalid ? styles.optionsFieldsetError : ""}`}>
                       <legend className={styles.srOnly}>Answer for {question.number}</legend>
                       {question.options.map((option) => (
                         <label
@@ -259,9 +334,10 @@ export default function Assessment() {
                             name={`answer-${question.id}`}
                             value={option.key}
                             checked={answers[question.id] === option.key}
-                            onChange={() =>
-                              setAnswers((prev) => ({ ...prev, [question.id]: option.key }))
-                            }
+                            onChange={() => {
+                              setAnswers((prev) => ({ ...prev, [question.id]: option.key }));
+                              removeInvalid(`a-${question.id}`);
+                            }}
                             className={styles.srOnly}
                           />
                           <span className={styles.optionKey}>{option.key}</span>
@@ -270,7 +346,7 @@ export default function Assessment() {
                       ))}
                     </fieldset>
 
-                    <div className={styles.scaleRow}>
+                    <div className={`${styles.scaleRow} ${confidenceInvalid ? styles.scaleRowError : ""}`}>
                       <span className={styles.scaleRowLabel}>Confidence in answer:</span>
                       <fieldset className={styles.scaleFieldset}>
                         <legend className={styles.srOnly}>Confidence for {question.number}</legend>
@@ -285,9 +361,10 @@ export default function Assessment() {
                                 name={`confidence-${question.id}`}
                                 value={val}
                                 checked={confidence[question.id] === val}
-                                onChange={() =>
-                                  setConfidence((prev) => ({ ...prev, [question.id]: val }))
-                                }
+                                onChange={() => {
+                                  setConfidence((prev) => ({ ...prev, [question.id]: val }));
+                                  removeInvalid(`c-${question.id}`);
+                                }}
                                 className={styles.srOnly}
                               />
                               {val}
@@ -301,10 +378,14 @@ export default function Assessment() {
                       </fieldset>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
-              <div className={styles.understandingRow}>
+              <div
+                className={`${styles.understandingRow} ${invalidFields.has(`u-${section.id}`) ? styles.understandingRowError : ""}`}
+                data-invalid={invalidFields.has(`u-${section.id}`) || undefined}
+              >
                 <span className={styles.understandingLabel}>
                   Rate your understanding of {section.label}:
                 </span>
@@ -321,9 +402,10 @@ export default function Assessment() {
                           name={`understanding-${section.id}`}
                           value={val}
                           checked={understanding[section.id] === val}
-                          onChange={() =>
-                            setUnderstanding((prev) => ({ ...prev, [section.id]: val }))
-                          }
+                          onChange={() => {
+                            setUnderstanding((prev) => ({ ...prev, [section.id]: val }));
+                            removeInvalid(`u-${section.id}`);
+                          }}
                           className={styles.srOnly}
                         />
                         {val}
@@ -348,7 +430,11 @@ export default function Assessment() {
 
               <div className={styles.likertList}>
                 {FEEDBACK_STATEMENTS.map((statement, i) => (
-                  <div key={i} className={styles.likertRow}>
+                  <div
+                    key={i}
+                    className={`${styles.likertRow} ${invalidFields.has(`f-${i}`) ? styles.likertRowError : ""}`}
+                    data-invalid={invalidFields.has(`f-${i}`) || undefined}
+                  >
                     <p className={styles.statementText}>{statement}</p>
                     <fieldset className={styles.likertFieldset}>
                       <legend className={styles.srOnly}>{statement}</legend>
@@ -364,9 +450,10 @@ export default function Assessment() {
                               name={`feedback-${i}`}
                               value={opt.value}
                               checked={feedback[i] === opt.value}
-                              onChange={() =>
-                                setFeedback((prev) => ({ ...prev, [i]: opt.value }))
-                              }
+                              onChange={() => {
+                                setFeedback((prev) => ({ ...prev, [i]: opt.value }));
+                                removeInvalid(`f-${i}`);
+                              }}
                               className={styles.srOnly}
                             />
                             <span className={styles.likertNum}>{opt.value}</span>
@@ -393,7 +480,7 @@ export default function Assessment() {
                         setOpenEnded((prev) => ({ ...prev, [i]: e.target.value }))
                       }
                       rows={4}
-                      placeholder="Write your thoughts here…"
+                      placeholder="Write your thoughts here… (Optional)"
                     />
                   </div>
                 ))}
