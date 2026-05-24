@@ -4,6 +4,10 @@
   color: var(--diet-ink);
 }
 
+.page :global(.eyebrow) {
+  color: var(--diet-ink);
+}
+
 .hero,
 .layout {
   width: min(1080px, calc(100% - 2 * var(--gutter)));
@@ -34,13 +38,11 @@
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
-  gap: 16px;
+  gap: clamp(24px, 4vw, 42px);
   padding-bottom: clamp(52px, 7vw, 88px);
 }
 
-.videoPanel,
-.infoPanel {
+.videoPanel {
   border: 1px solid rgba(92, 61, 46, 0.22);
   border-radius: 8px;
   background: rgba(250, 247, 240, 0.72);
@@ -87,38 +89,35 @@
   text-transform: uppercase;
 }
 
-.infoPanel {
+.textSection {
   display: grid;
-  align-content: start;
-  gap: 12px;
+  gap: 28px;
+  /* max-width: 900px; */
 }
 
-.infoPanel article {
-  padding: 14px;
-  border: 1px solid rgba(92, 61, 46, 0.18);
-  border-radius: var(--diet-radius-document);
-  background: var(--diet-paper);
+.textBlock {
+  display: grid;
+  gap: 8px;
 }
 
-.infoPanel span {
-  display: block;
-  margin-bottom: 7px;
-  color: var(--diet-copper);
-  font-family: var(--font-case-file);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
+.textBlock :global(.eyebrow) {
+  margin-bottom: 0;
 }
 
-.infoPanel p {
+.textBlock p {
   margin: 0;
   color: var(--diet-ink-faded);
-  line-height: 1.5;
+  font-size: 17px;
+  line-height: 1.62;
 }
 
-@media (max-width: 840px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
+.textBlock a {
+  color: var(--diet-stamp-red);
+  font-weight: 700;
+  border-bottom: 1px solid rgba(139, 26, 26, 0.34);
+}
+
+.textBlock a:hover {
+  color: var(--diet-ink);
+  border-bottom-color: var(--diet-red-string);
 }
