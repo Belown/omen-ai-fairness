@@ -94,6 +94,16 @@ export const sessionLogger = {
     writeEntry({ type: "ch3_card_choice", ...entry, timestamp: Date.now() });
   },
   getLog: readLog,
+  downloadLog(filename = "diet-session-log.json"): void {
+    const data = JSON.stringify(readLog(), null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  },
   clearLog(): void {
     localStorage.removeItem(LOG_KEY);
   },

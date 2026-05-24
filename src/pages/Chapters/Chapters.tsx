@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { hasCompleted } from "../../utils/assessmentStorage";
+import { sessionLogger } from "../../utils/sessionLogger";
 import Logo from "../../components/Logo/Logo";
 import Chapter1SamplingBias from "./Chapter1-SamplingBias/Chapter1SamplingBias";
 import Chapter2COMPAS from "./Chapter2-COMPAS";
@@ -96,6 +97,8 @@ export default function Chapters() {
   });
   const pendingChapterScrollRef = useRef<ChapterId | null>(null);
 
+  const [logEnabled, setLogEnabled] = useState(false);
+
   const [preComplete] = useState(() => hasCompleted("pre"));
   const [postComplete] = useState(() => hasCompleted("post"));
   const activeIndex = CHAPTERS.findIndex((c) => c.id === active);
@@ -152,6 +155,7 @@ export default function Chapters() {
   const recordChapterResult = (chapter: ChapterId, result: ChapterResult) => {
     setChapterResults((prev) => {
       if (prev[chapter]?.completed) return prev;
+      if (logEnabled) sessionLogger.downloadLog(`diet-log-${chapter}-complete.json`);
       return { ...prev, [chapter]: result };
     });
   };
@@ -159,11 +163,24 @@ export default function Chapters() {
   useEffect(() => {
     if (!isCaseComplete || hasScrolledToEndingRef.current) return;
     hasScrolledToEndingRef.current = true;
+    if (logEnabled) sessionLogger.downloadLog("diet-log-all-chapters-complete.json");
     const timer = window.setTimeout(() => {
       setSearchParams({ ending: "final" });
     }, 250);
     return () => window.clearTimeout(timer);
   }, [isCaseComplete, setSearchParams]);
+
+  // Ctrl+Shift+L — manual download, only when logging is enabled.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === "L") {
+        e.preventDefault();
+        if (logEnabled) sessionLogger.downloadLog("diet-log-manual.json");
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [logEnabled]);
 
   useEffect(() => {
     if (!timelineOpen) return;
@@ -207,9 +224,24 @@ export default function Chapters() {
               Chapters
             </button>
           </div>
-          <Link to="/" className={styles.backLink}>
-            Back to case board
-          </Link>
+          <div className={styles.topbarRight}>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={logEnabled}
+              aria-label="Enable log download"
+              className={`${styles.logToggle} ${logEnabled ? styles.logToggleOn : ""}`}
+              onClick={() => setLogEnabled((v) => !v)}
+            >
+              <span className={styles.logToggleTrack}>
+                <span className={styles.logToggleThumb} />
+              </span>
+              <span className={styles.logToggleLabel}>LOG</span>
+            </button>
+            <Link to="/" className={styles.backLink}>
+              Back to case board
+            </Link>
+          </div>
         </header>
 
         <div
