@@ -1,17 +1,25 @@
 export type EndingPanel =
-  | { type: "text"; content: string }
+  | { type: "text"; header?: string; content: string }
   | { type: "section"; header: string; content: string }
   | { type: "list"; header?: string; intro?: string; content?: string; items: string[] }
+  | {
+      type: "recommendations";
+      header: string;
+      intro: string;
+      items: Array<{ title: string; bullets: string[] }>;
+    }
   | { type: "decision" };
 
 export const ENDING_PANELS: EndingPanel[] = [
   {
     type: "text",
+    header: "Why fairness still failed",
     content:
       "You've seen three different approaches to fairness, and you've probably noticed something troubling: no matter which metric you chose, someone suffered. That's not a problem with your choices—it's a fundamental mathematical reality.",
   },
   {
     type: "text",
+    header: "The data problem",
     content:
       "Let me explain what's really happening here. This AI system you've been testing? It learned from historical crime data. And here's the problem: that data doesn't show us who actually committed crimes. It shows us who got caught.",
   },
@@ -70,33 +78,43 @@ What happens next?`,
 You can't fix a systemic problem with better math. The math isn't the problem—the world the math learned from is.`,
   },
   {
-    type: "section",
+    type: "recommendations",
     header: "The Path Forward",
-    content: `So what's the solution? There's no easy answer, but here's what experts recommend:
-
-1. Question the Data
-
-- Where did it come from?
-- What biases does it encode?
-- Does it measure reality or just police behavior?
-
-2. Understand the Trade-offs
-
-- Every fairness metric helps some groups and harms others
-- Be transparent about who benefits and who suffers
-- Make value judgments explicit, not hidden in 'optimization'
-
-3. Consider Not Using AI
-
-- Sometimes the most fair system is no algorithmic system
-- Human judgment has biases too, but it can be questioned, explained, and appealed
-- AI makes bias seem objective and unchallengeable
-
-4. Address Root Causes
-
-- Fix over-policing, not algorithms
-- Invest in communities instead of surveillance
-- Break feedback loops by changing how we police, not just how we predict`,
+    intro: "There is no easy answer, but experts usually return to four habits:",
+    items: [
+      {
+        title: "Question the data",
+        bullets: [
+          "Where did it come from?",
+          "What biases does it encode?",
+          "Does it measure reality or police behavior?",
+        ],
+      },
+      {
+        title: "Name the trade-offs",
+        bullets: [
+          "Fairness metrics help some groups and harm others.",
+          "Show who benefits and who suffers.",
+          "Make value judgments explicit.",
+        ],
+      },
+      {
+        title: "Ask whether AI belongs",
+        bullets: [
+          "Sometimes the fairest system is no algorithmic system.",
+          "Human judgment can be questioned, explained, and appealed.",
+          "AI can make bias look objective.",
+        ],
+      },
+      {
+        title: "Address root causes",
+        bullets: [
+          "Fix over-policing, not just algorithms.",
+          "Invest in communities instead of surveillance.",
+          "Break the policing-to-data feedback loop.",
+        ],
+      },
+    ],
   },
   { type: "decision" },
 ];

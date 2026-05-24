@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { portraits } from "../../../../assets/detective/portraits";
 import {
   ENDING_PANELS,
@@ -20,15 +21,51 @@ type EndingSequenceProps = {
   onNextChapter: () => void;
 };
 
+function parseContent(content: string) {
+  const paragraphs: string[] = [];
+  const bullets: string[] = [];
+
+  content.split("\n").forEach((rawLine) => {
+    const line = rawLine.trim();
+    if (!line) return;
+    if (line.startsWith("- ")) {
+      bullets.push(line.slice(2));
+    } else {
+      paragraphs.push(line);
+    }
+  });
+
+  return { paragraphs, bullets };
+}
+
 function renderPanel(panel: EndingPanel) {
   if (panel.type === "text") {
-    return <p className={styles.body}>{panel.content}</p>;
+    return (
+      <>
+        {panel.header && <h2 className={styles.sectionHead}>{panel.header}</h2>}
+        <p className={styles.statementCard}>{panel.content}</p>
+      </>
+    );
   }
   if (panel.type === "section") {
+    const { paragraphs, bullets } = parseContent(panel.content);
     return (
       <>
         <h2 className={styles.sectionHead}>{panel.header}</h2>
-        <p className={styles.body}>{panel.content}</p>
+        <div className={styles.sectionStack}>
+          {paragraphs.map((paragraph) => (
+            <p key={paragraph} className={styles.body}>
+              {paragraph}
+            </p>
+          ))}
+          {bullets.length > 0 && (
+            <ul className={styles.pointGrid}>
+              {bullets.map((bullet) => (
+                <li key={bullet}>{bullet}</li>
+              ))}
+            </ul>
+          )}
+        </div>
       </>
     );
   }
@@ -37,12 +74,36 @@ function renderPanel(panel: EndingPanel) {
       <>
         {panel.header && <h2 className={styles.sectionHead}>{panel.header}</h2>}
         {panel.intro && <p className={styles.body}>{panel.intro}</p>}
-        <ol className={styles.list}>
-          {panel.items.map((item) => (
-            <li key={item}>{item}</li>
+        <ol className={styles.reasonGrid}>
+          {panel.items.map((item, index) => (
+            <li key={item}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              {item}
+            </li>
           ))}
         </ol>
-        {panel.content && <p className={styles.body}>{panel.content}</p>}
+        {panel.content && <p className={styles.callout}>{panel.content}</p>}
+      </>
+    );
+  }
+  if (panel.type === "recommendations") {
+    return (
+      <>
+        <h2 className={styles.sectionHead}>{panel.header}</h2>
+        <p className={styles.body}>{panel.intro}</p>
+        <div className={styles.recommendationGrid}>
+          {panel.items.map((item, index) => (
+            <article key={item.title} className={styles.recommendationCard}>
+              <span className={styles.recommendationNum}>{String(index + 1).padStart(2, "0")}</span>
+              <h3 className={styles.recommendationTitle}>{item.title}</h3>
+              <ul className={styles.recommendationList}>
+                {item.bullets.map((bullet) => (
+                  <li key={bullet}>{bullet}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
       </>
     );
   }
@@ -58,6 +119,20 @@ export default function EndingSequence({
   onReplay,
   onNextChapter,
 }: EndingSequenceProps) {
+  useEffect(() => {
+    const htmlOverflow = document.documentElement.style.overflow;
+    const bodyOverflow = document.body.style.overflow;
+
+    window.scrollTo(0, 0);
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.documentElement.style.overflow = htmlOverflow;
+      document.body.style.overflow = bodyOverflow;
+    };
+  }, []);
+
   if (phase === "outcome-best" || phase === "outcome-keep") {
     const outcome = phase === "outcome-best" ? OUTCOME_BEST : OUTCOME_KEEP;
     return (
@@ -88,10 +163,14 @@ export default function EndingSequence({
   const panel = ENDING_PANELS[panelIndex];
   const isDecision = panel?.type === "decision";
   const displayPanel = isDecision ? null : panel;
+  const isWidePanel =
+    displayPanel?.type === "recommendations" ||
+    displayPanel?.type === "list" ||
+    displayPanel?.type === "section";
 
   return (
     <div className={styles.sequence}>
-      <article className={styles.card}>
+      <article className={`${styles.card} ${isWidePanel ? styles.cardWide : ""}`}>
         <p className={styles.progress}>
           {isDecision ? "Your decision" : `${panelIndex + 1} / ${ENDING_PANELS.length}`}
         </p>
