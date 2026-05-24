@@ -807,6 +807,20 @@
   box-shadow: var(--diet-shadow-dramatic);
 }
 
+.completionPage {
+  min-height: calc(100dvh - 77px);
+  height: calc(100dvh - 77px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.completionPage .completion {
+  margin-block: 0;
+  max-height: calc(100dvh - 118px);
+  overflow: hidden;
+}
+
 .ctaLink {
   display: inline-block;
   align-self: flex-start;

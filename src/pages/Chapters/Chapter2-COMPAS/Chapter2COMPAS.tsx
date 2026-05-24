@@ -5,7 +5,6 @@ import {
   useRef,
   useState,
   type CSSProperties,
-  type RefObject,
 } from "react";
 import { useSearchParams } from "react-router-dom";
 import Chatbox from "../../../components/Chatbox/Chatbox";
@@ -24,13 +23,14 @@ import {
 } from "./chapter2Data";
 import { sessionLogger } from "../../../utils/sessionLogger";
 import { getScenario, type AggregateSatisfaction } from "./chapter2Scenarios";
-import { TUTORIAL_REOPEN_START, type TutorialSpotlight } from "./chapter2Tutorial";
+import { TUTORIAL_REOPEN_START, TUTORIAL_STEPS, type Chapter2TutorialTarget } from "./chapter2Tutorial";
 import type { DayRecord, MetricUsageCounts } from "./chapter2Types";
 import { INITIAL_GAME_STATE } from "./chapter2Types";
+import { useTutorial } from "../Chapter1-SamplingBias/hooks/useTutorial";
+import TutorialPopover from "../Chapter1-SamplingBias/components/Tutorial/TutorialPopover";
 import EndingSequence from "./components/EndingSequence";
 import LeftPanel from "./components/LeftPanel";
 import RightPanel from "./components/RightPanel";
-import TutorialOverlay from "./components/TutorialOverlay";
 
 type Phase = "intro" | "tutorial" | "game" | "ending";
 type EndingPhase = "narrative" | "outcome-best" | "outcome-keep";
@@ -63,7 +63,6 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
 
   const [phase, setPhase] = useState<Phase>("intro");
   const [introChunkIndex, setIntroChunkIndex] = useState(0);
-  const [tutorialStep, setTutorialStep] = useState(0);
   const [currentDay, setCurrentDay] = useState(INITIAL_GAME_STATE.currentDay);
   const [fairnessMetric, setFairnessMetric] = useState<FairnessDefinitionId>(INITIAL_GAME_STATE.fairnessMetric);
   const [budget, setBudget] = useState(STARTING_BUDGET);
@@ -77,24 +76,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
   const [isNarrativeCollapsed, setIsNarrativeCollapsed] = useState(false);
   const [chatboxReopenSignal, setChatboxReopenSignal] = useState(0);
 
-  const gameShellRef = useRef<HTMLDivElement>(null);
-  const metricSelectorRef = useRef<HTMLElement>(null);
-  const studyQueueRef = useRef<HTMLElement>(null);
-  const metricsDashboardRef = useRef<HTMLElement>(null);
-  const satisfactionMetersRef = useRef<HTMLElement>(null);
   const lastDialogueKeyRef = useRef<string>("");
-
-  const spotlightRefs: Record<TutorialSpotlight, RefObject<HTMLElement | null>> = useMemo(
-    () => ({
-      frame: gameShellRef,
-      metricSelector: metricSelectorRef,
-      metricsDashboard: metricsDashboardRef,
-      satisfactionMeters: satisfactionMetersRef,
-      studyQueue: studyQueueRef,
-      none: { current: null },
-    }),
-    [],
-  );
 
   const pendingCost = queueCost(pendingQueue);
   const canAdvance = budget - pendingCost >= 0;
@@ -185,9 +167,18 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
     setEndingPhase("narrative");
   };
 
+  const finishTutorial = useCallback(() => {
+    setPhase("game");
+  }, []);
+
+  const tutorial = useTutorial(TUTORIAL_STEPS, {
+    enabled: phase === "tutorial",
+    onDismiss: finishTutorial,
+  });
+
   const resetGame = useCallback(() => {
     setPhase("tutorial");
-    setTutorialStep(0);
+    tutorial.restartAt(0);
     setCurrentDay(0);
     setFairnessMetric("equal_rates");
     setBudget(STARTING_BUDGET);
@@ -199,11 +190,11 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
     setIsNarrativeCollapsed(false);
     setChatboxReopenSignal(0);
     lastDialogueKeyRef.current = "";
-  }, []);
+  }, [tutorial]);
 
   const openTutorialFromHelp = () => {
-    setTutorialStep(TUTORIAL_REOPEN_START - 1);
     setPhase("tutorial");
+    tutorial.restartAt(TUTORIAL_REOPEN_START);
   };
 
   const advanceIntro = useCallback(() => {
@@ -214,9 +205,11 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
     }
   }, [introChunkIndex]);
 
-  const finishTutorial = () => {
-    setPhase("game");
-    setTutorialStep(0);
+  const getTutorialTargetClass = (target: Chapter2TutorialTarget, className = "") => {
+    if (tutorial.open && tutorial.step?.target === "frame" && target !== "frame") {
+      return className;
+    }
+    return tutorial.getTargetClass(target, className);
   };
 
   const chapterBackground = CHAPTER1_BACKGROUNDS.caseRoom;
@@ -224,6 +217,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
 
   const gameShellClass = [
     styles.gameShell,
+    tutorial.open ? styles.gameShellTutorialActive : "",
     showGameChatbox && !isNarrativeCollapsed ? styles.gameShellChatboxOpen : "",
     showGameChatbox && isNarrativeCollapsed ? styles.gameShellChatboxCollapsed : "",
   ]
@@ -276,11 +270,15 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
     );
   }
 
-  const showTutorial = phase === "tutorial";
-
   return (
     <div className={`${styles.phase} ${styles.phaseWithBackground}`} style={phaseStyle}>
-      <div ref={gameShellRef} className={gameShellClass} data-tutorial-dim={showTutorial ? true : undefined}>
+      <div
+        className={
+          tutorial.open && tutorial.step?.target === "frame"
+            ? tutorial.getTargetClass("frame", gameShellClass)
+            : gameShellClass
+        }
+      >
         <LeftPanel
           currentDay={currentDay}
           budget={budget}
@@ -292,8 +290,8 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
           onAdvance={advanceDay}
           onConfirmEnding={confirmEnding}
           onOpenTutorial={openTutorialFromHelp}
-          metricSelectorRef={metricSelectorRef}
-          studyQueueRef={studyQueueRef}
+          metricSelectorClassName={getTutorialTargetClass("metricSelector")}
+          studyQueueClassName={getTutorialTargetClass("studyQueue")}
         />
 
         <RightPanel
@@ -301,18 +299,25 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
           scenario={displayedScenario}
           commissionedStudies={commissionedStudies}
           satisfactionHistory={satisfactionHistory}
-          metricsDashboardRef={metricsDashboardRef}
-          satisfactionMetersRef={satisfactionMetersRef}
+          showTutorialPlaceholders={tutorial.open}
+          metricsDashboardClassName={getTutorialTargetClass("metricsDashboard")}
+          satisfactionMetersClassName={getTutorialTargetClass("satisfactionMeters")}
         />
       </div>
 
-      {showTutorial && (
-        <TutorialOverlay
-          stepIndex={tutorialStep}
-          onNext={() => setTutorialStep((s) => s + 1)}
-          onComplete={finishTutorial}
-          onSkip={finishTutorial}
-          spotlightRefs={spotlightRefs}
+      {tutorial.step && (
+        <TutorialPopover
+          open={tutorial.open}
+          title={tutorial.step.title}
+          body={tutorial.step.body}
+          stepIndex={tutorial.stepIndex}
+          totalSteps={tutorial.totalSteps}
+          style={tutorial.popoverStyle}
+          onSkip={tutorial.close}
+          onBack={tutorial.goPrev}
+          onNext={tutorial.goNext}
+          titleId="chapter2-tutorial-title"
+          popoverRef={tutorial.registerPopover}
         />
       )}
 

@@ -1,4 +1,3 @@
-import type { RefObject } from "react";
 import styles from "./LeftPanel.module.css";
 import chapterStyles from "../Chapter2COMPAS.module.css";
 import { MAX_CURRENT_DAY } from "../chapter2Data";
@@ -17,8 +16,8 @@ type LeftPanelProps = {
   onAdvance: () => void;
   onConfirmEnding: () => void;
   onOpenTutorial: () => void;
-  metricSelectorRef?: RefObject<HTMLElement | null>;
-  studyQueueRef?: RefObject<HTMLElement | null>;
+  metricSelectorClassName?: string;
+  studyQueueClassName?: string;
 };
 
 export default function LeftPanel({
@@ -32,8 +31,8 @@ export default function LeftPanel({
   onAdvance,
   onConfirmEnding,
   onOpenTutorial,
-  metricSelectorRef,
-  studyQueueRef,
+  metricSelectorClassName,
+  studyQueueClassName,
 }: LeftPanelProps) {
   const isFinalDay = currentDay === MAX_CURRENT_DAY;
 
@@ -69,12 +68,12 @@ export default function LeftPanel({
           </p>
         )}
 
-        <div ref={metricSelectorRef as RefObject<HTMLDivElement>}>
+        <div className={metricSelectorClassName}>
           <FairnessMetricSelector active={fairnessMetric} onSelect={onMetricSelect} compact={isFinalDay} />
         </div>
 
         {!isFinalDay && (
-          <div ref={studyQueueRef as RefObject<HTMLDivElement>}>
+          <div className={studyQueueClassName}>
             <StudyQueuePanel
               pendingQueue={pendingQueue}
               budget={budget}

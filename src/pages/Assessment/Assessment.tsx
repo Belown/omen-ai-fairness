@@ -133,6 +133,22 @@ export default function Assessment() {
     });
   }, [answers, confidence, feedback, mode, openEnded, understanding]);
 
+  useEffect(() => {
+    if (!submitted || isPost) return;
+
+    const htmlOverflow = document.documentElement.style.overflow;
+    const bodyOverflow = document.body.style.overflow;
+
+    window.scrollTo({ top: 0, left: 0 });
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.documentElement.style.overflow = htmlOverflow;
+      document.body.style.overflow = bodyOverflow;
+    };
+  }, [isPost, submitted]);
+
   const handleSubmit = () => {
     const allQuestionsAnswered = BIAS_SECTIONS.every((section) =>
       section.questions.every((q) => answers[q.id] && confidence[q.id]) &&
@@ -403,7 +419,7 @@ function CompletionState({ isPost }: { isPost: boolean }) {
   return (
     <>
       <Nav investigation />
-      <main className={`${styles.page} ${isPost ? styles.pagePost : styles.pagePre}`}>
+      <main className={`${styles.page} ${styles.completionPage} ${isPost ? styles.pagePost : styles.pagePre}`}>
         <div className={styles.sceneWash} />
         <div className={styles.completion}>
           <span className={styles.caseTag}>Assessment complete</span>

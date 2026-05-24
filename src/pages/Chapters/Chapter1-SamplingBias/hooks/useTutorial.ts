@@ -44,6 +44,7 @@ export type TutorialController<T extends string> = {
   registerPopover: (el: HTMLElement | null) => void;
   getTargetClass: (target: T, baseClassName: string) => string;
   restart: () => void;
+  restartAt: (index: number) => void;
   goNext: () => void;
   goPrev: () => void;
   close: () => void;
@@ -339,6 +340,14 @@ export function useTutorial<T extends string>(
     setOpen(true);
   };
 
+  const restartAt = (index: number) => {
+    if (!steps.length) return;
+    setStepIndex(Math.min(Math.max(0, index), steps.length - 1));
+    setManuallyStarted(true);
+    setDismissed(false);
+    setOpen(true);
+  };
+
   const goPrev = () => {
     setStepIndex((i) => Math.max(0, i - 1));
   };
@@ -359,6 +368,7 @@ export function useTutorial<T extends string>(
     registerPopover,
     getTargetClass,
     restart,
+    restartAt,
     goNext,
     goPrev,
     close,
