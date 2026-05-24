@@ -15,6 +15,7 @@ import styles from "./Chapter2COMPAS.module.css";
 import { buildScenarioDialogue } from "./chapter2Dialogue";
 import {
   FAIRNESS_DEFINITIONS,
+  INTRO_CHUNKS,
   MAX_CURRENT_DAY,
   STARTING_BUDGET,
   STUDY_METRICS,
@@ -31,7 +32,7 @@ import LeftPanel from "./components/LeftPanel";
 import RightPanel from "./components/RightPanel";
 import TutorialOverlay from "./components/TutorialOverlay";
 
-type Phase = "tutorial" | "game" | "ending";
+type Phase = "intro" | "tutorial" | "game" | "ending";
 type EndingPhase = "narrative" | "outcome-best" | "outcome-keep";
 
 export type ChapterResult = {
@@ -60,7 +61,8 @@ function satisfactionFromDays(days: DayRecord[]): AggregateSatisfaction[] {
 export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2COMPASProps) {
   const [, setSearchParams] = useSearchParams();
 
-  const [phase, setPhase] = useState<Phase>("tutorial");
+  const [phase, setPhase] = useState<Phase>("intro");
+  const [introChunkIndex, setIntroChunkIndex] = useState(0);
   const [tutorialStep, setTutorialStep] = useState(0);
   const [currentDay, setCurrentDay] = useState(INITIAL_GAME_STATE.currentDay);
   const [fairnessMetric, setFairnessMetric] = useState<FairnessDefinitionId>(INITIAL_GAME_STATE.fairnessMetric);
@@ -204,6 +206,14 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
     setPhase("tutorial");
   };
 
+  const advanceIntro = useCallback(() => {
+    if (introChunkIndex < INTRO_CHUNKS.length - 1) {
+      setIntroChunkIndex((i) => i + 1);
+    } else {
+      setPhase("tutorial");
+    }
+  }, [introChunkIndex]);
+
   const finishTutorial = () => {
     setPhase("game");
     setTutorialStep(0);
@@ -219,6 +229,20 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
   ]
     .filter(Boolean)
     .join(" ");
+
+  if (phase === "intro") {
+    return (
+      <div className={`${styles.phase} ${styles.phaseWithBackground}`} style={phaseStyle}>
+        <Chatbox
+          text={INTRO_CHUNKS[introChunkIndex]}
+          portraitSrc={portraits.thoughtful}
+          onAdvance={advanceIntro}
+          speakerName="Whiskers Holmes"
+          disablePreviousNavigation
+        />
+      </div>
+    );
+  }
 
   if (phase === "ending") {
     return (

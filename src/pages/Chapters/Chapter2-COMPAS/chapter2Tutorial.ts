@@ -25,7 +25,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     id: 1,
     spotlight: "frame",
     whiskersText:
-      "Welcome to the COMPAS simulation! I'm Whiskers Holmes, and I'll guide you through one of the most controversial AI systems ever deployed in criminal justice. You're going to make real decisions about algorithmic fairness — and discover there are no easy answers.",
+      "Welcome to the COMPAS simulation! I'm Dr. Hedgehog, your virtual assistant, and I'll guide you through one of the most controversial AI systems ever deployed in criminal justice. You're going to make real decisions about algorithmic fairness — and discover there are no easy answers.",
   },
   {
     id: 2,

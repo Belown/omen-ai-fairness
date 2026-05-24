@@ -38,11 +38,11 @@ const DIALOGUES: Dialogue[] = [
   },
   {
     portrait: portraits.serious,
-    text: "From the book, The last think I need to solve is the human bias. More precisely, even if we reinforce our model with human feedback, these persons can introduce more biases.",
+    text: "From the book, The last think I need to solve is the animal bias. More precisely, even if we reinforce our model with animal feedback, these persons can introduce more biases.",
   },
   {
     portrait: portraits.encouraging,
-    text: "How to do this ? I simply have to face the machine and tell them what I think is correct or wrong ... should be simple right ?",
+    text: "How to solve this ? I simply have to face the machine and tell them what I think is correct or wrong ... should be simple right ?",
   },
   // Beat 4 is outcome-driven — resolved at render time from BEAT_FOUR.
   { portrait: portraits.alarmed, text: "__BEAT_FOUR_PLACEHOLDER__" },

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { portraits } from "../../../../assets/detective/portraits";
+import hedgehogPortrait from "../../../../assets/hedgehog_scientist/hedgehog_portrait.png";
 import { TUTORIAL_STEPS, type TutorialSpotlight } from "../chapter2Tutorial";
 import styles from "./TutorialOverlay.module.css";
 
@@ -77,9 +77,9 @@ export default function TutorialOverlay({
         </p>
         {step.whiskersText && (
           <div className={styles.whiskersRow}>
-            <img src={portraits.thoughtful} alt="" className={styles.portrait} />
+            <img src={hedgehogPortrait} alt="" className={styles.portrait} />
             <div>
-              <p className={styles.whiskersName}>Whiskers Holmes</p>
+              <p className={styles.whiskersName}>Dr Hedgehog</p>
               <p className={styles.whiskersText}>{step.whiskersText}</p>
             </div>
           </div>
