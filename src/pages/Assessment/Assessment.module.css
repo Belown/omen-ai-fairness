@@ -942,6 +942,21 @@
   color: var(--diet-stamp-red);
 }
 
+.ctaLinkSecondary {
+  display: inline-block;
+  align-self: flex-start;
+  color: var(--diet-paper);
+  opacity: 0.55;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  transition: opacity 0.15s ease;
+}
+
+.ctaLinkSecondary:hover {
+  opacity: 0.85;
+}
+
 @media (max-width: 700px) {
   .hero {
     grid-template-columns: 1fr;

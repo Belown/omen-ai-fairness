@@ -47,3 +47,36 @@ export function loadAssessmentDraft(mode: "pre" | "post"): AssessmentDraft {
     return createEmptyAssessmentDraft();
   }
 }
+
+// ---------------------------------------------------------------------------
+// Chapter results — persisted so that the ending page works after navigating
+// away to /post-assessment and back to /chapters?ending=final
+// ---------------------------------------------------------------------------
+
+export type PersistedChapterResult = {
+  completed: boolean;
+  passed: boolean;
+  scoreLabel?: string;
+  attempts?: number;
+};
+
+const CHAPTER_RESULTS_KEY = "diet_chapter_results";
+
+export function saveChapterResults(
+  results: Record<string, PersistedChapterResult | null>
+): void {
+  try {
+    sessionStorage.setItem(CHAPTER_RESULTS_KEY, JSON.stringify(results));
+  } catch {
+    console.error("[DIET] Could not persist chapter results to sessionStorage");
+  }
+}
+
+export function loadChapterResults(): Record<string, PersistedChapterResult | null> {
+  try {
+    const raw = sessionStorage.getItem(CHAPTER_RESULTS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}

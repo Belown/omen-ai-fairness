@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { hasCompleted } from "../../utils/assessmentStorage";
+import {
+  hasCompleted,
+  loadChapterResults,
+  saveChapterResults,
+} from "../../utils/assessmentStorage";
 import { sessionLogger } from "../../utils/sessionLogger";
 import Logo from "../../components/Logo/Logo";
 import Chapter1SamplingBias from "./Chapter1-SamplingBias/Chapter1SamplingBias";
@@ -86,10 +90,13 @@ export default function Chapters() {
   });
   const [timelineOpen, setTimelineOpen] = useState(false);
   const [chapterTutorialOverlayOpen, setChapterTutorialOverlayOpen] = useState(false);
-  const [chapterResults, setChapterResults] = useState<Record<ChapterId, ChapterResult | null>>({
-    ch1: null,
-    ch2: null,
-    ch3: null,
+  const [chapterResults, setChapterResults] = useState<Record<ChapterId, ChapterResult | null>>(() => {
+    const stored = loadChapterResults();
+    return {
+      ch1: (stored.ch1 as ChapterResult | null) ?? null,
+      ch2: (stored.ch2 as ChapterResult | null) ?? null,
+      ch3: (stored.ch3 as ChapterResult | null) ?? null,
+    };
   });
   const chromeRef = useRef<HTMLDivElement>(null);
   const endingRef = useRef<HTMLDivElement>(null);
@@ -160,19 +167,20 @@ export default function Chapters() {
     setChapterResults((prev) => {
       if (prev[chapter]?.completed) return prev;
       if (logEnabled) sessionLogger.downloadLog(`diet-log-${chapter}-complete.json`, chapter);
-      return { ...prev, [chapter]: result };
+      const next = { ...prev, [chapter]: result };
+      saveChapterResults(next);
+      return next;
     });
   };
 
+  // Log completion once when all chapters are done, but do NOT auto-navigate
+  // to the ending. The user reaches the ending via the button on the
+  // post-assessment completion page.
   useEffect(() => {
     if (!isCaseComplete || hasScrolledToEndingRef.current) return;
     hasScrolledToEndingRef.current = true;
     if (logEnabled) sessionLogger.downloadLog("diet-log-all-chapters-complete.json");
-    const timer = window.setTimeout(() => {
-      setSearchParams({ ending: "final" });
-    }, 250);
-    return () => window.clearTimeout(timer);
-  }, [isCaseComplete, setSearchParams]);
+  }, [isCaseComplete, logEnabled]);
 
   // Ctrl+Shift+L — manual download, only when logging is enabled.
   useEffect(() => {

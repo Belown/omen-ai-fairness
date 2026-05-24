@@ -1,3 +1,9 @@
+/**
+ * Feature flag — set to `false` to hide the "Randomize" button on both the
+ * Pre-Game and Post-Game assessment pages.
+ */
+export const SHOW_RANDOMIZE_BUTTON = true;
+
 export const BIAS_SECTIONS = [
   {
     id: 'sampling-bias',

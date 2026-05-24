@@ -6,6 +6,7 @@ import {
   FEEDBACK_STATEMENTS,
   LIKERT_OPTIONS,
   OPEN_ENDED_QUESTIONS,
+  SHOW_RANDOMIZE_BUTTON,
 } from "./assessmentData";
 import {
   loadAssessmentDraft,
@@ -432,9 +433,11 @@ function PreTest() {
             Your baseline answers are recorded. Begin the investigation when you are ready.
           </p>
           <div className={styles.submitRow}>
-            <button className={styles.randomizeBtn} onClick={handleRandomize} type="button">
-              Randomize
-            </button>
+            {SHOW_RANDOMIZE_BUTTON && (
+              <button className={styles.randomizeBtn} onClick={handleRandomize} type="button">
+                Randomize
+              </button>
+            )}
             <button className={styles.submitBtn} onClick={handleSubmit} type="button">
               Submit {isPost ? "Post-Game" : "Pre-Game"} Assessment
             </button>

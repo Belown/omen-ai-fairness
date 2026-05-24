@@ -7,6 +7,7 @@ import {
   FEEDBACK_STATEMENTS,
   LIKERT_OPTIONS,
   OPEN_ENDED_QUESTIONS,
+  SHOW_RANDOMIZE_BUTTON,
 } from "./assessmentData";
 import {
   loadAssessmentDraft,
@@ -549,9 +550,11 @@ function PostTest() {
               : "Submitting saves the baseline case record as a local JSON file."}
           </p>
           <div className={styles.submitRow}>
-            <button className={styles.randomizeBtn} onClick={handleRandomize} type="button">
-              Randomize
-            </button>
+            {SHOW_RANDOMIZE_BUTTON && (
+              <button className={styles.randomizeBtn} onClick={handleRandomize} type="button">
+                Randomize
+              </button>
+            )}
             <button className={styles.submitBtn} onClick={handleSubmit} type="button">
               Submit {isPost ? "Post-Game" : "Pre-Game"} Assessment
             </button>
@@ -586,13 +589,17 @@ function CompletionState({ isPost }: { isPost: boolean }) {
             </Link>
           )}
           {isPost && (
-            <Link to="/" className={styles.ctaLink}>
-              Return to home →
-            </Link>
+            <>
+              <Link to="/chapters?ending=final" className={styles.ctaLink}>
+                View your ending →
+              </Link>
+              <Link to="/" className={styles.ctaLinkSecondary}>
+                Return to home
+              </Link>
+            </>
           )}
         </div>
       </main>
-
     </>
   );
 }
