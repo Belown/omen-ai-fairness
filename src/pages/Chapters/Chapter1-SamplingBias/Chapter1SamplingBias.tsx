@@ -76,7 +76,7 @@ type ImportantInstructionTarget = {
 type Chapter1SamplingBiasProps = {
   isActive?: boolean;
   onTutorialOverlayOpenChange?: (open: boolean) => void;
-  onChapterComplete?: (result: { completed: boolean; passed: boolean; scoreLabel?: string }) => void;
+  onChapterComplete?: (result: { completed: boolean; passed: boolean; scoreLabel?: string; attempts?: number }) => void;
   tutorialDebugEnabled?: boolean;
 };
 
@@ -132,6 +132,7 @@ export default function Chapter1SamplingBias({
   const [chatboxReopenSignal, setChatboxReopenSignal] = useState(0);
   const [sceneAdvanceSignal, setSceneAdvanceSignal] = useState(0);
   const [isNarrativeCollapsed, setIsNarrativeCollapsed] = useState(false);
+  const [attempt, setAttempt] = useState(1);
 
   useEffect(() => {
     onTutorialOverlayOpenChange?.(isActive && isTutorialOverlayOpen);
@@ -157,11 +158,12 @@ export default function Chapter1SamplingBias({
           day + 1,
           overallAcc,
           regionAccs.map((acc, i) => ({ zone: REGIONS[i]?.label ?? `Zone ${i + 1}`, accuracy: acc })),
+          attempt,
         );
       }
     });
     prevDayLockedRef.current = [...dayLocked];
-  }, [dayLocked, overallAcc, regionAccs]);
+  }, [attempt, dayLocked, overallAcc, regionAccs]);
 
   const passageChoices = useMemo((): Choice[] => {
     return getAdaptivePassage(passage, strategy).choices ?? [];
@@ -339,6 +341,7 @@ export default function Chapter1SamplingBias({
         questions: p.questions,
         cost: p.cost,
       })),
+      attempt,
     );
     sendDetective();
     const nextId: PassageId =
@@ -496,6 +499,8 @@ export default function Chapter1SamplingBias({
             pct={pct}
             onRestart={() => {
               resetInvestigation();
+              prevDayLockedRef.current = [false, false, false];
+              setAttempt((value) => value + 1);
               setPassage("day1-brief");
               setChunkIndex(0);
               setShowChoices(false);
@@ -506,6 +511,7 @@ export default function Chapter1SamplingBias({
                 completed: true,
                 passed: overallAcc >= 0.8,
                 scoreLabel: pct(overallAcc),
+                attempts: attempt,
               });
               setSearchParams({ chapter: "ch2" });
             }}

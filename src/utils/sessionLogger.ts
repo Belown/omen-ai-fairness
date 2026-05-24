@@ -6,6 +6,7 @@ const LOG_KEYS = {
 
 export type Ch1DayPlanEntry = {
   type: "ch1_day_plan";
+  attempt: number;
   day: number;
   plans: Array<{
     zones: string[];
@@ -18,6 +19,7 @@ export type Ch1DayPlanEntry = {
 
 export type Ch1DayAccuracyEntry = {
   type: "ch1_day_accuracy";
+  attempt: number;
   day: number;
   overallAccuracy: number;
   zoneAccuracies: Array<{ zone: string; accuracy: number }>;
@@ -26,6 +28,7 @@ export type Ch1DayAccuracyEntry = {
 
 export type Ch2DayEntry = {
   type: "ch2_day";
+  attempt: number;
   day: number;
   fairnessMetricId: string;
   fairnessMetricLabel: string;
@@ -36,6 +39,7 @@ export type Ch2DayEntry = {
 
 export type Ch2EndingChoiceEntry = {
   type: "ch2_ending_choice";
+  attempt: number;
   choice: "apply-best-practices" | "keep-current-system";
   finalFairnessMetricId: string;
   finalFairnessMetricLabel: string;
@@ -44,6 +48,7 @@ export type Ch2EndingChoiceEntry = {
 
 export type Ch3CardChoiceEntry = {
   type: "ch3_card_choice";
+  attempt: number;
   roundIndex: number;
   cardId: string;
   cardTag: string;
@@ -123,15 +128,16 @@ function readScopedLog(scope: ChapterLogKey): SessionLogExport {
 }
 
 export const sessionLogger = {
-  logCh1Plan(day: number, plans: Ch1DayPlanEntry["plans"]): void {
-    writeEntry("ch1", { type: "ch1_day_plan", day, plans, timestamp: Date.now() });
+  logCh1Plan(day: number, plans: Ch1DayPlanEntry["plans"], attempt = 1): void {
+    writeEntry("ch1", { type: "ch1_day_plan", attempt, day, plans, timestamp: Date.now() });
   },
   logCh1Accuracy(
     day: number,
     overallAccuracy: number,
     zoneAccuracies: Ch1DayAccuracyEntry["zoneAccuracies"],
+    attempt = 1,
   ): void {
-    writeEntry("ch1", { type: "ch1_day_accuracy", day, overallAccuracy, zoneAccuracies, timestamp: Date.now() });
+    writeEntry("ch1", { type: "ch1_day_accuracy", attempt, day, overallAccuracy, zoneAccuracies, timestamp: Date.now() });
   },
   logCh2Day(entry: Omit<Ch2DayEntry, "type" | "timestamp">): void {
     writeEntry("ch2", { type: "ch2_day", ...entry, timestamp: Date.now() });

@@ -39,6 +39,7 @@ export type ChapterResult = {
   completed: boolean;
   passed: boolean;
   scoreLabel?: string;
+  attempts?: number;
 };
 
 type Chapter2COMPASProps = {
@@ -90,6 +91,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
   const [endingPhase, setEndingPhase] = useState<EndingPhase>("narrative");
   const [isNarrativeCollapsed, setIsNarrativeCollapsed] = useState(false);
   const [chatboxReopenSignal, setChatboxReopenSignal] = useState(0);
+  const [attempt, setAttempt] = useState(1);
 
   const lastDialogueKeyRef = useRef<string>("");
 
@@ -142,6 +144,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
 
     const metricDef = FAIRNESS_DEFINITIONS.find((d) => d.id === metric);
     sessionLogger.logCh2Day({
+      attempt,
       day: currentDay + 1,
       fairnessMetricId: metric,
       fairnessMetricLabel: metricDef?.title ?? metric,
@@ -173,6 +176,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
       completed: true,
       passed: true,
       scoreLabel: "COMPAS complete",
+      attempts: attempt,
     });
   };
 
@@ -187,7 +191,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
   }, []);
 
   const tutorial = useTutorial(TUTORIAL_STEPS, {
-    enabled: phase === "tutorial",
+    enabled: isActive && phase === "tutorial",
     onDismiss: finishTutorial,
   });
 
@@ -204,21 +208,24 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
     setEndingPhase("narrative");
     setIsNarrativeCollapsed(false);
     setChatboxReopenSignal(0);
+    setAttempt((value) => value + 1);
     lastDialogueKeyRef.current = "";
   }, [tutorial]);
 
   const openTutorialFromHelp = () => {
+    if (!isActive) return;
     setPhase("tutorial");
     tutorial.restartAt(TUTORIAL_REOPEN_START);
   };
 
   const advanceIntro = useCallback(() => {
+    if (!isActive) return;
     if (introChunkIndex < INTRO_CHUNKS.length - 1) {
       setIntroChunkIndex((i) => i + 1);
     } else {
       setPhase("tutorial");
     }
-  }, [introChunkIndex]);
+  }, [introChunkIndex, isActive]);
 
   const getTutorialTargetClass = (target: Chapter2TutorialTarget, className = "") => {
     if (tutorial.open && tutorial.step?.target === "frame" && target !== "frame") {
@@ -232,7 +239,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
 
   const gameShellClass = [
     styles.gameShell,
-    tutorial.open ? styles.gameShellTutorialActive : "",
+    isActive && tutorial.open ? styles.gameShellTutorialActive : "",
     showGameChatbox && !isNarrativeCollapsed ? styles.gameShellChatboxOpen : "",
     showGameChatbox && isNarrativeCollapsed ? styles.gameShellChatboxCollapsed : "",
   ]
@@ -247,6 +254,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
           portraitSrc={portraits.thoughtful}
           onAdvance={advanceIntro}
           speakerName="Whiskers Holmes"
+          disableKeyboardAdvance={!isActive}
           disablePreviousNavigation
         />
       </div>
@@ -263,6 +271,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
           onChooseBest={() => {
             const metricDef = FAIRNESS_DEFINITIONS.find((d) => d.id === fairnessMetric);
             sessionLogger.logCh2EndingChoice({
+              attempt,
               choice: "apply-best-practices",
               finalFairnessMetricId: fairnessMetric,
               finalFairnessMetricLabel: metricDef?.title ?? fairnessMetric,
@@ -272,6 +281,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
           onChooseKeep={() => {
             const metricDef = FAIRNESS_DEFINITIONS.find((d) => d.id === fairnessMetric);
             sessionLogger.logCh2EndingChoice({
+              attempt,
               choice: "keep-current-system",
               finalFairnessMetricId: fairnessMetric,
               finalFairnessMetricLabel: metricDef?.title ?? fairnessMetric,
@@ -308,13 +318,13 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
           scenario={displayedScenario}
           commissionedStudies={commissionedStudies}
           satisfactionHistory={satisfactionHistory}
-          showTutorialPlaceholders={tutorial.open}
+          showTutorialPlaceholders={isActive && tutorial.open}
           metricsDashboardClassName={getTutorialTargetClass("metricsDashboard")}
           satisfactionMetersClassName={getTutorialTargetClass("satisfactionMeters")}
         />
       </div>
 
-      {tutorial.step && (
+      {isActive && tutorial.step && (
         <TutorialPopover
           open={tutorial.open}
           title={tutorial.step.title}
@@ -344,6 +354,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
           onCollapsedChange={setIsNarrativeCollapsed}
           reopenSignal={chatboxReopenSignal}
           speakerName="Whiskers Holmes"
+          disableKeyboardAdvance={!isActive}
           disablePreviousNavigation
         />
       )}

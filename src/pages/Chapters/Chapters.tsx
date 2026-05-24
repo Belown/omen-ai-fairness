@@ -23,6 +23,7 @@ type ChapterResult = {
   completed: boolean;
   passed: boolean;
   scoreLabel?: string;
+  attempts?: number;
 };
 
 type EndingTier = "good" | "medium" | "bad";
@@ -54,16 +55,19 @@ const createPreviewResults = (passCount: number): Record<ChapterId, ChapterResul
     completed: true,
     passed: passCount >= 1,
     scoreLabel: passCount >= 1 ? "Low Risk" : "Review needed",
+    attempts: 1,
   },
   ch2: {
     completed: true,
     passed: passCount >= 2,
     scoreLabel: passCount >= 2 ? "Fairness lesson complete" : "Review needed",
+    attempts: 1,
   },
   ch3: {
     completed: true,
     passed: passCount >= 3,
     scoreLabel: passCount >= 3 ? "honest-even" : "alignment drift",
+    attempts: 1,
   },
 });
 
@@ -452,6 +456,7 @@ function EndingPanel({
                 {result?.passed ? "Pass" : "Review needed"}
               </p>
               {result?.scoreLabel ? <span className={styles.endingDetail}>{result.scoreLabel}</span> : null}
+              {result?.attempts ? <span className={styles.endingDetail}>Attempts: {result.attempts}</span> : null}
             </article>
           );
         })}

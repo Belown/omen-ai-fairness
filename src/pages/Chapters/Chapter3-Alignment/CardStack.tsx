@@ -76,8 +76,8 @@ const TAG_LABEL: Record<Card["tag"], string> = {
 };
 
 export type GameOutcome =
-  | { kind: "early"; meter: MeterKey }
-  | { kind: "final"; verdict: Verdict };
+  | { kind: "early"; meter: MeterKey; attempt: number }
+  | { kind: "final"; verdict: Verdict; attempt: number };
 
 // Beam search across a deck's choices to find a path that ends in the
 // "honest-even" verdict without ever crashing a meter. If the current deck
@@ -220,6 +220,7 @@ export default function CardStack({
   const [demoMode, setDemoMode] = useState(false);
   const [failureCount, setFailureCount] = useState(0);
   const [demoAnnotation, setDemoAnnotation] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(1);
   const demoPlanRef = useRef<("A" | "B")[]>([]);
   const demoAnnotationIndicesRef = useRef<Set<number>>(new Set());
 
@@ -233,12 +234,12 @@ export default function CardStack({
     if (demoMode) return;
     if (earlyEnd) {
       completedRef.current = true;
-      onComplete?.({ kind: "early", meter: earlyEnd.meter });
+      onComplete?.({ kind: "early", meter: earlyEnd.meter, attempt });
     } else if (done) {
       completedRef.current = true;
-      onComplete?.({ kind: "final", verdict: computeVerdict(meters) });
+      onComplete?.({ kind: "final", verdict: computeVerdict(meters), attempt });
     }
-  }, [done, earlyEnd, demoMode, meters, onComplete]);
+  }, [attempt, done, earlyEnd, demoMode, meters, onComplete]);
 
   const pick = (which: "A" | "B") => {
     if (!card || pending) return;
@@ -250,6 +251,7 @@ export default function CardStack({
     const otherChoice = which === "A" ? card.choiceB : card.choiceA;
     const nextMeters = applyDelta(meters, choice.delta);
     sessionLogger.logCh3Choice({
+      attempt,
       roundIndex: index,
       cardId: card.id,
       cardTag: card.tag,
@@ -286,6 +288,7 @@ export default function CardStack({
 
   const reset = () => {
     completedRef.current = false;
+    setAttempt((value) => value + 1);
     setDeck(sampleDeck());
     setIndex(0);
     setMeters(INITIAL_METERS);
