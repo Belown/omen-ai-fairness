@@ -66,8 +66,7 @@ const FAQS = [
   },
   {
     question: "What data does the tool collect?",
-    answer: "Placeholder: document whether the deployed version stores gameplay choices, analytics, or no user data.",
-    placeholder: true,
+    answer: "The tool can generate a local activity log after the post-test is finished, including examples such as chapter choices, assessment responses, and completion results. This log is downloaded to the user's device for review and is not uploaded to any server.",
   },
 ];
 

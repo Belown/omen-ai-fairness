@@ -1,16 +1,24 @@
+import { useState } from "react";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import styles from "./Resources.module.css";
 
-const RESOURCE_ITEMS = [
-  "Lesson plan",
-  "Worksheets",
-  "Facilitation guide",
-  "Setup instructions",
-  "Source code repository link",
+const PDF_RESOURCES = [
+  {
+    title: "Lesson plan",
+    label: "Classroom flow",
+    body: "A structured plan for timing, activity flow, discussion moments, and learning objectives.",
+  },
+  {
+    title: "Facilitation guide",
+    label: "Instructor notes",
+    body: "Guidance for setup, prompts, reflection questions, and supporting learners during the session.",
+  },
 ];
 
 export default function Resources() {
+  const [activeResource, setActiveResource] = useState(PDF_RESOURCES[0]);
+
   return (
     <>
       <Nav />
@@ -18,37 +26,45 @@ export default function Resources() {
         <section className={styles.hero}>
           <p className="eyebrow">Resources</p>
           <h1 className={styles.title}>Teaching materials and practical setup.</h1>
-          <p className={styles.lede}>
-            Placeholder page for the lesson plan, worksheets, facilitation guide, setup instructions,
-            and repository link. This section will document how to run a classroom or workshop session.
-          </p>
         </section>
 
-        <section className={styles.layout} aria-label="Resource placeholders">
-          <div className={styles.panel}>
-            <div className={styles.sectionHeader}>
-              <p className="eyebrow">PDF slot</p>
-              <h2>Resource packet preview</h2>
-              <p>
-                Add the final PDF file or hosted PDF URL here when the teaching packet is ready.
-              </p>
-            </div>
-            <div className={styles.pdfSlot}>
-              <span>PDF placeholder</span>
-            </div>
+        <section className={styles.resources} aria-label="PDF resource placeholders">
+          <div className={styles.sectionHeader}>
+            <p className="eyebrow">PDF resources</p>
+            <h2>Choose a teaching document to preview.</h2>
+            <p>
+              Select the lesson plan or facilitation guide. The final PDF will appear in the preview
+              area below.
+            </p>
           </div>
 
-          <aside className={styles.panel}>
-            <div className={styles.sectionHeader}>
-              <p className="eyebrow">To add</p>
-              <h2>Submission materials</h2>
+          <div className={styles.resourcePicker} role="tablist" aria-label="PDF resource selector">
+            {PDF_RESOURCES.map((resource) => (
+              <button
+                key={resource.title}
+                type="button"
+                role="tab"
+                aria-selected={activeResource.title === resource.title}
+                className={`${styles.resourceTab} ${
+                  activeResource.title === resource.title ? styles.resourceTabActive : ""
+                }`}
+                onClick={() => setActiveResource(resource)}
+              >
+                {resource.title}
+              </button>
+            ))}
+          </div>
+
+          <article className={styles.pdfCard}>
+            <div className={styles.pdfHeader}>
+              <span>{activeResource.label}</span>
+              <h3>{activeResource.title}</h3>
+              <p>{activeResource.body}</p>
             </div>
-            <ul className={styles.resourceList}>
-              {RESOURCE_ITEMS.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </aside>
+            <div className={styles.pdfSlot}>
+              <span>{activeResource.title} PDF placeholder</span>
+            </div>
+          </article>
         </section>
       </main>
       <Footer />

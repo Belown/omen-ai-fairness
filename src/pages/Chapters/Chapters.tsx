@@ -108,7 +108,7 @@ export default function Chapters() {
   });
   const pendingChapterScrollRef = useRef<ChapterId | null>(null);
 
-  const [logEnabled, setLogEnabled] = useState(false);
+  const [logEnabled] = useState(false);
 
   const [preComplete] = useState(() => hasCompleted("pre"));
   const [postComplete] = useState(() => hasCompleted("post"));
@@ -237,7 +237,7 @@ export default function Chapters() {
             </button>
           </div>
           <div className={styles.topbarRight}>
-            <button
+            {/* <button
               type="button"
               role="switch"
               aria-checked={logEnabled}
@@ -249,7 +249,7 @@ export default function Chapters() {
                 <span className={styles.logToggleThumb} />
               </span>
               <span className={styles.logToggleLabel}>LOG</span>
-            </button>
+            </button> */}
             <Link to="/" className={styles.backLink}>
               Back to case board
             </Link>
