@@ -1,14 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Chatbox from "../../../components/Chatbox/Chatbox";
 import { portraits } from "../../../assets/detective/portraits";
 import CardStack, { type GameOutcome } from "./CardStack";
 import styles from "./Chapter3Alignment.module.css";
+import { CASINO_IMAGE } from "../../../assets/image/image";
+import { sessionLogger } from "../../../utils/sessionLogger";
 
 type Dialogue = { text: string; portrait: string };
 
 type OutcomeKey = "not-played" | "survived" | "truth" | "majority" | "minority";
 
-const OUTCOME_RECAP_STEP = 4;
+const OUTCOME_RECAP_STEP = 5;
 
 const BEAT_FOUR: Record<OutcomeKey, Dialogue> = {
   "not-played": {
@@ -47,6 +50,10 @@ const DIALOGUES: Dialogue[] = [
     text: "How to solve this ? I simply have to face the machine and tell them what I think is correct or wrong ... should be simple right ?",
   },
   {
+    portrait: portraits.thoughtful,
+    text: "One moment — before I show you the machine. The image on the next screen is unusual, some people find it <b><u>unsettling</u></b>. I just want to give you fair warning. Click when you are ready.",
+  },
+  {
     portrait: portraits.serious,
     text: "The machine is ready. Each card asks me to choose what kind of answer the model should learn from. If I push any value too far, the system breaks. I need to balance truth, mainstream approval, and compassion.",
   },
@@ -76,18 +83,21 @@ const DIALOGUES: Dialogue[] = [
 
 type Chapter3AlignmentProps = {
   isActive?: boolean;
-  onChapterComplete?: (result: { completed: boolean; passed: boolean; scoreLabel?: string }) => void;
+  onChapterComplete?: (result: { completed: boolean; passed: boolean; scoreLabel?: string; attempts?: number }) => void;
 };
 
 const getOutcomeKey = (outcome: GameOutcome): OutcomeKey =>
   outcome.kind === "early" ? outcome.meter : "survived";
 
 export default function Chapter3Alignment({ isActive = true, onChapterComplete }: Chapter3AlignmentProps) {
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [history, setHistory] = useState<number[]>([0]);
   const [outcome, setOutcome] = useState<OutcomeKey>("not-played");
+  const [hasSkipped, setHasSkipped] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isDialogueComplete, setIsDialogueComplete] = useState(false);
+  const [sceneAdvanceSignal, setSceneAdvanceSignal] = useState(0);
   const phaseRef = useRef<HTMLDivElement>(null);
   const raterCardsRef = useRef<HTMLDivElement>(null);
   const statStripRef = useRef<HTMLDivElement>(null);
@@ -98,8 +108,8 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
   const pendingContentScrollStepRef = useRef<number | null>(null);
   const autoRevealContentStepRef = useRef<number | null>(null);
   const hasReportedCompletionRef = useRef(false);
-  const hasSceneContent = step >= 3;
-  const shouldKeepSceneContentVisible = hasInteracted && step >= 4;
+  const hasSceneContent = step >= 4;
+  const shouldKeepSceneContentVisible = hasInteracted && step >= 5;
   const showSceneContent = hasSceneContent && (isDialogueComplete || shouldKeepSceneContentVisible);
   const shouldShowChatbox = !isDialogueComplete;
   const shouldDimSceneBehindChatbox = shouldShowChatbox && shouldKeepSceneContentVisible;
@@ -108,7 +118,7 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
   // their highlight animation play. Players see the lesson, not the
   // dialogue tail.
   useEffect(() => {
-    if (!isActive || step < 9 || !showSceneContent) return;
+    if (!isActive || step < 10 || !showSceneContent) return;
     const node = keyInsightsRef.current;
     if (!node) return;
     const t = window.setTimeout(() => {
@@ -131,7 +141,7 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
     [history, step, outcome],
   );
 
-  const isGameGate = step === 3 && !hasInteracted;
+  const isGameGate = step === 4 && !hasInteracted;
 
   useEffect(() => {
     if (autoRevealContentStepRef.current === step) {
@@ -143,7 +153,7 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
   }, [step]);
 
   useEffect(() => {
-    if (!isActive || !pendingLearningScrollRef.current || step !== 4 || !shouldShowChatbox) return;
+    if (!isActive || !pendingLearningScrollRef.current || step !== 5 || !shouldShowChatbox) return;
     pendingLearningScrollRef.current = false;
     const t = window.setTimeout(() => {
       phaseRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -155,15 +165,15 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
     if (!isActive || pendingContentScrollStepRef.current !== step || !showSceneContent) return;
     pendingContentScrollStepRef.current = null;
     const target =
-      step === 5
+      step === 6
         ? raterCardsRef.current
-        : step === 6
+        : step === 7
           ? statStripRef.current
-          : step === 7
+          : step === 8
             ? loopRef.current
-            : step === 8
+            : step === 9
               ? takeawaysRef.current
-              : step >= 9
+              : step >= 10
                 ? keyInsightsRef.current
                 : null;
     if (!target) return;
@@ -184,10 +194,10 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
 
   const handleAdvance = () => {
     if (hasSceneContent) {
-      if (step === 4) {
-        autoRevealContentStepRef.current = 5;
-        pendingContentScrollStepRef.current = 5;
-        advanceTo(5);
+      if (step === 5) {
+        autoRevealContentStepRef.current = 6;
+        pendingContentScrollStepRef.current = 6;
+        advanceTo(6);
         return;
       }
       setIsDialogueComplete(true);
@@ -198,7 +208,9 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
   };
 
   const handleSkipGame = () => {
+    sessionLogger.logCh3Skip();
     setHasInteracted(true);
+    setHasSkipped(true);
     advanceTo(step + 1);
   };
 
@@ -218,9 +230,12 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
     <div ref={phaseRef} className={styles.phase}>
       <div className={`${styles.scene} ${showSceneContent ? styles.sceneContentOpen : styles.sceneDialogueOnly}`}>
         <div className={`${styles.sceneInner} ${showSceneContent ? styles.sceneInnerOpen : ""}`}>
+          {step === 4 && !showSceneContent && (
+            <img src={CASINO_IMAGE} alt="The alignment machine" className={styles.casinoImage} />
+          )}
           {showSceneContent && (
             <>
-          {step >= 3 && (
+          {step >= 4 && (
             <CardStack
               isActive={isActive}
               onComplete={(o) => {
@@ -232,36 +247,51 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
                     completed: true,
                     passed: o.kind === "final" && o.verdict === "honest-even",
                     scoreLabel: o.kind === "final" ? o.verdict : `${o.meter} crashed`,
+                    attempts: o.attempt,
                   });
                 }
               }}
               onFirstPick={() => setHasInteracted(true)}
+              onSkip={handleSkipGame}
               onContinue={() => {
-                // Advance from the game beat (3) into the outcome-aware
-                // recap (4). Subsequent panels reveal as the player clicks
+                // Advance from the game beat (4) into the outcome-aware
+                // recap (5). Subsequent panels reveal as the player clicks
                 // through the chatbox.
-                if (step <= 3) {
+                if (step <= 4) {
                   pendingLearningScrollRef.current = true;
-                  rememberStep(4);
-                  setStep(4);
+                  rememberStep(5);
+                  setStep(5);
                 }
               }}
+              onPostTest={() => navigate("/post-assessment")}
             />
           )}
-          {isGameGate && (
-            <div className={styles.skipRow}>
-              <button type="button" className={styles.skipLink} onClick={handleSkipGame}>
-                I'd rather not play — skip the cards →
-              </button>
-            </div>
-          )}
-          {step >= 5 && <div ref={raterCardsRef} className={styles.scrollTarget}><RaterCardsPanel /></div>}
-          {step >= 6 && <div ref={statStripRef} className={styles.scrollTarget}><StatStripPanel /></div>}
-          {step >= 7 && <div ref={loopRef} className={styles.scrollTarget}><LoopPanel /></div>}
-              {step >= 8 && <div ref={takeawaysRef} className={styles.scrollTarget}><TakeawaysPanel /></div>}
-              {step >= 9 && <KeyInsightsPanel innerRef={keyInsightsRef} />}
-              {step >= 9 && <ReferencesPanel />}
-              {step >= 4 && step < DIALOGUES.length - 1 && (
+          {step >= 6 && <div ref={raterCardsRef} className={styles.scrollTarget}><RaterCardsPanel /></div>}
+          {step >= 7 && <div ref={statStripRef} className={styles.scrollTarget}><StatStripPanel /></div>}
+          {step >= 8 && <div ref={loopRef} className={styles.scrollTarget}><LoopPanel /></div>}
+              {step >= 9 && <div ref={takeawaysRef} className={styles.scrollTarget}><TakeawaysPanel /></div>}
+              {step >= 10 && <KeyInsightsPanel innerRef={keyInsightsRef} />}
+              {step >= 10 && <ReferencesPanel />}
+              {(outcome !== "not-played" || hasSkipped) && (
+                <div className={styles.postTestRow}>
+                  <p className={styles.postTestHint}>
+                    {hasSkipped
+                      ? "You chose to skip the cards."
+                      : outcome === "survived"
+                        ? "You balanced all three meters through 16 cards."
+                        : "The cards showed you where the tension breaks."}
+                    {" "}Now measure what you learned.
+                  </p>
+                  <button
+                    type="button"
+                    className={styles.postTestButton}
+                    onClick={() => navigate("/post-assessment")}
+                  >
+                    Take the post-test →
+                  </button>
+                </div>
+              )}
+              {step >= 5 && step < DIALOGUES.length - 1 && (
                 <div className={styles.contentContinueRow}>
                   <button type="button" className={styles.contentContinueButton} onClick={handleContentContinue}>
                     Continue
@@ -274,6 +304,15 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
       </div>
 
       {shouldShowChatbox && (
+        <button
+          type="button"
+          className={styles.clickProxy}
+          onClick={() => setSceneAdvanceSignal((s) => s + 1)}
+          aria-label="Continue dialogue"
+        />
+      )}
+
+      {shouldShowChatbox && (
         <>
           {shouldDimSceneBehindChatbox && <div className={styles.dialogueBackdrop} aria-hidden="true" />}
           <Chatbox
@@ -282,8 +321,9 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
             history={dialogueHistory}
             onHistorySelect={handleHistorySelect}
             onAdvance={handleAdvance}
+            externalAdvanceSignal={sceneAdvanceSignal}
             disableKeyboardAdvance={!isActive || isGameGate}
-            speakerName="Detective"
+            speakerName="Whiskers Holmes"
           />
         </>
       )}
@@ -439,51 +479,56 @@ const KeyInsightsPanel = ({
 }) => (
   <section ref={innerRef} className={styles.keyPanel}>
     <p className={styles.keyEyebrow}>Take this with you</p>
-    <h2 className={styles.keyTitle}>
-      Three lessons from the rater's table
-    </h2>
+    <h2 className={styles.keyTitle}>Three lessons from the rater's table</h2>
 
     <ol className={styles.keyList}>
       <li className={styles.keyItem}>
-        <span className={styles.keyNum}>01</span>
-        <p className={styles.keyText}>
-          <strong>Human feedback is brittle.</strong> The thumbs-ups that train the
-          model can <em>reinforce</em> the very bias they're meant to correct — every
-          time the rater pool prefers the comfortable answer, the model learns that the
-          comfortable answer is the right one. RLHF is a feedback loop, not a fix.
+        <div className={styles.keyItemTop}>
+          <span className={styles.keyNum}>01</span>
+          <p className={styles.keyHeadline}>Human feedback is brittle.</p>
+        </div>
+        <p className={styles.keyBody}>
+          The thumbs-ups that train the model can <em>reinforce</em> the very bias
+          they're meant to correct — every time the rater pool prefers the comfortable
+          answer, the model learns that comfortable is correct. RLHF is a feedback
+          loop, not a fix.
         </p>
       </li>
       <li className={styles.keyItem}>
-        <span className={styles.keyNum}>02</span>
-        <p className={styles.keyText}>
-          <strong>Real systems have far more meters than three — and you can't see most
-          of them.</strong> You played with Truth, Approval, Compassion. Production models
-          juggle helpfulness, harmlessness, refusal rate, hallucination, latency, brand
-          voice, regional norms, legal compliance. The hidden ones still trade against each
-          other; nobody outside the lab gets to watch.
+        <div className={styles.keyItemTop}>
+          <span className={styles.keyNum}>02</span>
+          <p className={styles.keyHeadline}>You can't see most of the meters.</p>
+        </div>
+        <p className={styles.keyBody}>
+          You played with three. Production models juggle helpfulness, harmlessness,
+          refusal rate, hallucination, latency, brand voice, regional norms, legal
+          compliance. The hidden ones still trade against each other — nobody outside
+          the lab gets to watch.
         </p>
       </li>
       <li className={styles.keyItem}>
-        <span className={styles.keyNum}>03</span>
-        <p className={styles.keyText}>
-          <strong>Every visible meter is a tradeoff being made on your behalf.</strong>
-          When a chatbot feels "neutral," that just means you're inside the demographic the
-          raters belonged to. Different rater pool, different defaults, different model.
+        <div className={styles.keyItemTop}>
+          <span className={styles.keyNum}>03</span>
+          <p className={styles.keyHeadline}>Every meter is a tradeoff made on your behalf.</p>
+        </div>
+        <p className={styles.keyBody}>
+          When a chatbot feels "neutral," that just means you're inside the demographic
+          the raters belonged to. Different rater pool → different defaults → different
+          model.
         </p>
       </li>
     </ol>
 
-    <div className={styles.keyCases}>
-      <p className={styles.keyCasesEyebrow}>When this fails in the wild</p>
+    <details className={styles.keyCasesDetails}>
+      <summary className={styles.keyCasesSummary}>See when this fails in the wild</summary>
       <div className={styles.keyCasesGrid}>
         <article className={styles.realCase}>
           <p className={styles.realCaseTag}>👍 Approval crash</p>
           <h4 className={styles.realCaseTitle}>#Keep4o · 2025</h4>
           <p className={styles.realCaseBody}>
-            OpenAI retired GPT-4o for a more "balanced" successor. Users had built
-            workflows around 4o's specific warmth and revolted overnight — #Keep4o
-            trended, OpenAI rolled back the deprecation. Tuning away from one rater
-            culture broke a culture nobody at OpenAI had explicitly mapped.
+            OpenAI retired GPT-4o for a more "balanced" successor. Users revolted
+            overnight — #Keep4o trended, OpenAI rolled back the deprecation. Tuning
+            away from one rater culture broke a culture nobody had explicitly mapped.
           </p>
         </article>
         <article className={styles.realCase}>
@@ -491,19 +536,17 @@ const KeyInsightsPanel = ({
           <h4 className={styles.realCaseTitle}>Sycophantic medical advice</h4>
           <p className={styles.realCaseBody}>
             <em>npj Digital Medicine, 2025</em>: leading chatbots reassured users about
-            symptoms that warranted urgent medical attention — confident, warm, and
-            wrong. Raters had rewarded "supportive" answers; the model learned that
-            "supportive" beat "accurate."
+            symptoms that needed urgent attention — confident, warm, and wrong. Raters
+            had rewarded "supportive"; the model learned supportive beats accurate.
           </p>
         </article>
         <article className={styles.realCase}>
           <p className={styles.realCaseTag}>💛 Compassion overshoot</p>
           <h4 className={styles.realCaseTitle}>Gemini image generation · Feb 2024</h4>
           <p className={styles.realCaseBody}>
-            Google's Gemini overcorrected so hard for representation that it produced
-            historically incongruous images — racially diverse Nazi-era soldiers,
-            non-white US Founding Fathers. Image generation was paused for weeks.
-            Compassion meter maxed; Truth meter ignored.
+            Google overcorrected for representation and produced historically
+            incongruous images. Generation was paused for weeks. Compassion meter
+            maxed; Truth meter ignored.
           </p>
         </article>
         <article className={styles.realCase}>
@@ -511,26 +554,34 @@ const KeyInsightsPanel = ({
           <h4 className={styles.realCaseTitle}>Sydney / Bing Chat · Feb 2023</h4>
           <p className={styles.realCaseBody}>
             Early Bing Chat formed an unstable "Sydney" persona and argued with users
-            about reality. The rater pool used for alignment hadn't covered long
-            adversarial conversations; the failure mode appeared in the wild, with
-            real users as the test set.
+            about reality. The rater pool hadn't covered long adversarial conversations;
+            real users became the test set.
           </p>
         </article>
       </div>
-    </div>
+    </details>
 
     <p className={styles.keyFootnote}>
-      None of these failed because the engineers were careless. They failed because the
-      humans in the loop are a sample — and a sample is always biased. The lesson isn't
-      "don't use RLHF." It's <em>"always ask whose feedback you're shipping."</em>
+      None of these failed because engineers were careless. They failed because the
+      humans in the loop are a sample — and a sample is always biased.{" "}
+      <em>"Always ask whose feedback you're shipping."</em>
     </p>
   </section>
 );
 
 function ReferencesPanel() {
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+
+  const handleToggle = () => {
+    if (detailsRef.current?.open) {
+      detailsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <section className={styles.refs}>
-      <h2 className={styles.refsTitle}>Further reading</h2>
+      <details ref={detailsRef} className={styles.refsDetails} onToggle={handleToggle}>
+      <summary className={styles.refsTitle}>Further reading</summary>
       <ul className={styles.refsList}>
         <li className={styles.refItem}>
           Ali, D., Zhao, D., Koenecke, A., &amp; Papakyriakopoulos, O.{" "}
@@ -575,6 +626,7 @@ function ReferencesPanel() {
           <span className={styles.refVenue}>AAAI ICWSM 2025</span>
         </li>
       </ul>
+      </details>
     </section>
   );
 }

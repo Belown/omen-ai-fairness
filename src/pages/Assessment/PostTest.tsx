@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import JSZip from "jszip";
 import Nav from "../../components/Nav/Nav";
 import {
   BIAS_SECTIONS,
@@ -11,6 +12,7 @@ import {
   loadAssessmentDraft,
   saveAssessmentDraft,
 } from "../../utils/assessmentStorage";
+import { sessionLogger } from "../../utils/sessionLogger";
 import styles from "./Assessment.module.css";
 
 type Answers = Record<string, string>;
@@ -18,13 +20,14 @@ type Scale = Record<string, number>;
 type Feedback = Record<number, number>;
 type OpenEnded = Record<number, string>;
 
-const downloadJson = (filename: string, data: unknown) => {
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
-    type: "application/json",
-  });
+const downloadZip = async (filename: string, files: Record<string, unknown>) => {
+  const zip = new JSZip();
+  for (const [name, data] of Object.entries(files)) {
+    zip.file(name, JSON.stringify(data, null, 2));
+  }
+  const blob = await zip.generateAsync({ type: "blob" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-
   link.href = url;
   link.download = filename;
   document.body.appendChild(link);
@@ -207,7 +210,7 @@ function PostTest() {
     setError("");
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const invalid = new Set<string>();
 
     BIAS_SECTIONS.forEach((section) => {
@@ -235,12 +238,14 @@ function PostTest() {
 
     setInvalidFields(new Set());
     setError("");
-    const preParticipantName = loadAssessmentDraft("pre").participantName.trim();
-    const exportParticipantName = isPost
-      ? participantName.trim() || preParticipantName
-      : participantName.trim();
-    const exportData = createAssessmentExport(
-      mode,
+
+    const preDraft = loadAssessmentDraft("pre");
+    const preParticipantName = preDraft.participantName.trim();
+    const exportParticipantName = participantName.trim() || preParticipantName;
+    const filenameName = createFilenamePart(exportParticipantName || "unknown");
+
+    const postExportData = createAssessmentExport(
+      "post",
       exportParticipantName,
       answers,
       confidence,
@@ -248,12 +253,24 @@ function PostTest() {
       feedback,
       openEnded
     );
-    const timestamp = exportData.submittedAt.replace(/[:.]/g, "-");
-    const filenameName = createFilenamePart(exportParticipantName || "unknown");
 
-    const filename = `diet-assessment-${filenameName}-${mode}-${timestamp}.json`;
+    const preExportData = createAssessmentExport(
+      "pre",
+      preDraft.participantName,
+      preDraft.answers,
+      preDraft.confidence,
+      preDraft.understanding,
+      preDraft.feedback,
+      preDraft.openEnded
+    );
 
-    downloadJson(filename, exportData);
+    const sessionLog = sessionLogger.getGroupedLog();
+
+    await downloadZip(`diet-evaluation-${filenameName}.zip`, {
+      [`diet-assessment-${filenameName}-pre.json`]: preExportData,
+      [`diet-assessment-${filenameName}-post.json`]: postExportData,
+      [`diet-session-log-${filenameName}.json`]: sessionLog,
+    });
 
     window.setTimeout(() => setSubmitted(true), 100);
 
@@ -264,7 +281,7 @@ function PostTest() {
       understanding,
       feedback,
       openEnded,
-      submittedAt: exportData.submittedAt,
+      submittedAt: postExportData.submittedAt,
     });
   };
 
@@ -528,7 +545,7 @@ function PostTest() {
           {error && <p className={styles.errorMsg}>{error}</p>}
           <p className={styles.submitHint}>
             {isPost
-              ? "Submitting saves the final case record as a local JSON file."
+              ? "Submitting downloads a zip with your pre/post assessments and session log."
               : "Submitting saves the baseline case record as a local JSON file."}
           </p>
           <div className={styles.submitRow}>
