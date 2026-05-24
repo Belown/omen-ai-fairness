@@ -46,6 +46,21 @@ type Chapter2COMPASProps = {
   onChapterComplete: (result: ChapterResult) => void;
 };
 
+const CENTERED_TUTORIAL_STYLE: CSSProperties = {
+  width: "min(440px, calc(100vw - 32px))",
+  maxWidth: "calc(100vw - 32px)",
+  maxHeight: "calc(100vh - 32px)",
+  overflowY: "auto",
+  boxSizing: "border-box",
+  pointerEvents: "auto",
+  top: "50%",
+  left: "50%",
+  right: "auto",
+  visibility: "visible",
+  transform: "translate(-50%, -50%)",
+  animation: "none",
+};
+
 function queueCost(queue: StudyMetricId[]) {
   return queue.reduce((sum, id) => sum + (STUDY_METRICS.find((m) => m.id === id)?.cost ?? 0), 0);
 }
@@ -272,13 +287,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
 
   return (
     <div className={`${styles.phase} ${styles.phaseWithBackground}`} style={phaseStyle}>
-      <div
-        className={
-          tutorial.open && tutorial.step?.target === "frame"
-            ? tutorial.getTargetClass("frame", gameShellClass)
-            : gameShellClass
-        }
-      >
+      <div className={gameShellClass}>
         <LeftPanel
           currentDay={currentDay}
           budget={budget}
@@ -312,7 +321,7 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
           body={tutorial.step.body}
           stepIndex={tutorial.stepIndex}
           totalSteps={tutorial.totalSteps}
-          style={tutorial.popoverStyle}
+          style={tutorial.step.target === "frame" ? CENTERED_TUTORIAL_STYLE : tutorial.popoverStyle}
           onSkip={tutorial.close}
           onBack={tutorial.goPrev}
           onNext={tutorial.goNext}
