@@ -100,7 +100,8 @@ const createAssessmentExport = (
   };
 };
 
-export default function Assessment({ mode }: { mode: "pre" | "post" }) {
+function PostTest() {
+  const mode: "pre" | "post" = "post";
   const isPost = mode === "post";
   const initialDraft = useRef(loadAssessmentDraft(mode));
   const skipNextDraftSave = useRef(false);
@@ -254,6 +255,8 @@ export default function Assessment({ mode }: { mode: "pre" | "post" }) {
 
     downloadJson(filename, exportData);
 
+    window.setTimeout(() => setSubmitted(true), 100);
+
     saveAssessmentDraft(mode, {
       participantName: exportParticipantName,
       answers,
@@ -263,7 +266,6 @@ export default function Assessment({ mode }: { mode: "pre" | "post" }) {
       openEnded,
       submittedAt: exportData.submittedAt,
     });
-    setSubmitted(true);
   };
 
   if (submitted) {
@@ -544,6 +546,7 @@ export default function Assessment({ mode }: { mode: "pre" | "post" }) {
   );
 }
 
+
 function CompletionState({ isPost }: { isPost: boolean }) {
   return (
     <>
@@ -576,3 +579,5 @@ function CompletionState({ isPost }: { isPost: boolean }) {
     </>
   );
 }
+
+export default PostTest;

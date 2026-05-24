@@ -3,7 +3,8 @@ import Landing from "./pages/Landing/Landing";
 import About from "./pages/About/About";
 import Chapters from "./pages/Chapters/Chapters";
 import Demo from "./pages/Demo/Demo";
-import Assessment from "./pages/Assessment/Assessment";
+import PreTest from "./pages/Assessment/PreTest";
+import PostTest from "./pages/Assessment/PostTest";
 
 export default function App() {
   return (
@@ -12,8 +13,8 @@ export default function App() {
       <Route path="/about" element={<About />} />
       <Route path="/chapters" element={<Chapters />} />
       <Route path="/demo" element={<Demo />} />
-      <Route path="/pre-assessment" element={<Assessment key="pre" mode="pre" />} />
-      <Route path="/post-assessment" element={<Assessment key="post" mode="post" />} />
+      <Route path="/pre-assessment" element={<PreTest />} />
+      <Route path="/post-assessment" element={<PostTest />} />
       {/* legacy redirect */}
       <Route path="/assessment" element={<Navigate to="/pre-assessment" replace />} />
       <Route path="/simulator" element={<Navigate to="/chapters" replace />} />
