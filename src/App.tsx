@@ -12,7 +12,10 @@ export default function App() {
       <Route path="/about" element={<About />} />
       <Route path="/chapters" element={<Chapters />} />
       <Route path="/demo" element={<Demo />} />
-      <Route path="/assessment" element={<Assessment />} />
+      <Route path="/pre-assessment" element={<Assessment key="pre" mode="pre" />} />
+      <Route path="/post-assessment" element={<Assessment key="post" mode="post" />} />
+      {/* legacy redirect */}
+      <Route path="/assessment" element={<Navigate to="/pre-assessment" replace />} />
       <Route path="/simulator" element={<Navigate to="/chapters" replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

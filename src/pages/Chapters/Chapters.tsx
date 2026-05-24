@@ -264,7 +264,7 @@ export default function Chapters() {
                     styles.timelineNode,
                     preComplete ? styles.timelineNodePast : "",
                   ].filter(Boolean).join(" ")}
-                  onClick={() => navigate("/assessment")}
+                  onClick={() => navigate("/pre-assessment")}
                 >
                   <span className={styles.timelineDot} aria-hidden />
                   <span className={styles.timelineMeta}>
@@ -314,7 +314,7 @@ export default function Chapters() {
                     postComplete ? styles.timelineNodePast : "",
                     isEndingPage && !postComplete ? styles.timelineNodeActive : "",
                   ].filter(Boolean).join(" ")}
-                  onClick={() => navigate("/assessment?mode=post")}
+                  onClick={() => navigate("/post-assessment")}
                 >
                   <span className={styles.timelineDot} aria-hidden />
                   <span className={styles.timelineMeta}>
@@ -340,7 +340,7 @@ export default function Chapters() {
                 passCount={endingPagePassCount}
                 chapterResults={endingPageResults}
                 onReviewChapters={() => setTimelineOpen(true)}
-                onTakePostAssessment={() => navigate("/assessment?mode=post")}
+                onTakePostAssessment={() => navigate("/post-assessment")}
               />
             </div>
           ) : showStoryIntro ? (

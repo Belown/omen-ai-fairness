@@ -1,5 +1,3 @@
-import { clearAssessmentLogs, loadAssessments, type AssessmentEntry } from "./assessmentStorage";
-
 const LOG_KEYS = {
   ch1: "diet_session_log_ch1",
   ch2: "diet_session_log_ch2",
@@ -71,16 +69,10 @@ type ChapterLogMap = {
   ch3: Ch3CardChoiceEntry[];
 };
 
-type AssessmentLogMap = {
-  pre: AssessmentEntry[];
-  post: AssessmentEntry[];
-};
-
 type SessionLogExport = {
   version: 1;
   exportedAt: string;
   chapters: ChapterLogMap;
-  assessments: AssessmentLogMap;
 };
 
 function readChapterLog<T extends LogEntry>(chapter: ChapterLogKey): T[] {
@@ -115,10 +107,6 @@ function readGroupedLog(): SessionLogExport {
       ch2: readChapterLog<Ch2DayEntry | Ch2EndingChoiceEntry>("ch2"),
       ch3: readChapterLog<Ch3CardChoiceEntry>("ch3"),
     },
-    assessments: {
-      pre: loadAssessments("pre"),
-      post: loadAssessments("post"),
-    },
   };
 }
 
@@ -130,10 +118,6 @@ function readScopedLog(scope: ChapterLogKey): SessionLogExport {
       ch1: scope === "ch1" ? readChapterLog<Ch1DayPlanEntry | Ch1DayAccuracyEntry>("ch1") : [],
       ch2: scope === "ch2" ? readChapterLog<Ch2DayEntry | Ch2EndingChoiceEntry>("ch2") : [],
       ch3: scope === "ch3" ? readChapterLog<Ch3CardChoiceEntry>("ch3") : [],
-    },
-    assessments: {
-      pre: loadAssessments("pre"),
-      post: loadAssessments("post"),
     },
   };
 }
@@ -172,6 +156,5 @@ export const sessionLogger = {
   },
   clearLog(): void {
     Object.values(LOG_KEYS).forEach((key) => sessionStorage.removeItem(key));
-    clearAssessmentLogs();
   },
 };

@@ -294,7 +294,7 @@ export default function Landing() {
               before human feedback became machine judgment.
             </p>
             <div className={styles.ctaRow}>
-              <Button variant="primary" to="/assessment" id="start">
+              <Button variant="primary" to="/pre-assessment" id="start">
                 Start Investigation
               </Button>
               <Button
@@ -411,7 +411,7 @@ export default function Landing() {
               Travel back through the AI pipeline and find where the verdict
               started to bend.
             </p>
-            <Button variant="primary" size="lg" to="/assessment">
+            <Button variant="primary" size="lg" to="/pre-assessment">
               Start investigation
             </Button>
           </div>

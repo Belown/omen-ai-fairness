@@ -6,11 +6,11 @@ import { hasCompleted } from "../../utils/assessmentStorage";
 import styles from "./Nav.module.css";
 
 const STEPS = [
-  { id: "pre",  num: "Assessment", title: "Pre-Test",          hint: "Test your intuitions",           url: "/assessment" },
+  { id: "pre",  num: "Assessment", title: "Pre-Test",          hint: "Test your intuitions",           url: "/pre-assessment" },
   { id: "ch1",  num: "Chapter 01", title: "Sampling Bias",     hint: "Data collection shapes outcomes", url: "/chapters?chapter=ch1" },
   { id: "ch2",  num: "Chapter 02", title: "COMPAS Trade-offs", hint: "Fairness definitions collide",    url: "/chapters?chapter=ch2" },
   { id: "ch3",  num: "Chapter 03", title: "LLM Alignment",     hint: "Who teaches the model what's 'good'?", url: "/chapters?chapter=ch3" },
-  { id: "post", num: "Assessment", title: "Post-Test",         hint: "Reflect on what you learned",    url: "/assessment?mode=post" },
+  { id: "post", num: "Assessment", title: "Post-Test",         hint: "Reflect on what you learned",    url: "/post-assessment" },
 ];
 
 const getCenteredSectionTop = (target: HTMLElement) => {
@@ -154,7 +154,7 @@ export default function Nav({ investigation = false }: { investigation?: boolean
         <Button variant="ghost-dark" to="/about">
           About
         </Button>
-        <Button variant="primary" to="/assessment">
+        <Button variant="primary" to="/pre-assessment">
           Start investigation
         </Button>
       </div>

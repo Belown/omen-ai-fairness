@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Nav from "../../components/Nav/Nav";
 import {
   BIAS_SECTIONS,
@@ -9,8 +9,6 @@ import {
 } from "./assessmentData";
 import {
   loadAssessmentDraft,
-  loadAssessments,
-  saveAssessment,
   saveAssessmentDraft,
 } from "../../utils/assessmentStorage";
 import styles from "./Assessment.module.css";
@@ -31,8 +29,10 @@ const downloadJson = (filename: string, data: unknown) => {
   link.download = filename;
   document.body.appendChild(link);
   link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => {
+    link.remove();
+    URL.revokeObjectURL(url);
+  }, 1000);
 };
 
 const createFilenamePart = (value: string) =>
@@ -100,9 +100,7 @@ const createAssessmentExport = (
   };
 };
 
-export default function Assessment() {
-  const [searchParams] = useSearchParams();
-  const mode = searchParams.get("mode") === "post" ? "post" : "pre";
+export default function Assessment({ mode }: { mode: "pre" | "post" }) {
   const isPost = mode === "post";
   const initialDraft = useRef(loadAssessmentDraft(mode));
   const skipNextDraftSave = useRef(false);
@@ -120,8 +118,9 @@ export default function Assessment() {
 
   useEffect(() => {
     const draft = loadAssessmentDraft(mode);
+    const preParticipantName = mode === "post" ? loadAssessmentDraft("pre").participantName : "";
     skipNextDraftSave.current = true;
-    setParticipantName(draft.participantName);
+    setParticipantName(mode === "post" ? draft.participantName || preParticipantName : draft.participantName);
     setAnswers(draft.answers);
     setConfidence(draft.confidence);
     setUnderstanding(draft.understanding);
@@ -129,6 +128,8 @@ export default function Assessment() {
     setOpenEnded(draft.openEnded);
     setSubmitted(false);
     setError("");
+    setInvalidFields(new Set());
+    setScrollToError(false);
     window.scrollTo({ top: 0, left: 0 });
   }, [mode]);
 
@@ -176,6 +177,35 @@ export default function Assessment() {
   const removeInvalid = (key: string) =>
     setInvalidFields((prev) => { const s = new Set(prev); s.delete(key); return s; });
 
+  const handleRandomize = () => {
+    const newAnswers: Answers = {};
+    const newConfidence: Scale = {};
+    const newUnderstanding: Scale = {};
+    const newFeedback: Feedback = {};
+
+    BIAS_SECTIONS.forEach((section) => {
+      section.questions.forEach((q) => {
+        newAnswers[q.id] = q.options[Math.floor(Math.random() * q.options.length)].key;
+        newConfidence[q.id] = Math.floor(Math.random() * 5) + 1;
+      });
+      newUnderstanding[section.id] = Math.floor(Math.random() * 5) + 1;
+    });
+
+    if (isPost) {
+      FEEDBACK_STATEMENTS.forEach((_, i) => {
+        newFeedback[i] = LIKERT_OPTIONS[Math.floor(Math.random() * LIKERT_OPTIONS.length)].value;
+      });
+    }
+
+    setAnswers(newAnswers);
+    setConfidence(newConfidence);
+    setUnderstanding(newUnderstanding);
+    if (isPost) setFeedback(newFeedback);
+    if (!isPost) setParticipantName("test");
+    setInvalidFields(new Set());
+    setError("");
+  };
+
   const handleSubmit = () => {
     const invalid = new Set<string>();
 
@@ -204,9 +234,13 @@ export default function Assessment() {
 
     setInvalidFields(new Set());
     setError("");
+    const preParticipantName = loadAssessmentDraft("pre").participantName.trim();
+    const exportParticipantName = isPost
+      ? participantName.trim() || preParticipantName
+      : participantName.trim();
     const exportData = createAssessmentExport(
       mode,
-      participantName.trim(),
+      exportParticipantName,
       answers,
       confidence,
       understanding,
@@ -214,22 +248,21 @@ export default function Assessment() {
       openEnded
     );
     const timestamp = exportData.submittedAt.replace(/[:.]/g, "-");
-    const filenameName = createFilenamePart(
-      participantName.trim() ||
-        loadAssessments("pre").at(-1)?.participantName ||
-        "unknown"
-    );
+    const filenameName = createFilenamePart(exportParticipantName || "unknown");
 
-    saveAssessment({
-      mode,
-      timestamp: exportData.submittedAt,
-      participantName: participantName.trim() || undefined,
+    const filename = `diet-assessment-${filenameName}-${mode}-${timestamp}.json`;
+
+    downloadJson(filename, exportData);
+
+    saveAssessmentDraft(mode, {
+      participantName: exportParticipantName,
       answers,
       confidence,
       understanding,
-      ...(isPost && { feedback, openEnded }),
+      feedback,
+      openEnded,
+      submittedAt: exportData.submittedAt,
     });
-    downloadJson(`diet-assessment-${filenameName}-${mode}-${timestamp}.json`, exportData);
     setSubmitted(true);
   };
 
@@ -496,9 +529,14 @@ export default function Assessment() {
               ? "Submitting saves the final case record as a local JSON file."
               : "Submitting saves the baseline case record as a local JSON file."}
           </p>
-          <button className={styles.submitBtn} onClick={handleSubmit} type="button">
-            Submit {isPost ? "Post-Game" : "Pre-Game"} Assessment
-          </button>
+          <div className={styles.submitRow}>
+            <button className={styles.randomizeBtn} onClick={handleRandomize} type="button">
+              Randomize
+            </button>
+            <button className={styles.submitBtn} onClick={handleSubmit} type="button">
+              Submit {isPost ? "Post-Game" : "Pre-Game"} Assessment
+            </button>
+          </div>
         </div>
       </main>
 
