@@ -44,11 +44,11 @@ export const TUTORIAL_STEPS: TutorialStep<Chapter2TutorialTarget>[] = [
     placement: "right",
   },
   {
-    target: "metricSelector",
+    target: "frame",
     title: "Start Day 0",
     body:
       "There is no perfect answer here, only trade-offs. Choose your first fairness rule, queue any studies you want, and advance to see what the system does overnight.",
-    placement: "right",
+    placement: "auto",
   },
 ];
 
