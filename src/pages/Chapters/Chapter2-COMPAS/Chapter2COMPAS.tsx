@@ -228,6 +228,27 @@ export default function Chapter2COMPAS({ isActive, onChapterComplete }: Chapter2
     }
   }, [introChunkIndex, isActive]);
 
+  // RIGHT arrow advances dialogue in intro and game-chatbox phases regardless
+  // of which element has focus (capture phase fires before Chatbox's own handler;
+  // stopImmediatePropagation prevents the Chatbox handler from double-firing).
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code !== "ArrowRight" || event.ctrlKey || event.altKey || event.metaKey) return;
+      if (!isActive) return;
+      if (phase === "intro") {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        advanceIntro();
+      } else if (phase === "game" && showGameChatbox && !isNarrativeCollapsed) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        setSceneAdvanceSignal((s) => s + 1);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown, true);
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
+  }, [advanceIntro, isActive, isNarrativeCollapsed, phase, showGameChatbox]);
+
   const getTutorialTargetClass = (target: Chapter2TutorialTarget, className = "") => {
     if (tutorial.open && tutorial.step?.target === "frame" && target !== "frame") {
       return className;

@@ -310,10 +310,11 @@
   color: var(--rui-slate);
   margin: 0;
   font-style: normal;
-  padding: 10px 14px;
-  background: rgba(0, 0, 0, 0.04);
-  border-left: 3px solid rgba(0, 0, 0, 0.15);
-  border-radius: 0 4px 4px 0;
+  padding: 10px 16px;
+  background: var(--rui-white);
+  border: 1px solid var(--rui-border);
+  border-left: 3px solid var(--rui-border);
+  border-radius: var(--radius-sm);
   line-height: 1.5;
 }
 

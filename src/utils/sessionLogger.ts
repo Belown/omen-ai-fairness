@@ -159,6 +159,9 @@ export const sessionLogger = {
   },
   getLog: readLog,
   getGroupedLog: readGroupedLog,
+  getChapterLog(chapter: ChapterLogKey): SessionLogExport {
+    return readScopedLog(chapter);
+  },
   downloadLog(filename = "diet-session-log.json", scope?: ChapterLogKey): void {
     const data = JSON.stringify(scope ? readScopedLog(scope) : readGroupedLog(), null, 2);
     const blob = new Blob([data], { type: "application/json" });

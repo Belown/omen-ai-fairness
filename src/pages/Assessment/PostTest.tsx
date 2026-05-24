@@ -264,12 +264,12 @@ function PostTest() {
       preDraft.openEnded
     );
 
-    const sessionLog = sessionLogger.getGroupedLog();
-
     await downloadZip(`diet-evaluation-${filenameName}.zip`, {
       [`diet-assessment-${filenameName}-pre.json`]: preExportData,
       [`diet-assessment-${filenameName}-post.json`]: postExportData,
-      [`diet-session-log-${filenameName}.json`]: sessionLog,
+      [`diet-session-log-${filenameName}-ch1.json`]: sessionLogger.getChapterLog("ch1"),
+      [`diet-session-log-${filenameName}-ch2.json`]: sessionLogger.getChapterLog("ch2"),
+      [`diet-session-log-${filenameName}-ch3.json`]: sessionLogger.getChapterLog("ch3"),
     });
 
     window.setTimeout(() => setSubmitted(true), 100);

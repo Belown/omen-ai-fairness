@@ -226,6 +226,21 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
     advanceTo(next);
   };
 
+  // RIGHT arrow advances/skips dialogue regardless of focused element.
+  // Capture phase fires before Chatbox's own handler; stopImmediatePropagation
+  // prevents the Chatbox from double-firing.
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code !== "ArrowRight" || event.ctrlKey || event.altKey || event.metaKey) return;
+      if (!isActive || !shouldShowChatbox || isGameGate) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      setSceneAdvanceSignal((s) => s + 1);
+    };
+    window.addEventListener("keydown", handleKeyDown, true);
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
+  }, [isActive, isGameGate, shouldShowChatbox]);
+
   return (
     <div ref={phaseRef} className={styles.phase}>
       <div className={`${styles.scene} ${showSceneContent ? styles.sceneContentOpen : styles.sceneDialogueOnly}`}>
@@ -263,7 +278,6 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
                   setStep(5);
                 }
               }}
-              onPostTest={() => navigate("/post-assessment")}
             />
           )}
           {step >= 6 && <div ref={raterCardsRef} className={styles.scrollTarget}><RaterCardsPanel /></div>}
@@ -272,7 +286,7 @@ export default function Chapter3Alignment({ isActive = true, onChapterComplete }
               {step >= 9 && <div ref={takeawaysRef} className={styles.scrollTarget}><TakeawaysPanel /></div>}
               {step >= 10 && <KeyInsightsPanel innerRef={keyInsightsRef} />}
               {step >= 10 && <ReferencesPanel />}
-              {(outcome !== "not-played" || hasSkipped) && (
+              {step >= 10 && (outcome !== "not-played" || hasSkipped) && (
                 <div className={styles.postTestRow}>
                   <p className={styles.postTestHint}>
                     {hasSkipped

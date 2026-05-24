@@ -198,14 +198,12 @@ export default function CardStack({
   onFirstPick,
   onContinue,
   onSkip,
-  onPostTest,
 }: {
   isActive?: boolean;
   onComplete?: (outcome: GameOutcome) => void;
   onFirstPick?: () => void;
   onContinue?: () => void;
   onSkip?: () => void;
-  onPostTest?: () => void;
 } = {}) {
   const [deck, setDeck] = useState<Card[]>(() => sampleDeck());
   const [index, setIndex] = useState(0);
@@ -377,6 +375,7 @@ export default function CardStack({
           onReset={reset}
           onDemo={startDemo}
           showDemoOption={failureCount >= 2}
+          onContinue={onContinue}
         />
       ) : !done ? (
         <div className={styles.gameArea}>
@@ -450,7 +449,6 @@ export default function CardStack({
           deck={deck}
           onReset={reset}
           onContinue={onContinue}
-          onPostTest={onPostTest}
         />
       )}
     </div>
@@ -846,12 +844,15 @@ function EarlyEnd({
   onReset,
   onDemo,
   showDemoOption,
+  onContinue,
 }: {
   ending: Ending;
   cardsPlayed: number;
   onReset: () => void;
   onDemo: () => void;
   showDemoOption: boolean;
+  onContinue?: () => void;
+  onPostTest?: () => void;
 }) {
   const extremeWord = ending.extreme === "min" ? "collapsed to 0" : "maxed out at 100";
   return (
@@ -884,6 +885,15 @@ function EarlyEnd({
             God mode, auto win
           </button>
         )}
+        {onContinue && (
+          <button
+            type="button"
+            className={`${styles.endBtn} ${styles.endBtnContinue}`}
+            onClick={onContinue}
+          >
+            Continue to study →
+          </button>
+        )}
       </div>
     </section>
   );
@@ -895,14 +905,12 @@ function Endgame({
   deck,
   onReset,
   onContinue,
-  onPostTest,
 }: {
   meters: MeterState;
   history: HistoryEntry[];
   deck: Card[];
   onReset: () => void;
   onContinue?: () => void;
-  onPostTest?: () => void;
 }) {
   const verdict = useMemo(() => computeVerdict(meters), [meters]);
   const copy = VERDICT_COPY[verdict];
@@ -980,15 +988,6 @@ function Endgame({
             onClick={onContinue}
           >
             Continue to learning →
-          </button>
-        )}
-        {onPostTest && (
-          <button
-            type="button"
-            className={`${styles.endBtn} ${styles.endBtnPostTest}`}
-            onClick={onPostTest}
-          >
-            Take the post-test →
           </button>
         )}
       </div>
