@@ -29,13 +29,12 @@ export default function Resources() {
           <h1 className={styles.title}>Teaching materials and practical setup.</h1>
         </section>
 
-        <section className={styles.resources} aria-label="PDF resource placeholders">
+        <section className={styles.resources} aria-label="Teaching resources">
           <div className={styles.sectionHeader}>
-            <p className="eyebrow">PDF resources</p>
-            <h2>Choose a teaching document to preview.</h2>
+            <p className="eyebrow">Teaching documents</p>
+            <h2>Preview one document at a time.</h2>
             <p>
-              Select the lesson plan or facilitation guide. The final PDF will appear in the preview
-              area below.
+              Select the lesson plan or facilitation guide to inspect the material before a session.
             </p>
           </div>
 
@@ -70,7 +69,7 @@ export default function Resources() {
               />
             ) : (
               <div className={styles.pdfSlot}>
-                <span>{activeResource.title} PDF placeholder</span>
+                <span>{activeResource.title} pending</span>
               </div>
             )}
           </article>

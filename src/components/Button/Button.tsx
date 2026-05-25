@@ -17,10 +17,10 @@ type AnchorProps = CommonProps &
     to?: undefined;
   };
 
-type LinkProps = CommonProps & {
-  to: string;
-  id?: string;
-};
+type LinkProps = CommonProps &
+  AnchorHTMLAttributes<HTMLAnchorElement> & {
+    to: string;
+  };
 
 type Props = AnchorProps | LinkProps;
 
@@ -43,8 +43,10 @@ export default function Button(props: Props) {
     .join(" ");
 
   if ("to" in props && props.to !== undefined) {
+    const { variant: _v, size: _s, className: _c, children: _ch, to, ...rest } =
+      props as LinkProps;
     return (
-      <Link to={props.to} id={props.id} className={classes}>
+      <Link to={to} className={classes} {...rest}>
         {children}
       </Link>
     );

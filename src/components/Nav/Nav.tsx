@@ -32,6 +32,7 @@ export default function Nav({ investigation = false }: { investigation?: boolean
   const postComplete = investigation && hasCompleted("post");
   const activeStepIndex = isPost ? STEPS.length - 1 : 0;
   const progress = ((activeStepIndex + 0.5) / STEPS.length) * 100;
+  const isActivePath = (path: string) => location.pathname === path;
 
   useEffect(() => {
     if (investigation) return;
@@ -151,13 +152,28 @@ export default function Nav({ investigation = false }: { investigation?: boolean
         </nav>
       )}
       <div className={styles.cta}>
-        <Button variant="ghost-dark" to="/about">
+        <Button
+          variant="ghost-dark"
+          to="/about"
+          className={isActivePath("/about") ? styles.activeNavItem : ""}
+          aria-current={isActivePath("/about") ? "page" : undefined}
+        >
           About
         </Button>
-        <Button variant="ghost-dark" to="/resources">
+        <Button
+          variant="ghost-dark"
+          to="/resources"
+          className={isActivePath("/resources") ? styles.activeNavItem : ""}
+          aria-current={isActivePath("/resources") ? "page" : undefined}
+        >
           Resources
         </Button>
-        <Button variant="ghost-dark" to="/tool">
+        <Button
+          variant="ghost-dark"
+          to="/tool"
+          className={isActivePath("/tool") ? styles.activeNavItem : ""}
+          aria-current={isActivePath("/tool") ? "page" : undefined}
+        >
           Tool
         </Button>
         <Button variant="primary" to="/pre-assessment">

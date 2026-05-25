@@ -12,15 +12,15 @@ export default function Tool() {
           <h1 className={styles.title}>Access, demo, and AI disclosure.</h1>
         </section>
 
-        <section className={styles.layout} aria-label="Tool placeholders">
+        <section className={styles.layout} aria-label="Tool page content">
           <div className={styles.videoPanel}>
             <div className={styles.sectionHeader}>
               <p className="eyebrow">Demo video</p>
-              <h2>YouTube embed slot</h2>
-              <p>Add the final YouTube embed link here for the short demo video.</p>
+              <h2>Walkthrough preview</h2>
+              <p>A short video will show how learners enter the activity and interact with the main tasks.</p>
             </div>
             <div className={styles.videoSlot}>
-              <span>YouTube video placeholder</span>
+              <span>Demo video pending</span>
             </div>
           </div>
 
@@ -28,10 +28,9 @@ export default function Tool() {
             <div className={styles.textBlock}>
               <p className="eyebrow">App</p>
               <p>
-                The source code repository for this
-                website is available at{" "}
+                The source code repository for this website is available at{" "}
                 <a href="https://github.com/Belown/DIET" target="_blank" rel="noreferrer">
-                  Link
+                  Belown/DIET
                 </a>
                 .
               </p>

@@ -1,17 +1,19 @@
 .page {
   min-height: calc(100vh - 120px);
-  background: var(--diet-cream);
+  background:
+    linear-gradient(180deg, rgba(250, 247, 240, 0.98), rgba(245, 240, 232, 0.9)),
+    var(--diet-cream);
   color: var(--diet-ink);
 }
 
 .hero,
 .resources {
-  width: min(1080px, calc(100% - 2 * var(--gutter)));
+  width: min(1040px, calc(100% - 2 * var(--gutter)));
   margin: 0 auto;
 }
 
 .hero {
-  padding: clamp(52px, 7vw, 92px) 0 clamp(26px, 4vw, 46px);
+  padding: clamp(56px, 7vw, 88px) 0 clamp(30px, 5vw, 54px);
 }
 
 .title {
@@ -32,11 +34,11 @@
   display: inline-flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   padding: 4px;
   border: 1px solid rgba(92, 61, 46, 0.18);
-  border-radius: 8px;
-  background: rgba(245, 240, 232, 0.72);
+  border-radius: var(--diet-radius-document);
+  background: rgba(232, 224, 208, 0.58);
 }
 
 .resourceTab {
@@ -56,13 +58,14 @@
 
 .resourceTab:hover {
   color: var(--diet-ink);
-  background: rgba(250, 247, 240, 0.84);
+  background: rgba(250, 247, 240, 0.78);
 }
 
 .resourceTabActive {
-  border-color: rgba(180, 83, 9, 0.34);
+  border-color: rgba(92, 61, 46, 0.24);
   background: var(--diet-paper);
   color: var(--diet-stamp-red);
+  box-shadow: var(--diet-shadow-paper);
 }
 
 .pdfCard {
@@ -71,8 +74,9 @@
   gap: 18px;
   border: 1px solid rgba(92, 61, 46, 0.22);
   border-radius: 8px;
-  background: rgba(250, 247, 240, 0.72);
-  box-shadow: 0 12px 30px rgba(33, 24, 18, 0.07);
+  background:
+    linear-gradient(180deg, rgba(250, 247, 240, 0.88), rgba(245, 240, 232, 0.92));
+  box-shadow: var(--diet-shadow-paper);
   padding: clamp(18px, 2.4vw, 26px);
 }
 
@@ -128,12 +132,12 @@
   display: grid;
   place-items: center;
   min-height: clamp(420px, 54vw, 640px);
-  border: 1px dashed rgba(180, 83, 9, 0.58);
-  border-radius: 8px;
+  border: 1px dashed rgba(92, 61, 46, 0.32);
+  border-radius: var(--diet-radius-document);
   background:
-    linear-gradient(135deg, rgba(199, 125, 32, 0.08), rgba(47, 111, 100, 0.08)),
+    linear-gradient(180deg, rgba(232, 224, 208, 0.54), rgba(245, 240, 232, 0.86)),
     var(--diet-paper);
-  color: #92400e;
+  color: var(--diet-ink-faded);
   font-family: var(--font-case-file);
   font-size: 13px;
   font-weight: 800;
@@ -145,7 +149,7 @@
   width: 100%;
   min-height: clamp(520px, 68vw, 760px);
   border: 1px solid rgba(92, 61, 46, 0.22);
-  border-radius: 8px;
+  border-radius: var(--diet-radius-document);
   background: var(--diet-paper);
 }
 
