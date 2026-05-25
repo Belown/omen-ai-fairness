@@ -13,11 +13,12 @@ const PDF_RESOURCES = [
     title: "Facilitation guide",
     label: "Instructor notes",
     body: "Guidance for setup, prompts, reflection questions, and supporting learners during the session.",
+    file: `${import.meta.env.BASE_URL}Facilitator%20Notes.pdf`,
   },
 ];
 
 export default function Resources() {
-  const [activeResource, setActiveResource] = useState(PDF_RESOURCES[0]);
+  const [activeResource, setActiveResource] = useState(PDF_RESOURCES[1]);
 
   return (
     <>
@@ -61,9 +62,17 @@ export default function Resources() {
               <h3>{activeResource.title}</h3>
               <p>{activeResource.body}</p>
             </div>
-            <div className={styles.pdfSlot}>
-              <span>{activeResource.title} PDF placeholder</span>
-            </div>
+            {activeResource.file ? (
+              <iframe
+                className={styles.pdfFrame}
+                src={activeResource.file}
+                title={`${activeResource.title} PDF`}
+              />
+            ) : (
+              <div className={styles.pdfSlot}>
+                <span>{activeResource.title} PDF placeholder</span>
+              </div>
+            )}
           </article>
         </section>
       </main>

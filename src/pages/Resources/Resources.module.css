@@ -141,8 +141,17 @@
   text-transform: uppercase;
 }
 
+.pdfFrame {
+  width: 100%;
+  min-height: clamp(520px, 68vw, 760px);
+  border: 1px solid rgba(92, 61, 46, 0.22);
+  border-radius: 8px;
+  background: var(--diet-paper);
+}
+
 @media (max-width: 840px) {
-  .pdfSlot {
+  .pdfSlot,
+  .pdfFrame {
     min-height: 420px;
   }
 }
