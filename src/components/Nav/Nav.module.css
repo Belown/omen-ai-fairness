@@ -132,6 +132,12 @@
   gap: 24px;
 }
 
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .chaptersBtn {
   appearance: none;
   border: 1px solid rgba(212, 197, 169, 0.24);
@@ -192,6 +198,30 @@
 
 .backLink:hover {
   color: var(--diet-paper);
+}
+
+.headerAction {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 8px 14px;
+  border: 1px solid rgba(199, 125, 32, 0.44);
+  border-radius: var(--diet-radius-document);
+  background: rgba(199, 125, 32, 0.14);
+  color: var(--diet-paper);
+  font-family: var(--font-case-file);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.headerAction:hover {
+  background: rgba(199, 125, 32, 0.24);
+  border-color: rgba(199, 125, 32, 0.7);
+  transform: translateY(-1px);
 }
 
 .timelineWrapper {
@@ -286,6 +316,8 @@
 }
 
 .timelineDot {
+  position: relative;
+  z-index: 1;
   width: 36px;
   height: 36px;
   border-radius: var(--diet-radius-stamp);
@@ -300,8 +332,11 @@
 }
 
 .timelineNodePast .timelineDot {
-  background: rgba(0, 240, 181, 0.16);
+  background: #063f38;
   border-color: rgba(0, 240, 181, 0.48);
+  box-shadow:
+    0 0 0 5px var(--diet-steel),
+    inset 0 0 0 7px rgba(0, 240, 181, 0.22);
 }
 
 .timelineNodeActive .timelineDot {
@@ -341,6 +376,25 @@
   color: var(--diet-machine-text);
   line-height: 1.5;
   max-width: 220px;
+}
+
+.timelineBadgeComplete {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 6px;
+  padding: 4px 10px;
+  border-radius: var(--diet-radius-document);
+  font-family: var(--font-case-file);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.timelineBadgeComplete {
+  background: rgba(0, 240, 181, 0.1);
+  border: 1px solid rgba(0, 240, 181, 0.42);
+  color: #00f0b5;
 }
 
 @media (max-width: 720px) {

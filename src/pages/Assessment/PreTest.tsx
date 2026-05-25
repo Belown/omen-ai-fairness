@@ -453,7 +453,10 @@ function PreTest() {
 function CompletionState({ isPost }: { isPost: boolean }) {
   return (
     <>
-      <Nav investigation />
+      <Nav
+        investigation
+        headerAction={!isPost ? { label: "Skip", to: "/chapters?chapter=ch1" } : undefined}
+      />
       <main className={`${styles.page} ${styles.completionPage} ${isPost ? styles.pagePost : styles.pagePre}`}>
         <div className={styles.sceneWash} />
         <div className={styles.completion}>

@@ -2,7 +2,7 @@ import { type MouseEvent, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../Button/Button";
 import Logo from "../Logo/Logo";
-import { hasCompleted } from "../../utils/assessmentStorage";
+import { hasCompleted, loadChapterResults } from "../../utils/assessmentStorage";
 import styles from "./Nav.module.css";
 
 const STEPS = [
@@ -20,16 +20,29 @@ const getCenteredSectionTop = (target: HTMLElement) => {
   return Math.max(0, targetTop - navHeight);
 };
 
-export default function Nav({ investigation = false }: { investigation?: boolean }) {
+type NavProps = {
+  investigation?: boolean;
+  headerAction?: {
+    label: string;
+    to: string;
+  };
+};
+
+export default function Nav({ investigation = false, headerAction }: NavProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [, setCompletionTick] = useState(0);
   const chromeRef = useRef<HTMLDivElement>(null);
   const showLandingLinks = location.pathname === "/";
   const isPost = location.search.includes("mode=post");
   const preComplete = investigation && hasCompleted("pre");
   const postComplete = investigation && hasCompleted("post");
+  const chapterResults = investigation ? loadChapterResults() : {};
+  const ch1Complete = Boolean(chapterResults.ch1?.completed);
+  const ch2Complete = Boolean(chapterResults.ch2?.completed);
+  const ch3Complete = Boolean(chapterResults.ch3?.completed);
   const activeStepIndex = isPost ? STEPS.length - 1 : 0;
   const progress = ((activeStepIndex + 0.5) / STEPS.length) * 100;
   const isActivePath = (path: string) => location.pathname === path;
@@ -40,6 +53,19 @@ export default function Nav({ investigation = false }: { investigation?: boolean
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, [investigation]);
+
+  useEffect(() => {
+    if (!investigation) return;
+
+    const refreshCompletion = () => setCompletionTick((value) => value + 1);
+    window.addEventListener("focus", refreshCompletion);
+    window.addEventListener("diet:assessment-updated", refreshCompletion);
+
+    return () => {
+      window.removeEventListener("focus", refreshCompletion);
+      window.removeEventListener("diet:assessment-updated", refreshCompletion);
+    };
   }, [investigation]);
 
   useEffect(() => {
@@ -98,9 +124,16 @@ export default function Nav({ investigation = false }: { investigation?: boolean
               Chapters
             </button>
           </div>
-          <Link to="/" className={styles.backLink}>
-            Back to case board
-          </Link>
+          <div className={styles.topbarRight}>
+            {headerAction && (
+              <Link to={headerAction.to} className={styles.headerAction}>
+                {headerAction.label}
+              </Link>
+            )}
+            <Link to="/" className={styles.backLink}>
+              Back to case board
+            </Link>
+          </div>
         </header>
 
         <div className={`${styles.timelineWrapper} ${open ? styles.timelineWrapperOpen : ""}`}>
@@ -110,7 +143,12 @@ export default function Nav({ investigation = false }: { investigation?: boolean
             </div>
             <ol className={styles.timelineList}>
               {STEPS.map((step) => {
-                const isDone = (step.id === "pre" && preComplete) || (step.id === "post" && postComplete);
+                const isDone =
+                  (step.id === "pre" && preComplete) ||
+                  (step.id === "ch1" && ch1Complete) ||
+                  (step.id === "ch2" && ch2Complete) ||
+                  (step.id === "ch3" && ch3Complete) ||
+                  (step.id === "post" && postComplete);
                 const isActive = (step.id === "pre" && !isPost) || (step.id === "post" && isPost);
                 return (
                   <li key={step.id} className={styles.timelineItem}>
@@ -121,7 +159,10 @@ export default function Nav({ investigation = false }: { investigation?: boolean
                         isDone   ? styles.timelineNodePast   : "",
                         isActive ? styles.timelineNodeActive : "",
                       ].filter(Boolean).join(" ")}
-                      onClick={() => { navigate(step.url); setOpen(false); }}
+                      onClick={() => {
+                        navigate(step.url);
+                        setOpen(false);
+                      }}
                       aria-current={isActive ? "step" : undefined}
                     >
                       <span className={styles.timelineDot} aria-hidden />
@@ -130,6 +171,7 @@ export default function Nav({ investigation = false }: { investigation?: boolean
                         <span className={styles.timelineTitle}>{step.title}</span>
                         <span className={styles.timelineHint}>{step.hint}</span>
                       </span>
+                      {isDone && <span className={styles.timelineBadgeComplete}>Finished</span>}
                     </button>
                   </li>
                 );

@@ -110,8 +110,12 @@ export default function Chapters() {
 
   const [logEnabled] = useState(false);
 
-  const [preComplete] = useState(() => hasCompleted("pre"));
-  const [postComplete] = useState(() => hasCompleted("post"));
+  const [assessmentCompletion, setAssessmentCompletion] = useState(() => ({
+    pre: hasCompleted("pre"),
+    post: hasCompleted("post"),
+  }));
+  const preComplete = assessmentCompletion.pre;
+  const postComplete = assessmentCompletion.post;
   const activeIndex = CHAPTERS.findIndex((c) => c.id === active);
   const completedResults = CHAPTERS.map((chapter) => chapterResults[chapter.id]);
   const isCaseComplete = completedResults.every(Boolean);
@@ -119,7 +123,7 @@ export default function Chapters() {
   const endingRoute = isEndingRoute(endingParam) ? endingParam : null;
   const isEndingPage = endingRoute !== null && (endingRoute !== "final" || isCaseComplete);
   // 5-step overall index: 0=pre, 1-3=ch1-ch3, 4=post (must come after isEndingPage)
-  const overallActiveIndex = isEndingPage ? 4 : 1 + activeIndex;
+  const overallActiveIndex = isEndingPage ? 4 : showStoryIntro ? 0 : 1 + activeIndex;
   const progress = ((overallActiveIndex + 0.5) / 5) * 100;
   const endingPagePassCount =
     endingRoute === "final" ? passCount : endingRoute ? PREVIEW_PASS_COUNT[endingRoute] : passCount;
@@ -132,6 +136,24 @@ export default function Chapters() {
       setActive(chapter);
     }
   }, [active, searchParams]);
+
+  useEffect(() => {
+    const refreshAssessmentCompletion = () => {
+      setAssessmentCompletion({
+        pre: hasCompleted("pre"),
+        post: hasCompleted("post"),
+      });
+    };
+
+    refreshAssessmentCompletion();
+    window.addEventListener("focus", refreshAssessmentCompletion);
+    window.addEventListener("diet:assessment-updated", refreshAssessmentCompletion);
+
+    return () => {
+      window.removeEventListener("focus", refreshAssessmentCompletion);
+      window.removeEventListener("diet:assessment-updated", refreshAssessmentCompletion);
+    };
+  }, []);
 
   useEffect(() => {
     setVisitedChapters((prev) => (prev[active] ? prev : { ...prev, [active]: true }));
@@ -161,6 +183,22 @@ export default function Chapters() {
         pendingChapterScrollRef.current = null;
       });
     }
+  };
+
+  const skipToNextStep = () => {
+    setChapterTutorialOverlayOpen(false);
+
+    if (active === "ch1") {
+      selectChapter("ch2");
+      return;
+    }
+
+    if (active === "ch2") {
+      selectChapter("ch3");
+      return;
+    }
+
+    navigate("/post-assessment");
   };
 
   const recordChapterResult = (chapter: ChapterId, result: ChapterResult) => {
@@ -250,6 +288,11 @@ export default function Chapters() {
               </span>
               <span className={styles.logToggleLabel}>LOG</span>
             </button> */}
+            {!showStoryIntro && !isEndingPage && (
+              <button type="button" className={styles.headerAction} onClick={skipToNextStep}>
+                Skip
+              </button>
+            )}
             <Link to="/" className={styles.backLink}>
               Back to case board
             </Link>
@@ -288,9 +331,10 @@ export default function Chapters() {
               </li>
 
               {/* Chapters */}
-              {CHAPTERS.map((c, i) => {
-                const isActive = c.id === active && !isEndingPage;
-                const isPast = i < activeIndex || isEndingPage;
+              {CHAPTERS.map((c) => {
+                const isActive = c.id === active && !isEndingPage && !showStoryIntro;
+                const isFinished = Boolean(chapterResults[c.id]?.completed);
+                const isPast = isFinished || isEndingPage;
                 return (
                   <li key={c.id} className={styles.timelineItem}>
                     <button
@@ -309,6 +353,9 @@ export default function Chapters() {
                         <span className={styles.timelineTitle}>{c.title}</span>
                         <span className={styles.timelineHint}>{c.hint}</span>
                       </span>
+                      {isFinished && (
+                        <span className={styles.timelineBadgeComplete}>Finished</span>
+                      )}
                       {c.status === "draft" && (
                         <span className={styles.timelineBadge}>Classified</span>
                       )}
@@ -334,6 +381,7 @@ export default function Chapters() {
                     <span className={styles.timelineTitle}>Post-Test</span>
                     <span className={styles.timelineHint}>Reflect on what you learned</span>
                   </span>
+                  {postComplete && <span className={styles.timelineBadgeComplete}>Finished</span>}
                 </button>
               </li>
             </ol>

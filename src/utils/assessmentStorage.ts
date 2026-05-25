@@ -34,6 +34,7 @@ export function clearAssessmentStorage(): void {
 export function saveAssessmentDraft(mode: "pre" | "post", draft: AssessmentDraft): void {
   try {
     sessionStorage.setItem(getStorageKey(mode), JSON.stringify(draft));
+    window.dispatchEvent(new CustomEvent("diet:assessment-updated", { detail: { mode } }));
   } catch {
     console.error("[DIET] Could not persist assessment draft to sessionStorage");
   }

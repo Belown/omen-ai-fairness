@@ -408,10 +408,10 @@ function StatStripPanel() {
             Black raters diverged <strong>44%</strong> from majority ratings — revealing huge demographic gaps in what counts as "safe."
           </p>
         </div>
+        <p className={styles.citation}>
+          Numbers from Ali et al., <em>Operationalizing Pluralistic Values in LLM Alignment</em> — AAAI 2025. 1,095 US + German participants across 27,375 ratings.
+        </p>
       </div>
-      <p className={styles.citation}>
-        Numbers from Ali et al., <em>Operationalizing Pluralistic Values in LLM Alignment</em> — AAAI 2025. 1,095 US + German participants across 27,375 ratings.
-      </p>
     </section>
   );
 }

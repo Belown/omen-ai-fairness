@@ -200,11 +200,11 @@
 
 .eyebrow {
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: var(--rui-blue);
+  color: #f3d27a;
   margin: 0;
 }
 
@@ -277,7 +277,7 @@
 .statStrip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 18px 16px;
   padding: 24px;
   background: var(--rui-white);
   border: 1px solid var(--rui-border);
@@ -306,15 +306,14 @@
 .statLabel { font-size: 13px; line-height: 1.5; color: var(--rui-slate); margin: 0; }
 
 .citation {
+  grid-column: 1 / -1;
   font-size: 13px;
   color: var(--rui-slate);
-  margin: 0;
+  margin: 4px -24px -24px;
   font-style: normal;
-  padding: 10px 16px;
-  background: var(--rui-white);
-  border: 1px solid var(--rui-border);
-  border-left: 3px solid var(--rui-border);
-  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  background: rgba(247, 241, 230, 0.72);
+  border-top: 1px solid var(--rui-border);
   line-height: 1.5;
 }
 
@@ -520,7 +519,7 @@
 
 .keyEyebrow {
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.7px;
   text-transform: uppercase;
