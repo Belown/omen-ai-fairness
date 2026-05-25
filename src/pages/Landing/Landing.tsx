@@ -288,10 +288,7 @@ export default function Landing() {
             <p className="eyebrow">Case file: Novus AI justice system</p>
             <h1 className={styles.display}>Θmen</h1>
             <p className={styles.lede}>
-              A future court trusts an AI to decide who is dangerous. When the
-              machine condemns your apprentice, the only way forward is back:
-              before the data was collected, before fairness was defined,
-              before human feedback became machine judgment.
+              A future court trusts AI to decide who is dangerous. When the machine condemns your apprentice, the only way forward is to travel back: before the data was collected, before fairness was defined, before human feedback became machine judgment.
             </p>
             <div className={styles.ctaRow}>
               <Button variant="primary" to="/pre-assessment" id="start">
@@ -316,8 +313,8 @@ export default function Landing() {
             <div className={styles.detectivePanel}>
               <img src={portraits.angry} alt="The detective reacts to the AI verdict." />
               <div>
-                <span>Detective status</span>
-                <p>The machine saw a pattern. The case file shows a person.</p>
+                <span>Whiskers Holmes: </span>
+                <p>The machine only saw a pattern. But the case file shows a person.</p>
               </div>
             </div>
             <dl className={styles.caseStats}>
@@ -330,8 +327,8 @@ export default function Landing() {
                 <dd>Contested</dd>
               </div>
               <div>
-                <dt>Window</dt>
-                <dd>Pre-deployment</dd>
+                <dt>Review</dt>
+                <dd>Post-verdict</dd>
               </div>
             </dl>
           </aside>
@@ -405,7 +402,7 @@ export default function Landing() {
 
         <section className={`${styles.cta_section} ${styles.pageSection}`} id="case-status">
           <div className={styles.ctaContent}>
-            <p className={`eyebrow ${styles.cta_eyebrow}`}>Case status</p>
+            <p className={`eyebrow ${styles.cta_eyebrow}`}>What about now?</p>
             <h2 className={styles.cta_title}>The past is still editable.</h2>
             <p className={styles.cta_sub}>
               Travel back through the AI pipeline and find where the verdict

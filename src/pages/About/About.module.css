@@ -121,7 +121,6 @@
 }
 
 .lede {
-  max-width: 68ch;
   margin: 0 0 28px;
   color: var(--diet-ink-faded);
   font-size: clamp(17px, 1.2vw, 20px);
@@ -156,7 +155,6 @@
 }
 
 .sectionHeader > p:last-child {
-  max-width: 70ch;
   margin: 14px 0 0;
   color: var(--diet-ink-faded);
   font-size: 16px;
@@ -175,13 +173,11 @@
 }
 
 .infoCard,
-.teamCard,
 .relatedItem {
   padding: 16px;
 }
 
-.infoCard span,
-.teamCard span {
+.infoCard span {
   display: block;
   margin-bottom: 7px;
   color: var(--diet-copper);
@@ -193,7 +189,6 @@
 }
 
 .infoCard p,
-.teamCard p,
 .relatedItem p {
   margin: 0;
   color: var(--diet-ink-faded);
@@ -287,8 +282,235 @@
   text-transform: uppercase;
 }
 
+/* ─── Team grid ─── */
 .teamGrid {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+/* ─── Card shell ─── */
+.teamCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(92, 61, 46, 0.26);
+  border-radius: 7px;
+  background: var(--diet-paper);
+  box-shadow:
+    0 6px 18px rgba(33, 24, 18, 0.12),
+    0 2px 5px rgba(33, 24, 18, 0.07);
+  overflow: hidden;
+  transition:
+    transform 0.32s cubic-bezier(0.34, 1.15, 0.64, 1),
+    box-shadow 0.32s ease;
+}
+
+.teamCard:hover {
+  transform: translateY(-10px);
+  box-shadow:
+    0 28px 56px rgba(33, 24, 18, 0.2),
+    0 10px 22px rgba(33, 24, 18, 0.1);
+  z-index: 5;
+}
+
+/* ─── Coloured top band ─── */
+.teamCardBand {
+  height: 44px;
+  flex-shrink: 0;
+  background: var(--diet-copper);
+  position: relative;
+}
+
+/* Pushpin sitting in the centre of the band */
+.teamCardBand::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 38% 34%,
+    rgba(255, 255, 255, 0.65) 0%,
+    var(--diet-amber) 55%,
+    #8b5a00 100%
+  );
+  box-shadow:
+    0 2px 7px rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(0, 0, 0, 0.18),
+    inset 0 1px 2px rgba(255, 255, 255, 0.35);
+}
+
+.teamCard:nth-child(2) .teamCardBand,
+.teamCard:nth-child(4) .teamCardBand {
+  background: var(--diet-red-string);
+}
+
+.teamCard:nth-child(3) .teamCardBand,
+.teamCard:nth-child(5) .teamCardBand {
+  background: var(--diet-case-teal);
+}
+
+/* ─── Body ─── */
+.teamCardBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+  padding: 18px 14px 14px;
+  flex: 1;
+}
+
+/* Passport-style photo frame */
+.teamCardPhoto {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  background: rgba(250, 247, 240, 0.95);
+  border: 1.5px solid rgba(92, 61, 46, 0.2);
+  /* Double-frame look: outer ring of paper, inner hairline */
+  box-shadow:
+    0 0 0 5px rgba(250, 247, 240, 0.95),
+    0 0 0 6.5px rgba(92, 61, 46, 0.18),
+    0 8px 20px rgba(33, 24, 18, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.3s ease;
+}
+
+.teamCard:hover .teamCardPhoto {
+  box-shadow:
+    0 0 0 5px rgba(250, 247, 240, 0.95),
+    0 0 0 6.5px rgba(92, 61, 46, 0.28),
+    0 12px 28px rgba(33, 24, 18, 0.22);
+}
+
+/* Initials */
+.teamCardInitials {
+  font-family: var(--font-case-file);
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  user-select: none;
+  color: var(--diet-copper);
+}
+
+.teamCard:nth-child(2) .teamCardInitials,
+.teamCard:nth-child(4) .teamCardInitials {
+  color: var(--diet-red-string);
+}
+
+.teamCard:nth-child(3) .teamCardInitials,
+.teamCard:nth-child(5) .teamCardInitials {
+  color: var(--diet-case-teal);
+}
+
+/* Name */
+.teamCardName {
+  margin: 0;
+  color: var(--diet-ink);
+  font-family: var(--font-case-file);
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.45;
+}
+
+/* Center the pills */
+.teamCardBody .contributionWidget {
+  justify-content: center;
+}
+
+/* ─── Footer ─── */
+.teamCardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 13px;
+  border-top: 1px solid rgba(92, 61, 46, 0.1);
+  background: rgba(33, 24, 18, 0.03);
+}
+
+.teamCaseId {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--diet-ink-faded);
+  letter-spacing: 0.6px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+/* Decorative barcode */
+.teamBarcode {
+  height: 18px;
+  flex: 1;
+  max-width: 44px;
+  border-radius: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--diet-ink) 0px,    var(--diet-ink) 1.5px,
+    transparent      1.5px,  transparent      3.5px,
+    var(--diet-ink) 3.5px,  var(--diet-ink) 5px,
+    transparent      5px,    transparent      6px,
+    var(--diet-ink) 6px,    var(--diet-ink) 7.5px,
+    transparent      7.5px,  transparent      10px,
+    var(--diet-ink) 10px,   var(--diet-ink) 12px,
+    transparent      12px,   transparent      13.5px,
+    var(--diet-ink) 13.5px, var(--diet-ink) 14.5px,
+    transparent      14.5px, transparent      16.5px,
+    var(--diet-ink) 16.5px, var(--diet-ink) 18.5px,
+    transparent      18.5px, transparent      20px,
+    var(--diet-ink) 20px,   var(--diet-ink) 21px,
+    transparent      21px,   transparent      23.5px,
+    var(--diet-ink) 23.5px, var(--diet-ink) 25px,
+    transparent      25px,   transparent      26.5px,
+    var(--diet-ink) 26.5px, var(--diet-ink) 28px,
+    transparent      28px,   transparent      30px,
+    var(--diet-ink) 30px,   var(--diet-ink) 31.5px,
+    transparent      31.5px, transparent      33px,
+    var(--diet-ink) 33px,   var(--diet-ink) 34px,
+    transparent      34px,   transparent      36px,
+    var(--diet-ink) 36px,   var(--diet-ink) 38px,
+    transparent      38px,   transparent      40px,
+    var(--diet-ink) 40px,   var(--diet-ink) 41.5px,
+    transparent      41.5px, transparent      44px
+  );
+  opacity: 0.22;
+}
+
+.contributionWidget {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.contributionWidget small {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 6px 9px;
+  border: 1px solid rgba(92, 61, 46, 0.18);
+  border-radius: var(--diet-radius-impossible);
+  background: rgba(250, 247, 240, 0.78);
+  color: var(--diet-copper);
+  font-family: var(--font-case-file);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(92, 61, 46, 0.08);
 }
 
 .faqHeader {
@@ -433,6 +655,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .teamCard,
+  .teamCardPhoto {
+    transform: none;
+    transition: none;
+  }
+
   .faqToggleIcon::before,
   .faqToggleIcon::after,
   .faqAnswerWrapper,
@@ -463,9 +691,11 @@
 
   .summaryGrid,
   .rationaleGrid,
+  .teamGrid,
   .relatedList {
     grid-template-columns: 1fr;
   }
+
 
   .faqHeader {
     display: block;

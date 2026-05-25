@@ -16,7 +16,13 @@ const SECTIONS = [
   { id: "faq", label: "FAQ" },
 ];
 
-const TEAM_MEMBERS = ["Wanglei Shen", "Zihan Li", "Ines Araujo", "Sophia Kacem", "Rui Wang"];
+const TEAM_MEMBERS = [
+  { name: "Wanglei Shen",   caseId: "NVS-001", contributions: ["UI", "Chapter 1"] },
+  { name: "Zihan Li",       caseId: "NVS-002", contributions: ["Eval", "Chapter 1"] },
+  { name: "Ines Araujo",    caseId: "NVS-003", contributions: ["Chapter 2", "Assets"] },
+  { name: "Sophia Kacem",   caseId: "NVS-004", contributions: ["Chapter 2", "Assets"] },
+  { name: "Rui Wang",       caseId: "NVS-005", contributions: ["Chapter 3"] },
+];
 
 const OBJECTIVES = [
   "Explain how sampling bias can make a model look accurate on a narrow dataset while failing the wider population.",
@@ -155,7 +161,7 @@ export default function About() {
           <div className={styles.summaryGrid}>
             <InfoCard label="Format" value="Three-chapter interactive investigation" />
             <InfoCard label="Core Topic" value="AI fairness, bias, and accountable model design" />
-            <InfoCard label="Current Status" value="Prototype for coursework and critique" />
+            <InfoCard label="Current Status" value="In-development, running evaluations" />
           </div>
           <Link to="/chapters" className={styles.back}>
             Open the chapters
@@ -230,9 +236,35 @@ export default function About() {
           <SectionHeader eyebrow="Team" title="Project team members" />
           <div className={styles.teamGrid}>
             {TEAM_MEMBERS.map((member) => (
-              <article key={member} className={styles.teamCard}>
-                <span>{member}</span>
-                <p>Placeholder: add role, contribution, affiliation, or contact details.</p>
+              <article key={member.name} className={styles.teamCard}>
+                {/* Coloured band + pushpin */}
+                <div className={styles.teamCardBand} aria-hidden="true" />
+
+                {/* Passport-style photo frame */}
+                <div className={styles.teamCardBody}>
+                  <div className={styles.teamCardPhoto} aria-hidden="true">
+                    <span className={styles.teamCardInitials}>
+                      {member.name.split(" ").map((n) => n[0]).join("")}
+                    </span>
+                  </div>
+
+                  <p className={styles.teamCardName}>{member.name}</p>
+
+                  <div
+                    className={styles.contributionWidget}
+                    aria-label={`${member.name} contributions`}
+                  >
+                    {member.contributions.map((contribution) => (
+                      <small key={contribution}>{contribution}</small>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Case-file footer */}
+                <footer className={styles.teamCardFooter}>
+                  <span className={styles.teamCaseId}>{member.caseId}</span>
+                  <div className={styles.teamBarcode} aria-hidden="true" />
+                </footer>
               </article>
             ))}
           </div>
