@@ -217,12 +217,12 @@
 .verdictHero {
   --hero-accent: #3f332b;
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
-  gap: clamp(20px, 4vw, 38px);
-  align-items: center;
+  grid-template-columns: 1fr;
+  gap: clamp(18px, 3vw, 32px);
+  align-items: end;
   overflow: hidden;
   position: relative;
-  padding: clamp(24px, 4vw, 38px);
+  padding: clamp(20px, 3vw, 30px);
   background: var(--diet-paper);
   border: 1px solid rgba(92, 61, 46, 0.28);
   border-radius: var(--diet-radius-document);
@@ -272,9 +272,26 @@
   min-width: 0;
 }
 
+.heroCopy {
+  display: grid;
+  grid-template-columns: minmax(220px, max-content) minmax(0, 1fr);
+  grid-template-areas:
+    "eyebrow stats"
+    "label stats"
+    "summary stats";
+  column-gap: clamp(20px, 4vw, 52px);
+  align-items: end;
+  width: 100%;
+}
+
+.heroCopy .panelEyebrow {
+  grid-area: eyebrow;
+}
+
 .verdictLabel {
+  grid-area: label;
   font-family: var(--font-display);
-  font-size: clamp(44px, 7vw, 78px);
+  font-size: clamp(38px, 5.4vw, 62px);
   font-weight: 650;
   letter-spacing: 0;
   line-height: 0.92;
@@ -284,18 +301,29 @@
 }
 
 .heroSummary {
-  max-width: 42ch;
-  margin: 16px 0 0;
-  font-size: clamp(16px, 2vw, 20px);
+  grid-area: summary;
+  margin: 12px 0 0;
+  font-size: clamp(15px, 1.6vw, 18px);
   line-height: 1.45;
   color: var(--diet-ink-faded);
 }
 
+.deploymentNotice {
+  max-width: 70ch;
+  margin: 14px 0 0;
+  color: var(--diet-ink-faded);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
 .heroStats {
+  grid-area: stats;
   display: flex;
   flex-wrap: wrap;
+  align-items: end;
+  justify-content: flex-end;
   gap: 10px;
-  margin-top: 24px;
+  margin-top: 0;
 }
 
 .heroStat {
@@ -321,7 +349,7 @@
 
 .heroScoreDeck {
   display: grid;
-  grid-template-columns: repeat(2, minmax(130px, 1fr));
+  grid-template-columns: minmax(130px, 1fr);
   gap: 14px;
   align-items: center;
   justify-items: center;
@@ -413,12 +441,12 @@
 
 .transferDelta {
   grid-column: 1 / -1;
-  width: 100%;
+  width: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-  padding: 14px 16px;
+  gap: 12px;
+  padding: 10px 12px;
   border: 1px solid rgba(92, 61, 46, 0.18);
   border-radius: var(--diet-radius-document);
   background: rgba(245, 240, 232, 0.72);
@@ -426,7 +454,7 @@
 
 .transferDelta span {
   font-family: var(--font-case-file);
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
   color: #5f4c3f;
   text-transform: uppercase;
@@ -435,8 +463,9 @@
 
 .transferDelta strong {
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .transferDelta_good strong,
@@ -452,6 +481,62 @@
 .transferDelta_low strong,
 .tone_low {
   color: #b91c1c;
+}
+
+.transferPanel {
+  --transfer-accent: #3f332b;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.68fr);
+  gap: clamp(18px, 3vw, 28px);
+  align-items: center;
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid color-mix(in srgb, var(--transfer-accent), transparent 68%);
+  border-radius: var(--diet-radius-document);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--transfer-accent), transparent 92%), rgba(255, 255, 255, 0.48)),
+    var(--diet-paper);
+  box-shadow: var(--diet-shadow-paper);
+}
+
+.transferPanel_good {
+  --transfer-accent: #15803d;
+}
+
+.transferPanel_mid {
+  --transfer-accent: #b45309;
+}
+
+.transferPanel_low {
+  --transfer-accent: #b91c1c;
+}
+
+.transferCopy {
+  min-width: 0;
+}
+
+.transferCopy h3 {
+  margin: 0;
+  color: var(--diet-ink);
+  font-family: var(--font-display);
+  font-size: clamp(26px, 4vw, 42px);
+  font-weight: 600;
+  line-height: 1.02;
+}
+
+.transferScoreDeck {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(124px, 164px)) max-content;
+  gap: 12px;
+  align-items: center;
+  justify-content: end;
+}
+
+.transferScoreDeck .transferDelta {
+  grid-column: auto;
+  align-self: center;
+  min-width: 116px;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .districtBoard,
@@ -1018,7 +1103,29 @@
     grid-template-columns: 1fr;
   }
 
+  .heroCopy {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "eyebrow"
+      "label"
+      "summary"
+      "stats";
+  }
+
+  .heroStats {
+    justify-content: flex-start;
+    margin-top: 20px;
+  }
+
+  .transferPanel {
+    grid-template-columns: 1fr;
+  }
+
   .heroScoreDeck {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .transferScoreDeck {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1046,6 +1153,7 @@
   }
 
   .verdictHero,
+  .transferPanel,
   .districtBoard,
   .insightBoard,
   .continueRow {
@@ -1057,6 +1165,7 @@
   }
 
   .heroScoreDeck,
+  .transferScoreDeck,
   .districtGrid,
   .statChipGrid {
     grid-template-columns: 1fr;

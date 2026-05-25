@@ -43,7 +43,7 @@ const DIALOGUES: Dialogue[] = [
   },
   {
     portrait: portraits.serious,
-    text: "From the book, The last think I need to solve is the animal bias. More precisely, even if we reinforce our model with animal feedback, these persons can introduce more biases.",
+    text: "From the book, The last think I need to solve is the animal bias. More precisely, even if we reinforce our model with animal feedback, these people can introduce more biases.",
   },
   {
     portrait: portraits.encouraging,

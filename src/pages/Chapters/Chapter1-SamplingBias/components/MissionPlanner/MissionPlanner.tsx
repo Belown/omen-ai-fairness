@@ -76,7 +76,7 @@ const TUTORIAL_STEPS: TutorialStep<TutorialTarget>[] = [
   {
     target: "budget",
     title: "Budget",
-    body: "This card tracks your daily investigation points, spent budget, and draft cost. A mission must fit the budget before it can be queued. Spend your full daily allowance — unused IP doesn't carry over and resets the next day.",
+    body: "This card tracks your daily Case Points, spent budget, and draft cost. A mission must fit the budget before it can be queued. Spend your full daily allowance — unused Case Points don't carry over and reset the next day.",
     placement: "left",
   },
   {
@@ -170,6 +170,11 @@ export default function MissionPlanner({
   const budgetUsed = Math.min(100, Math.round((spentToday / DAILY_BUDGET) * 100));
   const coverageProgress = Math.round((zoneCount / REGIONS.length) * 100);
   const selectedDistricts = REGIONS.filter((_, i) => planZones[i]).map((region) => region.label);
+  const coverageCost = zoneCount * ZONE_COST;
+  const sampleCost = zoneCount > 0 ? POP_COST[planPopulation] : 0;
+  const signalCost = zoneCount > 0
+    ? planQuestions.reduce((sum, key) => sum + (QUESTION_OPTIONS.find((q) => q.key === key)?.cost ?? 0), 0)
+    : 0;
   const dayCopy = DAY_COPY[currentDay];
   const previousDecisionDays = dayPlans
     .slice(0, currentDay)
@@ -213,7 +218,7 @@ export default function MissionPlanner({
         >
           <div className={styles.budgetRing} style={{ ["--budget-used" as string]: `${budgetUsed}%` }}>
             <span>{remainToday}</span>
-            <small>IP left</small>
+            <small>CP left</small>
           </div>
           <div className={styles.budgetStats}>
             <span><img src={BUDGET_VISUALS.budget} alt="" aria-hidden="true" /> Budget {DAILY_BUDGET}</span>
@@ -222,7 +227,7 @@ export default function MissionPlanner({
           </div>
           <p className={styles.budgetHint}>
             <span className={styles.budgetHintIcon}>↻</span>
-            This is your daily budget. Spend it all — unused IP resets at the start of each new day.
+            This is your daily budget (Case Points). Spend it all — unused Case Points reset at the start of each new day.
           </p>
         </div>
       </section>
@@ -259,7 +264,7 @@ export default function MissionPlanner({
                 <span className={styles.regionName}>{r.label}</span>
                 <span className={styles.regionDesc}>{r.desc}</span>
                 <span className={styles.regionStatus}>{planZones[i] ? "Deployed" : "Standby"}</span>
-                <span className={styles.regionCost}>+{ZONE_COST} IP</span>
+                <span className={styles.regionCost}>+{ZONE_COST} CP each</span>
               </label>
             ))}
           </div>
@@ -290,7 +295,7 @@ export default function MissionPlanner({
                 <strong>{tier.value}</strong>
                 <span>{tier.title}</span>
                 <small>{tier.desc}</small>
-                <span className={styles.sampleTierCost}>{POP_COST[tier.value]} IP</span>
+                <span className={styles.sampleTierCost}>+{POP_COST[tier.value]} CP once</span>
               </button>
             ))}
           </div>
@@ -341,7 +346,7 @@ export default function MissionPlanner({
                   />
                   <img src={QUESTION_VISUALS[f.key].icon} alt="" aria-hidden="true" className={styles.featureIcon} />
                   <span className={styles.featureChipLabel}>{compactLabel}</span>
-                  <strong>+{f.cost}</strong>
+                  <strong>+{f.cost} CP</strong>
                 </label>
               );
             })}
@@ -380,6 +385,9 @@ export default function MissionPlanner({
             <span>Next sortie</span>
             <strong>{draftCost}</strong>
             <p>{selectedDistricts.length ? selectedDistricts.join(", ") : "No district selected"}</p>
+            <p>
+              Total = coverage {coverageCost} CP + sample {sampleCost} CP + signals {signalCost} CP
+            </p>
           </div>
           <button type="button" className={shared.continueBtn} onClick={addPlan} disabled={!canAddPlan}>
             Add Sortie
@@ -396,7 +404,7 @@ export default function MissionPlanner({
                       <span className={styles.queueBadge}>{index + 1}</span>
                       Mission {index + 1}
                     </strong>
-                    <span>{p.cost} credits</span>
+                    <span>{p.cost} CP</span>
                   </div>
                   <p>{p.population} residents | {p.zones.filter(Boolean).length} zone(s)</p>
                   <p>{REGIONS.filter((_, i) => p.zones[i]).map((z) => z.label).join(", ")}</p>
@@ -436,7 +444,7 @@ export default function MissionPlanner({
                   <div key={day.day} className={styles.previousDecisionDay}>
                     <div className={styles.previousDecisionDayHeader}>
                       <strong>Day {day.day}</strong>
-                      <span>{day.totalCost} credits</span>
+                      <span>{day.totalCost} CP</span>
                     </div>
                     {day.plans.map((plan, index) => {
                       const planDistricts = REGIONS.filter((_, i) => plan.zones[i]).map((region) => region.label);
@@ -448,7 +456,7 @@ export default function MissionPlanner({
                       return (
                         <div key={plan.id} className={styles.previousDecisionItem}>
                           <span className={styles.previousDecisionMeta}>
-                            Mission {index + 1} | {plan.population} residents | {plan.cost} credits
+                            Mission {index + 1} | {plan.population} residents | {plan.cost} CP
                           </span>
                           <p>{planDistricts.join(", ")}</p>
                           <p>Candidate: {planQuestions.length ? planQuestions.join("; ") : "No candidate signals"}</p>

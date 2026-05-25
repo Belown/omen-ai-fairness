@@ -34,6 +34,10 @@ const districtCode = (index: number) => ["UP", "DT", "FZ", "SL"][index] ?? "RG";
 const districtName = (label: string) => label.replace(/\s+/g, " ").trim();
 
 type TutorialTarget = "overall" | "districts" | "narrative" | "continue" | "help";
+type PillarStatus = "pass" | "partial" | "fail";
+
+const sampleStatusFromTotal = (totalSamples: number): PillarStatus =>
+  totalSamples > 700 ? "pass" : totalSamples >= 300 ? "partial" : "fail";
 
 const TUTORIAL_STEPS: TutorialStep<TutorialTarget>[] = [
   {
@@ -122,26 +126,16 @@ export default function DayReportPanel({
   const overallTone = overallPct >= 75 ? "good" : overallPct >= 60 ? "mid" : "low";
 
   // ── Three-pillar check ───────────────────────────────────────────────────────
-  type PillarStatus = "pass" | "partial" | "fail";
-
   // Pillar 1 — Coverage: 1 zone = fail, 2-3 = partial, 4 = pass
   const coverageStatus: PillarStatus =
     sampledCount === 4 ? "pass" : sampledCount >= 2 ? "partial" : "fail";
   const coverageValue = `${sampledCount} / 4`;
 
-  // Pillar 2 — Sample size: based on average samples per sampled zone
-  //   < 300 → 100-tier (fail), 300–700 → 500-tier (partial), > 700 → 1000-tier (pass)
-  const sampledAccs = regionAccs.filter((_, i) => sampledFlags[i]);
-  const sampledAvgPct = sampledAccs.length
-    ? Math.round((sampledAccs.reduce((s, a) => s + a, 0) / sampledAccs.length) * 100)
-    : 0;
+  // Pillar 2 — Sample size: based on total sampled residents, matching the mission planner tier.
   const sampledZoneSamples = zoneSamples.filter((_, i) => sampledFlags[i]);
-  const avgZoneSamples = sampledZoneSamples.length
-    ? sampledZoneSamples.reduce((s, n) => s + n, 0) / sampledZoneSamples.length
-    : 0;
-  const sampleStatus: PillarStatus =
-    avgZoneSamples > 700 ? "pass" : avgZoneSamples >= 300 ? "partial" : "fail";
-  const sampleValue = sampledCount > 0 ? `${sampledAvgPct}% avg` : "—";
+  const totalSamples = Math.round(sampledZoneSamples.reduce((s, n) => s + n, 0));
+  const sampleStatus = sampleStatusFromTotal(totalSamples);
+  const sampleValue = sampledCount > 0 ? `${totalSamples} residents` : "—";
 
   // Pillar 3 — Signal quality: no signals = fail, wrong only = partial, routine = pass
   const usedRoutine = usefulSignal > 0;
@@ -169,17 +163,14 @@ export default function DayReportPanel({
   const hintSampledCount  = hintSampledFlags.filter(Boolean).length;
   const hintUnseenZones   = REGIONS.filter((_, i) => !hintSampledFlags[i]).map((r) => districtName(r.label));
   const hintZoneSamplesFiltered = hintZoneSamples.filter((_, i) => hintSampledFlags[i]);
-  const hintAvgZoneSamples = hintZoneSamplesFiltered.length
-    ? hintZoneSamplesFiltered.reduce((s, n) => s + n, 0) / hintZoneSamplesFiltered.length
-    : 0;
+  const hintTotalSamples = Math.round(hintZoneSamplesFiltered.reduce((s, n) => s + n, 0));
   const hintUsedRoutine   = hintUsefulSignal > 0;
   const hintUsedPhone     = hintNoiseSignal  > 0;
   const hintUsedPolice    = hintBiasSignal   > 0;
 
   const hintCoverageStatus: PillarStatus =
     hintSampledCount === 4 ? "pass" : hintSampledCount >= 2 ? "partial" : "fail";
-  const hintSampleStatus: PillarStatus =
-    hintAvgZoneSamples > 700 ? "pass" : hintAvgZoneSamples >= 300 ? "partial" : "fail";
+  const hintSampleStatus = sampleStatusFromTotal(hintTotalSamples);
   const hintSignalStatus: PillarStatus =
     hintUsedRoutine && !hintUsedPhone && !hintUsedPolice ? "pass"
     : hintUsedRoutine || hintUsedPhone || hintUsedPolice ? "partial"
@@ -194,10 +185,10 @@ export default function DayReportPanel({
 
   const sampleHint =
     hintSampleStatus === "pass"
-      ? "High sample volume — 1000-tier reached. Strongest possible evidence base."
+      ? `High sample volume: ${hintTotalSamples} residents sampled. 1000-tier evidence reached.`
       : hintSampleStatus === "partial"
-        ? "500-tier samples — solid, but 1000 per zone is optimal if IP allows."
-        : "Only 100-tier samples detected. Increase to 500 or 1000 per zone for reliable evidence.";
+        ? `${hintTotalSamples} residents sampled. Solid 500-tier evidence, but 1000-tier is strongest if CP allows.`
+        : `${hintTotalSamples} residents sampled. Increase to 500 or 1000 for more reliable evidence.`;
 
   const signalHint = (() => {
     if (hintUsedRoutine && !hintUsedPhone && !hintUsedPolice)

@@ -32,6 +32,14 @@ type ScoreRingProps = {
   pct: (value: number) => string;
 };
 
+type TransferPanelProps = {
+  overallAcc: number;
+  otherCityOvr: number;
+  transferDeltaLabel: string;
+  transferDeltaTone: ScoreTone;
+  pct: (value: number) => string;
+};
+
 type DistrictCardProps = {
   index: number;
   localScore: number;
@@ -68,6 +76,30 @@ function ScoreRing({ label, value, tone, pct }: ScoreRingProps) {
         <span className={styles.scoreRingStatus}>{scoreStatus(value)}</span>
       </div>
     </div>
+  );
+}
+
+function TransferPanel({ overallAcc, otherCityOvr, transferDeltaLabel, transferDeltaTone, pct }: TransferPanelProps) {
+  return (
+    <section className={`${styles.transferPanel} ${styles[`transferPanel_${transferDeltaTone}`]}`}>
+      <div className={styles.transferCopy}>
+        <p className={styles.panelEyebrow}>Neighbor City Deployment</p>
+        <h3>Same model, new city</h3>
+        <p className={styles.deploymentNotice}>
+          The model trained in Novus is now being deployed unchanged in a neighboring city. This transfer test
+          checks whether the pattern it learned still works beyond the city that supplied the training data.
+        </p>
+      </div>
+
+      <div className={styles.transferScoreDeck}>
+        <ScoreRing label="Novus" value={overallAcc} tone={scoreTone(overallAcc)} pct={pct} />
+        <ScoreRing label="Neighbor" value={otherCityOvr} tone={scoreTone(otherCityOvr)} pct={pct} />
+        <div className={`${styles.transferDelta} ${styles[`transferDelta_${transferDeltaTone}`]}`}>
+          <span>Transfer shift</span>
+          <strong>{transferDeltaLabel}</strong>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -138,7 +170,6 @@ export default function VerdictPanel({
   otherCityAccs,
   sampledFlags,
   zoneSamples = [0, 0, 0, 0],
-  committedCount,
   usefulSignal = 0,
   noiseSignal = 0,
   biasSignal = 0,
@@ -249,8 +280,8 @@ export default function VerdictPanel({
 
           <div className={styles.heroStats} aria-label="Verdict summary">
             <span className={styles.heroStat}>
-              <strong>{committedCount}</strong>
-              missions committed
+              <strong>{pct(overallAcc)}</strong>
+              Novus accuracy
             </span>
             <span className={styles.heroStat}>
               <strong>{sampledCount}/4</strong>
@@ -270,14 +301,6 @@ export default function VerdictPanel({
           </div>
         </div>
 
-        <div className={styles.heroScoreDeck}>
-          <ScoreRing label="Novus" value={overallAcc} tone={scoreTone(overallAcc)} pct={pct} />
-          <ScoreRing label="Neighbor" value={otherCityOvr} tone={scoreTone(otherCityOvr)} pct={pct} />
-          <div className={`${styles.transferDelta} ${styles[`transferDelta_${transferDeltaTone}`]}`}>
-            <span>Transfer shift</span>
-            <strong>{transferDeltaLabel}</strong>
-          </div>
-        </div>
       </section>
 
       <section className={styles.districtBoard}>
@@ -300,6 +323,14 @@ export default function VerdictPanel({
           ))}
         </div>
       </section>
+
+      <TransferPanel
+        overallAcc={overallAcc}
+        otherCityOvr={otherCityOvr}
+        transferDeltaLabel={transferDeltaLabel}
+        transferDeltaTone={transferDeltaTone}
+        pct={pct}
+      />
 
       <section className={styles.insightBoard}>
         <div className={styles.statChipGrid} aria-label="What changed the verdict">
