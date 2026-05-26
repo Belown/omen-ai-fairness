@@ -282,6 +282,209 @@
   text-transform: uppercase;
 }
 
+/* ─── Citation list ─── */
+.citationFilter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 18px;
+}
+
+.citationFilterBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid rgba(92, 61, 46, 0.28);
+  border-radius: 999px;
+  background: rgba(250, 247, 240, 0.86);
+  color: var(--diet-ink-faded);
+  font-family: var(--font-case-file);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.citationFilterBtn:hover {
+  background: rgba(250, 247, 240, 1);
+  border-color: rgba(92, 61, 46, 0.46);
+  color: var(--diet-ink);
+}
+
+.citationFilterBtnActive {
+  background: var(--diet-ink);
+  border-color: var(--diet-ink);
+  color: var(--diet-paper);
+}
+
+.citationFilterCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.citationFilterBtnActive .citationFilterCount {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.citationList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.citationItem {
+  border: 1px solid rgba(92, 61, 46, 0.22);
+  border-radius: 8px;
+  background: rgba(250, 247, 240, 0.78);
+  box-shadow: 0 8px 18px rgba(33, 24, 18, 0.05);
+  overflow: hidden;
+}
+
+.citationHeader {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.citationHeader:hover {
+  background: rgba(250, 247, 240, 1);
+}
+
+.citationTag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: var(--font-case-file);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.citationTag_ch1 { background: #fde68a; color: #78350f; }
+.citationTag_ch2 { background: #bfdbfe; color: #1e3a8a; }
+.citationTag_ch3 { background: #fbcfe8; color: #831843; }
+.citationTag_design { background: #e0e7ff; color: #312e81; }
+
+.citationHeaderText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.citationTitle {
+  color: var(--diet-ink);
+  font-family: var(--font-case-file);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.citationMeta {
+  color: var(--diet-ink-faded);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.citationMeta em {
+  font-style: italic;
+}
+
+.citationCaret {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--diet-ink-faded);
+  border-bottom: 2px solid var(--diet-ink-faded);
+  transform: rotate(45deg);
+  transition: transform 0.18s ease;
+}
+
+.citationCaretOpen {
+  transform: rotate(225deg);
+}
+
+.citationBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 16px 16px 84px;
+  color: var(--diet-ink-faded);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.citationBody p {
+  margin: 0;
+}
+
+.citationGrounds strong {
+  color: var(--diet-ink);
+  font-family: var(--font-case-file);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.citationLink {
+  align-self: flex-start;
+  color: var(--diet-copper);
+  font-family: var(--font-case-file);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+.citationLink:hover {
+  color: var(--diet-ink);
+}
+
+@media (max-width: 640px) {
+  .citationHeader {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+  }
+  .citationCaret {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+  .citationHeaderText {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+  }
+  .citationBody {
+    padding-left: 16px;
+  }
+}
+
 /* ─── Team grid ─── */
 .teamGrid {
   display: grid;

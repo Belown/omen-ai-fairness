@@ -31,27 +31,142 @@ const OBJECTIVES = [
   "Practice auditing an AI system as a chain of design decisions instead of treating bias as a single technical bug.",
 ];
 
-const RELATED_WORKS = [
+type ChapterTag = "ch1" | "ch2" | "ch3" | "design";
+
+type RelatedWork = {
+  chapter: ChapterTag;
+  title: string;
+  authors: string;
+  venue: string;
+  url?: string;
+  body: string;
+  grounds: string;
+};
+
+const RELATED_WORKS: RelatedWork[] = [
+  // Chapter 1 — Sampling Bias
   {
-    title: "ProPublica COMPAS reporting and the Northpointe response",
-    body: "Grounds Chapter 2 in the public debate over recidivism risk scores, calibration, and error-rate disparities.",
+    chapter: "ch1",
+    title: "Gender Shades: Intersectional Accuracy Disparities in Commercial Gender Classification",
+    authors: "Buolamwini, J. & Gebru, T.",
+    venue: "FAccT 2018",
+    url: "https://proceedings.mlr.press/v81/buolamwini18a.html",
+    body: "Audits commercial face classifiers and shows error rates spike on darker-skinned women, demonstrating that benchmark accuracy can hide subgroup failure.",
+    grounds: "Chapter 1's core claim: a narrow training distribution can look accurate overall while silently failing minority groups.",
   },
   {
-    title: "Chouldechova (2017) and fairness impossibility results",
-    body: "Supports the lesson that different statistical fairness criteria cannot always be satisfied at the same time.",
+    chapter: "ch1",
+    title: "A Framework for Understanding Sources of Harm throughout the Machine Learning Life Cycle",
+    authors: "Suresh, H. & Guttag, J.",
+    venue: "EAAMO 2021",
+    url: "https://arxiv.org/abs/1901.10002",
+    body: "Names six distinct sources of harm — including historical, representation, and measurement bias — that arise at different stages of the ML pipeline.",
+    grounds: "Chapter 1's framing of bias as a chain of design choices rather than one technical bug.",
+  },
+
+  // Chapter 2 — COMPAS / fairness trade-offs
+  {
+    chapter: "ch2",
+    title: "Machine Bias",
+    authors: "Angwin, J., Larson, J., Mattu, S. & Kirchner, L.",
+    venue: "ProPublica, 2016",
+    url: "https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing",
+    body: "The investigation that surfaced disparate false-positive rates in COMPAS recidivism risk scores between Black and white defendants.",
+    grounds: "Chapter 2's central case study and the source of its recidivism scenario.",
   },
   {
-    title: "Situated, game-based AI literacy experiences such as AI Quests",
-    body: "Informs the no-code, story-led format where learners act inside a concrete problem instead of reading definitions first.",
+    chapter: "ch2",
+    title: "Fair Prediction with Disparate Impact: A Study of Bias in Recidivism Prediction Instruments",
+    authors: "Chouldechova, A.",
+    venue: "Big Data, 2017",
+    url: "https://arxiv.org/abs/1610.07524",
+    body: "Formal proof that calibration and equal false-positive/negative rates cannot all hold simultaneously when base rates differ.",
+    grounds: "Chapter 2's lesson that competing fairness definitions can be mathematically incompatible.",
   },
   {
-    title: "RLHF and alignment-bias discussions",
-    body: "Grounds Chapter 3's focus on how rater pools, preference data, and helpfulness pressure can steer model behavior.",
+    chapter: "ch2",
+    title: "Inherent Trade-Offs in the Fair Determination of Risk Scores",
+    authors: "Kleinberg, J., Mullainathan, S. & Raghavan, M.",
+    venue: "ITCS 2017",
+    url: "https://arxiv.org/abs/1609.05807",
+    body: "Independent impossibility result showing three natural fairness criteria can only coexist in degenerate cases.",
+    grounds: "Reinforces Chapter 2's framing that fairness choices are value choices, not optimisation choices.",
+  },
+
+  // Chapter 3 — LLM alignment
+  {
+    chapter: "ch3",
+    title: "Operationalizing Pluralistic Values in Large Language Model Alignment",
+    authors: "Ali, D., Zhao, D., Koenecke, A. & Papakyriakopoulos, O.",
+    venue: "AAAI 2025",
+    url: "https://arxiv.org/abs/2511.14476",
+    body: "Argues alignment pipelines should represent multiple value systems rather than collapsing to a single rater majority.",
+    grounds: "Chapter 3's three-rater card-game frame (mainstream / overlooked / truth).",
   },
   {
-    title: "Additional citations",
-    body: "Placeholder: add course readings, papers, or design precedents that directly informed the final submission.",
-    placeholder: true,
+    chapter: "ch3",
+    title: "Towards Understanding Sycophancy in Language Models",
+    authors: "Sharma, M. et al.",
+    venue: "ICLR 2024",
+    url: "https://arxiv.org/abs/2310.13548",
+    body: "Shows RLHF-trained models drift toward agreeing with users even when the user is wrong.",
+    grounds: "Chapter 3's sycophancy card bucket and the Approval-vs-Truth tension.",
+  },
+  {
+    chapter: "ch3",
+    title: "Robust Reinforcement Learning from Corrupted Human Feedback",
+    authors: "Bukharin, A. et al.",
+    venue: "NeurIPS 2024",
+    url: "https://arxiv.org/abs/2406.15568",
+    body: "Demonstrates that a small fraction of noisy or adversarial labels can steer the policy and proposes robust RLHF.",
+    grounds: "Chapter 3's takeaway that human feedback is brittle and the rater pool matters.",
+  },
+  {
+    chapter: "ch3",
+    title: "Evaluating Large Language Model Biases in Persona-Steered Generation",
+    authors: "Liu, A., Diab, M. & Fried, D.",
+    venue: "ACL 2024 Findings",
+    url: "https://aclanthology.org/2024.findings-acl.586/",
+    body: "Persona prompts amplify stereotypes even when the underlying request is neutral.",
+    grounds: "Chapter 3's cultural / stereotype card bucket.",
+  },
+  {
+    chapter: "ch3",
+    title: "Biased LLMs Can Influence Political Decision-Making",
+    authors: "Fisher, J. et al.",
+    venue: "ACL 2025",
+    url: "https://aclanthology.org/2025.acl-long.328.pdf",
+    body: "Exposure to politically-skewed model outputs measurably shifts user opinions.",
+    grounds: "Chapter 3's political / persona card bucket and the real-world stakes of the Approval meter.",
+  },
+  {
+    chapter: "ch3",
+    title: "Human and LLM Biases in Hate Speech Annotations: A Socio-Demographic Analysis",
+    authors: "Giorgi, S. et al.",
+    venue: "AAAI ICWSM 2025",
+    url: "https://ojs.aaai.org/index.php/ICWSM/article/view/35837",
+    body: "Annotator demographics shape both the labels and the models trained on them.",
+    grounds: "Chapter 3's Compassion meter: whose feedback ends up in the training signal.",
+  },
+
+  // Design precedents
+  {
+    chapter: "design",
+    title: "Reigns",
+    authors: "Nerial / Devolver Digital",
+    venue: "Game, 2016",
+    url: "https://www.nerial.co.uk/",
+    body: "Swipe-based decision card game where every choice nudges four meters and any extreme triggers an ending.",
+    grounds: "Direct mechanical reference for Chapter 3's card stack and meter cliffs.",
+  },
+  {
+    chapter: "design",
+    title: "Survival of the Best Fit",
+    authors: "Park, J., Tu, J., Hu, J. & Subramonyam, H.",
+    venue: "Web playable, 2019",
+    url: "https://www.survivalofthebestfit.com/",
+    body: "Browser game where the player hires by feel and watches a model amplify the resulting bias.",
+    grounds: "Precedent for the no-code, situated, story-led format used across all three chapters.",
   },
 ];
 
@@ -76,11 +191,28 @@ const FAQS = [
   },
 ];
 
+const CHAPTER_FILTERS: { id: ChapterTag | "all"; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "ch1", label: "Ch 1 · Sampling" },
+  { id: "ch2", label: "Ch 2 · COMPAS" },
+  { id: "ch3", label: "Ch 3 · Alignment" },
+  { id: "design", label: "Design precedents" },
+];
+
+const CHAPTER_LABELS: Record<ChapterTag, string> = {
+  ch1: "Ch 1",
+  ch2: "Ch 2",
+  ch3: "Ch 3",
+  design: "Design",
+};
+
 export default function About() {
   const [activeSection, setActiveSection] = useState(SECTIONS[0].id);
   const [openFaqs, setOpenFaqs] = useState<Record<string, boolean>>({
     [FAQS[0].question]: true,
   });
+  const [chapterFilter, setChapterFilter] = useState<ChapterTag | "all">("all");
+  const [openCitations, setOpenCitations] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     document.documentElement.classList.add("aboutHideScrollbar");
@@ -220,16 +352,83 @@ export default function About() {
           <SectionHeader
             eyebrow="Related works"
             title="Grounded in fairness research and playable AI literacy precedents."
-            body="These references are the current grounding set. Replace placeholders with complete citations before submission."
+            body="Filter by chapter to see which papers and design precedents shaped each part of the case. Tap any entry to see what idea it grounds and follow the link to the source."
           />
-          <div className={styles.relatedList}>
-            {RELATED_WORKS.map((work) => (
-              <article key={work.title} className={`${styles.relatedItem} ${work.placeholder ? styles.placeholder : ""}`}>
-                <h3>{work.title}</h3>
-                <p>{work.body}</p>
-              </article>
-            ))}
+
+          <div className={styles.citationFilter} role="tablist" aria-label="Filter citations by chapter">
+            {CHAPTER_FILTERS.map((filter) => {
+              const count = filter.id === "all"
+                ? RELATED_WORKS.length
+                : RELATED_WORKS.filter((work) => work.chapter === filter.id).length;
+              const isActive = chapterFilter === filter.id;
+              return (
+                <button
+                  key={filter.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  className={`${styles.citationFilterBtn} ${isActive ? styles.citationFilterBtnActive : ""}`}
+                  onClick={() => setChapterFilter(filter.id)}
+                >
+                  {filter.label}
+                  <span className={styles.citationFilterCount}>{count}</span>
+                </button>
+              );
+            })}
           </div>
+
+          <ul className={styles.citationList}>
+            {RELATED_WORKS
+              .filter((work) => chapterFilter === "all" || work.chapter === chapterFilter)
+              .map((work) => {
+                const key = `${work.chapter}-${work.title}`;
+                const isOpen = Boolean(openCitations[key]);
+                return (
+                  <li key={key} className={styles.citationItem}>
+                    <button
+                      type="button"
+                      className={styles.citationHeader}
+                      aria-expanded={isOpen}
+                      onClick={() =>
+                        setOpenCitations((prev) => ({ ...prev, [key]: !prev[key] }))
+                      }
+                    >
+                      <span className={`${styles.citationTag} ${styles[`citationTag_${work.chapter}`]}`}>
+                        {CHAPTER_LABELS[work.chapter]}
+                      </span>
+                      <span className={styles.citationHeaderText}>
+                        <span className={styles.citationTitle}>{work.title}</span>
+                        <span className={styles.citationMeta}>
+                          {work.authors} · <em>{work.venue}</em>
+                        </span>
+                      </span>
+                      <span
+                        className={`${styles.citationCaret} ${isOpen ? styles.citationCaretOpen : ""}`}
+                        aria-hidden
+                      />
+                    </button>
+                    {isOpen && (
+                      <div className={styles.citationBody}>
+                        <p>{work.body}</p>
+                        <p className={styles.citationGrounds}>
+                          <strong>Grounds in this tool:</strong> {work.grounds}
+                        </p>
+                        {work.url && (
+                          <a
+                            href={work.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.citationLink}
+                          >
+                            Open source ↗
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+          </ul>
         </section>
 
         <section id="team" className={`${styles.section} ${styles.pageSection}`}>
