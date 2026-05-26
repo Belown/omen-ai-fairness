@@ -189,6 +189,30 @@ const FAQS = [
     question: "What data does the tool collect?",
     answer: "The tool can generate a local activity log after the post-test is finished, including examples such as chapter choices, assessment responses, and completion results. This log is downloaded to the user's device for review and is not uploaded to any server.",
   },
+  {
+    question: "Why these three topics — sampling, COMPAS, and LLM alignment?",
+    answer: "Each chapter targets a distinct stage of an AI pipeline where bias enters: the dataset (Chapter 1), the fairness criterion chosen at modelling time (Chapter 2), and the human feedback used to fine-tune behavior (Chapter 3). Together they make the point that bias is not a single technical bug but a chain of design decisions.",
+  },
+  {
+    question: "Why a fictional city and a time-travel detective frame, not just real datasets?",
+    answer: "The frame turns each chapter into an investigation of a prior design decision rather than a slide of definitions. Learners act inside a concrete scenario, see the consequences of their own choices, and only then meet the formal concept — which mirrors how bias actually gets diagnosed in practice.",
+  },
+  {
+    question: "Are the games supposed to be 'won'?",
+    answer: "Not in a leaderboard sense. The games are designed so that the easy or majority-preferred choice often produces a biased outcome. Reaching a 'good' verdict matters less than noticing which choices made it harder.",
+  },
+  {
+    question: "Can the chapters be used independently?",
+    answer: "Yes. Each chapter is self-contained and can be taught on its own — for example, Chapter 2 alongside a fairness-criteria reading, or Chapter 3 alongside an RLHF discussion. The full case is most useful when learners need to see bias as cumulative across stages.",
+  },
+  {
+    question: "What is the pre- and post-assessment for?",
+    answer: "The pre-assessment captures learners' starting intuitions about fairness and bias; the post-assessment revisits the same prompts after the case. The comparison is meant to surface conceptual shifts for the learner to reflect on, not to grade performance.",
+  },
+  {
+    question: "What is explicitly out of scope?",
+    answer: "The tool does not cover model architectures, training maths, regulation, or organisational accountability mechanisms. It also does not claim to teach how to mitigate bias in production — the goal is conceptual fluency about where bias enters and why fairness choices are value choices.",
+  },
 ];
 
 const CHAPTER_FILTERS: { id: ChapterTag | "all"; label: string }[] = [
