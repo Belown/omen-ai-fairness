@@ -8,6 +8,7 @@ const PDF_RESOURCES = [
     title: "Lesson plan",
     label: "Classroom flow",
     body: "A structured plan for timing, activity flow, discussion moments, and learning objectives.",
+    file: `${import.meta.env.BASE_URL}Lesson%20Plan.pdf`,
   },
   {
     title: "Facilitation guide",
@@ -18,7 +19,7 @@ const PDF_RESOURCES = [
 ];
 
 export default function Resources() {
-  const [activeResource, setActiveResource] = useState(PDF_RESOURCES[1]);
+  const [activeResource, setActiveResource] = useState(PDF_RESOURCES[0]);
 
   return (
     <>
