@@ -1,59 +1,51 @@
-# DIET
+# Θmen
 
-## Chapter 2 Quick Player Guide (Sampling Bias)
+Θmen is an interactive educational website about AI bias and fairness. It presents AI ethics as a story-driven investigation in the fictional city of Novus, where players examine how an automated justice system reaches a harmful verdict and trace that outcome back through the decisions that shaped it.
 
-This chapter teaches one core idea:
-A model can look good on small or biased training data, then fail in the real world.
+The website is designed for learners who are encountering AI fairness concepts for the first time. Instead of requiring programming knowledge, it uses playable scenarios, case-file evidence, assessments, and reflection prompts to make abstract ideas easier to inspect and discuss.
 
-### What You Should Do (Step by Step)
+## Website Overview
 
-### 1) Start in Demo
-- Open Chapter 2 and go to `02 · Demo`.
-- Use the boundary sliders to separate the small training set (Region 1).
-- Try to make training accuracy look high.
+The experience is built around a time-travel detective story. Players move through a case about an AI system that appears objective but misses target context, then investigate different points in the AI pipeline where bias can enter.
 
-### 2) Trigger the Reveal
-- Click `Deploy to Full City (1000 Points)`.
-- Watch what changes when all regions appear.
-- Observe how accuracy drops and errors increase.
+The site includes:
 
-### 3) Enter Investigate (3-Day Game)
-- Move to `03 · Investigate`.
-- You now have **3 days**, each day with a fixed budget.
-- Goal: design better data collection before training.
+- A landing page that introduces the case, the city of Novus, and the central AI justice problem.
+- Pre- and post-assessments for checking how learner understanding changes.
+- Three interactive chapters focused on different sources of AI bias.
+- Teaching resources and facilitator materials for classroom use.
+- An about page describing the learning goals, audience, and design rationale.
 
-### 4) For Each Day, Build Mission Plans
-- Choose **zones** to search.
-- Choose **population amount** (`100 / 500 / 1000`).
-- If multiple zones are selected, set **distribution** across those zones.
-- Distribution uses 10% increments and selected zones always sum to 100%.
-- Choose **additional questions** (you can select multiple):
-	- Daily Routine (useful context)
-	- Phone Model (mostly noise)
-	- Past Police Stops (bias risk)
-- Add one or more missions until budget is used or strategy is complete.
+## Learning Themes
 
-### 5) Send Detective
-- Click `Send Detective` to lock the day.
-- Repeat planning on Day 2 and Day 3 using what you learned.
+Θmen focuses on three connected ideas:
 
-### 6) Train and Read Results
-- After Day 3, train the model.
-- In `04 · Results`, check:
-	- accuracy by district
-	- transfer to neighboring city
-	- which districts were under-sampled
+- Sampling bias: who appears in the data, who is missing, and how that affects model behavior.
+- Fairness trade-offs: why different definitions of fairness can conflict in real AI systems.
+- Human feedback and alignment: how human preferences, labels, and judgments can shape model outputs.
 
-### 7) Improve Your Strategy
-- Go back and try a new plan.
-- Compare outcomes when you:
-	- over-focus on one zone
-	- spread sampling across zones
-	- add useful vs noisy vs bias-prone questions
+Together, the chapters show that AI bias is not usually caused by one broken model. It can emerge from a chain of choices about data collection, fairness goals, system design, and human feedback.
 
-## Learning Outcome
+## Technology
 
-By the end of Chapter 2, players should understand that:
-- Data collection decisions shape model behavior.
-- Better sampling strategy often matters more than model tuning.
-- A model that scores well on narrow data can still be unfair and unsafe in deployment.
+This project is a React and TypeScript website built with Vite. It uses React Router for navigation and includes custom interactive chapter components, assessment storage, visual assets, and teaching materials.
+
+## Development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Build the production version:
+
+```bash
+npm run build
+```
