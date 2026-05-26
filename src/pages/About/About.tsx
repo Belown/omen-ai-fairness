@@ -1,4 +1,4 @@
-import { type MouseEvent, useEffect, useState } from "react";
+import { type MouseEvent, type ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
@@ -170,27 +170,39 @@ const RELATED_WORKS: RelatedWork[] = [
   },
 ];
 
-const FAQS = [
+type Faq = {
+  question: string;
+  answer: ReactNode;
+  placeholder?: boolean;
+};
+
+const FAQS: Faq[] = [
   {
     question: "Do learners need to know how to code?",
     answer: "No. The prototype is designed as a no-code investigation where learners make choices, inspect outcomes, and reflect on trade-offs.",
   },
   {
     question: "How long does the activity take?",
-    answer: "Placeholder: add the tested session length after classroom or user testing is complete.",
-    placeholder: true,
+    answer: "The game is designed to be completed in approximately 40-50 minutes, depending on the pace of discussion and reflection. And if you follow the Lesson plan given in the resources page, it will take around 60 minutes.",
   },
   {
     question: "Can this be used in class?",
-    answer: "Yes, it is intended for guided AI fairness teaching. Placeholder: add facilitator notes, timing, and reflection prompts.",
-    placeholder: true,
+    answer: (
+      <>
+        Yes, this website can be used both for self-interest and in a classroom setting. With this website we aim to provide an engaging and interactive way to learn about AI fairness. If you want to apply it in a classroom setting, we also provide a lesson plan and facilitation guide on the{" "}
+        <Link to="/resources" className={styles.inlineLink}>
+          Resources page
+        </Link>
+        .
+      </>
+    ),
   },
   {
     question: "What data does the tool collect?",
     answer: "The tool can generate a local activity log after the post-test is finished, including examples such as chapter choices, assessment responses, and completion results. This log is downloaded to the user's device for review and is not uploaded to any server.",
   },
   {
-    question: "Why these three topics — sampling, COMPAS, and LLM alignment?",
+    question: "Why these three chapters — Sampling Bias, COMPAS, and LLM alignment?",
     answer: "Each chapter targets a distinct stage of an AI pipeline where bias enters: the dataset (Chapter 1), the fairness criterion chosen at modelling time (Chapter 2), and the human feedback used to fine-tune behavior (Chapter 3). Together they make the point that bias is not a single technical bug but a chain of design decisions.",
   },
   {
@@ -372,6 +384,87 @@ export default function About() {
           </div>
         </section>
 
+        <section id="team" className={`${styles.section} ${styles.pageSection}`}>
+          <SectionHeader eyebrow="Team" title="Project team members" />
+          <div className={styles.teamGrid}>
+            {TEAM_MEMBERS.map((member) => (
+              <article key={member.name} className={styles.teamCard}>
+                {/* Coloured band + pushpin */}
+                <div className={styles.teamCardBand} aria-hidden="true" />
+
+                {/* Passport-style photo frame */}
+                <div className={styles.teamCardBody}>
+                  <div className={styles.teamCardPhoto} aria-hidden="true">
+                    <span className={styles.teamCardInitials}>
+                      {member.name.split(" ").map((n) => n[0]).join("")}
+                    </span>
+                  </div>
+
+                  <p className={styles.teamCardName}>{member.name}</p>
+
+                  <div
+                    className={styles.contributionWidget}
+                    aria-label={`${member.name} contributions`}
+                  >
+                    {member.contributions.map((contribution) => (
+                      <small key={contribution}>{contribution}</small>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Case-file footer */}
+                <footer className={styles.teamCardFooter}>
+                  <span className={styles.teamCaseId}>{member.caseId}</span>
+                  <div className={styles.teamBarcode} aria-hidden="true" />
+                </footer>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section id="faq" className={`${styles.section} ${styles.pageSection}`}>
+          <div className={styles.faqHeader}>
+            <SectionHeader eyebrow="Optional FAQ" title="Frequently asked questions" />
+            <div className={styles.faqControls}>
+              <button type="button" onClick={() => expandAllFaqs(true)}>Expand All</button>
+              <button type="button" onClick={() => expandAllFaqs(false)}>Collapse</button>
+            </div>
+          </div>
+          <div className={styles.faqList}>
+            {FAQS.map((faq) => {
+              const isOpen = Boolean(openFaqs[faq.question]);
+              const answerId = `faq-answer-${faq.question.replace(/\s+/g, "-").toLowerCase()}`;
+              return (
+                <article key={faq.question} className={`${styles.faqItem} ${faq.placeholder ? styles.placeholder : ""}`}>
+                  <button
+                    type="button"
+                    className={styles.faqQuestion}
+                    onClick={() => setOpenFaqs((prev) => ({ ...prev, [faq.question]: !prev[faq.question] }))}
+                    aria-expanded={isOpen}
+                    aria-controls={answerId}
+                  >
+                    <span className={styles.faqQuestionText}>{faq.question}</span>
+                    <span
+                      className={`${styles.faqToggleIcon} ${isOpen ? styles.faqToggleIconOpen : ""}`}
+                      aria-hidden
+                    />
+                  </button>
+                  <div
+                    id={answerId}
+                    className={`${styles.faqAnswerWrapper} ${isOpen ? styles.faqAnswerWrapperOpen : ""}`}
+                    role="region"
+                    aria-hidden={!isOpen}
+                  >
+                    <div className={styles.faqAnswerInner}>
+                      <p className={styles.faqAnswer}>{faq.answer}</p>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
         <section id="related-work" className={`${styles.section} ${styles.pageSection}`}>
           <SectionHeader
             eyebrow="Related works"
@@ -455,86 +548,6 @@ export default function About() {
           </ul>
         </section>
 
-        <section id="team" className={`${styles.section} ${styles.pageSection}`}>
-          <SectionHeader eyebrow="Team" title="Project team members" />
-          <div className={styles.teamGrid}>
-            {TEAM_MEMBERS.map((member) => (
-              <article key={member.name} className={styles.teamCard}>
-                {/* Coloured band + pushpin */}
-                <div className={styles.teamCardBand} aria-hidden="true" />
-
-                {/* Passport-style photo frame */}
-                <div className={styles.teamCardBody}>
-                  <div className={styles.teamCardPhoto} aria-hidden="true">
-                    <span className={styles.teamCardInitials}>
-                      {member.name.split(" ").map((n) => n[0]).join("")}
-                    </span>
-                  </div>
-
-                  <p className={styles.teamCardName}>{member.name}</p>
-
-                  <div
-                    className={styles.contributionWidget}
-                    aria-label={`${member.name} contributions`}
-                  >
-                    {member.contributions.map((contribution) => (
-                      <small key={contribution}>{contribution}</small>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Case-file footer */}
-                <footer className={styles.teamCardFooter}>
-                  <span className={styles.teamCaseId}>{member.caseId}</span>
-                  <div className={styles.teamBarcode} aria-hidden="true" />
-                </footer>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section id="faq" className={`${styles.section} ${styles.pageSection}`}>
-          <div className={styles.faqHeader}>
-            <SectionHeader eyebrow="Optional FAQ" title="Frequently asked questions" />
-            <div className={styles.faqControls}>
-              <button type="button" onClick={() => expandAllFaqs(true)}>Expand All</button>
-              <button type="button" onClick={() => expandAllFaqs(false)}>Collapse</button>
-            </div>
-          </div>
-          <div className={styles.faqList}>
-            {FAQS.map((faq) => {
-              const isOpen = Boolean(openFaqs[faq.question]);
-              const answerId = `faq-answer-${faq.question.replace(/\s+/g, "-").toLowerCase()}`;
-              return (
-                <article key={faq.question} className={`${styles.faqItem} ${faq.placeholder ? styles.placeholder : ""}`}>
-                  <button
-                    type="button"
-                    className={styles.faqQuestion}
-                    onClick={() => setOpenFaqs((prev) => ({ ...prev, [faq.question]: !prev[faq.question] }))}
-                    aria-expanded={isOpen}
-                    aria-controls={answerId}
-                  >
-                    <span className={styles.faqQuestionText}>{faq.question}</span>
-                    <span
-                      className={`${styles.faqToggleIcon} ${isOpen ? styles.faqToggleIconOpen : ""}`}
-                      aria-hidden
-                    />
-                  </button>
-                  <div
-                    id={answerId}
-                    className={`${styles.faqAnswerWrapper} ${isOpen ? styles.faqAnswerWrapperOpen : ""}`}
-                    role="region"
-                    aria-hidden={!isOpen}
-                  >
-                    <div className={styles.faqAnswerInner}>
-                      <p className={styles.faqAnswer}>{faq.answer}</p>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
       </main>
       <Footer />
     </>

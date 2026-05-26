@@ -857,6 +857,17 @@
   transform: translateY(0);
 }
 
+.inlineLink {
+  color: var(--diet-copper);
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+.inlineLink:hover {
+  color: var(--diet-stamp-red);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .teamCard,
   .teamCardPhoto {
