@@ -17,8 +17,8 @@ const SECTIONS = [
 ];
 
 const TEAM_MEMBERS = [
-  { name: "Wanglei Shen",   caseId: "NVS-001", contributions: ["UI", "Chapter 1"] },
-  { name: "Zihan Li",       caseId: "NVS-002", contributions: ["Eval", "Chapter 1"] },
+  { name: "Wanglei Shen",   caseId: "NVS-001", contributions: ["Chapter 1", "UI"] },
+  { name: "Zihan Li",       caseId: "NVS-002", contributions: ["Chapter 1", "Eval"] },
   { name: "Ines Araujo",    caseId: "NVS-003", contributions: ["Chapter 2", "Assets"] },
   { name: "Sophia Kacem",   caseId: "NVS-004", contributions: ["Chapter 2", "Assets"] },
   { name: "Rui Wang",       caseId: "NVS-005", contributions: ["Chapter 3"] },
