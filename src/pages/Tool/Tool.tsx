@@ -26,7 +26,7 @@ export default function Tool() {
 
           <section className={styles.textSection} aria-label="Tool information">
             <div className={styles.textBlock}>
-              <p className="eyebrow">App</p>
+              <p className="eyebrow">Repository</p>
               <p>
                 The source code repository for this website is available at{" "}
                 <a href="https://github.com/Belown/DIET" target="_blank" rel="noreferrer">
