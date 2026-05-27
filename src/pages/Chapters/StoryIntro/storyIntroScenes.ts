@@ -25,7 +25,7 @@ export const STORY_SCENES = [
     image: SCENE_IMAGES[2],
     audio: SCENE_AUDIO[2],
     title: "Scene 3",
-    text: "Until one ordinary evening, the doorbell rings. The sound is short and cold, as if fate itself is knocking. Police officers are standing outside. They offer little explanation and say only one thing: the apprentice has been accused of helping steal confidential government informations.",
+    text: "Until one ordinary evening, the doorbell rings. The sound is short and cold, as if fate itself is knocking. Police officers are standing outside. They offer little explanation and say only one thing: the apprentice has been accused of helping steal confidential government documents.",
   },
   {
     image: SCENE_IMAGES[3],
