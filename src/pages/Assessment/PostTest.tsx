@@ -12,6 +12,7 @@ import {
 import {
   loadAssessmentDraft,
   saveAssessmentDraft,
+  loadChapterResults,
 } from "../../utils/assessmentStorage";
 import { sessionLogger } from "../../utils/sessionLogger";
 import styles from "./Assessment.module.css";
@@ -568,6 +569,10 @@ function PostTest() {
 
 
 function CompletionState({ isPost }: { isPost: boolean }) {
+  const results = loadChapterResults();
+  const endingPath =
+    results.ch1?.passed && results.ch3?.passed ? "/ending/good" : "/ending/bad";
+
   return (
     <>
       <Nav investigation />
@@ -590,7 +595,7 @@ function CompletionState({ isPost }: { isPost: boolean }) {
           )}
           {isPost && (
             <>
-              <Link to="/chapters?ending=final" className={styles.ctaLink}>
+              <Link to={endingPath} className={styles.ctaLink}>
                 View your ending →
               </Link>
               <Link to="/" className={styles.ctaLinkSecondary}>

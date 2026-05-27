@@ -7,6 +7,7 @@ import Resources from "./pages/Resources/Resources";
 import Tool from "./pages/Tool/Tool";
 import PreTest from "./pages/Assessment/PreTest";
 import PostTest from "./pages/Assessment/PostTest";
+import { GoodEnding, BadEnding } from "./pages/Ending/Ending";
 
 export default function App() {
   return (
@@ -19,6 +20,8 @@ export default function App() {
       <Route path="/demo" element={<Demo />} />
       <Route path="/pre-assessment" element={<PreTest />} />
       <Route path="/post-assessment" element={<PostTest />} />
+      <Route path="/ending/good" element={<GoodEnding />} />
+      <Route path="/ending/bad" element={<BadEnding />} />
       {/* legacy redirect */}
       <Route path="/assessment" element={<Navigate to="/pre-assessment" replace />} />
       <Route path="/simulator" element={<Navigate to="/chapters" replace />} />

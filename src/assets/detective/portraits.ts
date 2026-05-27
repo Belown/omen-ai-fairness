@@ -13,7 +13,7 @@ export const portraits = {
   sad,
   scared,
   alarmed: scared,
-  confident: happy,
+  confident: neutral,
   confused: curious,
   encouraging: happy,
   serious: neutral,
