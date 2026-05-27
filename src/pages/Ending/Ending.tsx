@@ -5,7 +5,7 @@ import badImage from "../../assets/image/ending-bad.jpg";
 
 function EndingPage({ imageSrc, text }: { imageSrc: string; text: string }) {
   return (
-    <>
+    <div className={styles.shell}>
       <Nav investigation />
       <div className={styles.page}>
         <img className={styles.bg} src={imageSrc} alt="" aria-hidden />
@@ -14,7 +14,7 @@ function EndingPage({ imageSrc, text }: { imageSrc: string; text: string }) {
           {text}
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
