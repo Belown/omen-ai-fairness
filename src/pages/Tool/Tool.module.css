@@ -78,7 +78,6 @@
   place-items: center;
   aspect-ratio: 16 / 9;
   min-height: 260px;
-  border: 1px dashed rgba(92, 61, 46, 0.32);
   border-radius: var(--diet-radius-document);
   background:
     linear-gradient(180deg, rgba(232, 224, 208, 0.54), rgba(245, 240, 232, 0.86)),
