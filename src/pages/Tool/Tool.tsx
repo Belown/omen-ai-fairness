@@ -35,7 +35,15 @@ export default function Tool() {
               <p>A short video will show how learners enter the activity and interact with the main tasks.</p>
             </div>
             <div className={styles.videoSlot}>
-              <span>Demo video pending</span>
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/-FSHawwIbpU"
+                title="Demo video"
+                style={{ border: "none" }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
             </div>
           </div>
 
