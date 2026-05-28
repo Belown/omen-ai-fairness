@@ -1,10 +1,9 @@
-import { type MouseEvent, type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
+import PageProgressDots from "../../components/PageProgressDots";
 import styles from "./About.module.css";
-
-const NAV_OFFSET = 88;
 
 const SECTIONS = [
   { id: "about-tool", label: "Tool" },
@@ -243,7 +242,6 @@ const CHAPTER_LABELS: Record<ChapterTag, string> = {
 };
 
 export default function About() {
-  const [activeSection, setActiveSection] = useState(SECTIONS[0].id);
   const [openFaqs, setOpenFaqs] = useState<Record<string, boolean>>({
     [FAQS[0].question]: true,
   });
@@ -254,41 +252,6 @@ export default function About() {
     document.documentElement.classList.add("aboutHideScrollbar");
     return () => document.documentElement.classList.remove("aboutHideScrollbar");
   }, []);
-
-  useEffect(() => {
-    const updateActiveSection = () => {
-      const current = SECTIONS.reduce((best, section) => {
-        const target = document.getElementById(section.id);
-        if (!target) return best;
-
-        const distance = Math.abs(target.getBoundingClientRect().top - NAV_OFFSET);
-        return distance < best.distance ? { id: section.id, distance } : best;
-      }, { id: SECTIONS[0].id, distance: Number.POSITIVE_INFINITY });
-
-      setActiveSection(current.id);
-    };
-
-    updateActiveSection();
-    window.addEventListener("scroll", updateActiveSection, { passive: true });
-    window.addEventListener("resize", updateActiveSection);
-    return () => {
-      window.removeEventListener("scroll", updateActiveSection);
-      window.removeEventListener("resize", updateActiveSection);
-    };
-  }, []);
-
-  const scrollToSection = (event: MouseEvent<HTMLButtonElement>, id: string) => {
-    event.preventDefault();
-
-    const target = document.getElementById(id);
-    if (!target) return;
-
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const top = Math.max(0, target.getBoundingClientRect().top + window.scrollY - NAV_OFFSET);
-    window.scrollTo({ top, behavior: reduceMotion ? "auto" : "smooth" });
-    window.history.pushState(null, "", `#${id}`);
-    setActiveSection(id);
-  };
 
   const expandAllFaqs = (open: boolean) => {
     setOpenFaqs(
@@ -303,20 +266,7 @@ export default function About() {
     <>
       <Nav />
       <main className={styles.page}>
-        <nav className={styles.progressDots} aria-label="About page sections">
-          {SECTIONS.map((section) => (
-            <button
-              key={section.id}
-              type="button"
-              className={`${styles.progressDot} ${activeSection === section.id ? styles.progressDotActive : ""}`}
-              onClick={(event) => scrollToSection(event, section.id)}
-              aria-label={`Go to ${section.label}`}
-              aria-current={activeSection === section.id ? "step" : undefined}
-            >
-              <span>{section.label}</span>
-            </button>
-          ))}
-        </nav>
+        <PageProgressDots sections={SECTIONS} ariaLabel="About page sections" />
 
         <section id="about-tool" className={`${styles.hero} ${styles.pageSection}`}>
           <p className="eyebrow">About the project</p>

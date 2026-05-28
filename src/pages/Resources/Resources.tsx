@@ -1,7 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
+import PageProgressDots from "../../components/PageProgressDots";
 import styles from "./Resources.module.css";
+
+const SECTIONS = [
+  { id: "resources-overview", label: "Overview" },
+  { id: "teaching-documents", label: "Documents" },
+];
 
 const PDF_RESOURCES = [
   {
@@ -21,16 +27,23 @@ const PDF_RESOURCES = [
 export default function Resources() {
   const [activeResource, setActiveResource] = useState(PDF_RESOURCES[0]);
 
+  useEffect(() => {
+    document.documentElement.classList.add("aboutHideScrollbar");
+    return () => document.documentElement.classList.remove("aboutHideScrollbar");
+  }, []);
+
   return (
     <>
       <Nav />
       <main className={styles.page}>
-        <section className={styles.hero}>
+        <PageProgressDots sections={SECTIONS} ariaLabel="Resources page sections" />
+
+        <section id="resources-overview" className={`${styles.hero} ${styles.pageSection}`}>
           <p className="eyebrow">Resources</p>
           <h1 className={styles.title}>Teaching materials and practical setup.</h1>
         </section>
 
-        <section className={styles.resources} aria-label="Teaching resources">
+        <section id="teaching-documents" className={`${styles.resources} ${styles.pageSection}`} aria-label="Teaching resources">
           <div className={styles.sectionHeader}>
             <p className="eyebrow">Teaching documents</p>
             <h2>Preview one document at a time.</h2>

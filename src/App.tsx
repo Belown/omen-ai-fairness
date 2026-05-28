@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Landing from "./pages/Landing/Landing";
 import About from "./pages/About/About";
 import Chapters from "./pages/Chapters/Chapters";
@@ -9,7 +10,20 @@ import PreTest from "./pages/Assessment/PreTest";
 import PostTest from "./pages/Assessment/PostTest";
 import { GoodEnding, BadEnding } from "./pages/Ending/Ending";
 
+const SMOOTH_SCROLL_PAGES = new Set(["/", "/about", "/resources", "/tool"]);
+
 export default function App() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: SMOOTH_SCROLL_PAGES.has(pathname) && !reduceMotion ? "smooth" : "auto",
+    });
+  }, [pathname]);
+
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
