@@ -2,6 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import type { MouseEvent } from "react";
 import styles from "./Logo.module.css";
 
+const TOP_SCROLL_PAGES = new Set(["/", "/about", "/resources", "/tool"]);
+
 type Props = {
   className?: string;
 };
@@ -14,7 +16,7 @@ export default function Logo({ className }: Props) {
       return;
     }
 
-    if (location.pathname === "/") {
+    if (TOP_SCROLL_PAGES.has(location.pathname)) {
       event.preventDefault();
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
       return;

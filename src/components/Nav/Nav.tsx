@@ -46,6 +46,10 @@ export default function Nav({ investigation = false, headerAction }: NavProps) {
   const activeStepIndex = isPost ? STEPS.length - 1 : 0;
   const progress = ((activeStepIndex + 0.5) / STEPS.length) * 100;
   const isActivePath = (path: string) => location.pathname === path;
+  const scrollToPageTop = () => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, left: 0, behavior: reduceMotion ? "auto" : "smooth" });
+  };
 
   useEffect(() => {
     if (investigation) return;
@@ -197,6 +201,7 @@ export default function Nav({ investigation = false, headerAction }: NavProps) {
         <Button
           variant="ghost-dark"
           to="/about"
+          onClick={scrollToPageTop}
           className={isActivePath("/about") ? styles.activeNavItem : ""}
           aria-current={isActivePath("/about") ? "page" : undefined}
         >
@@ -205,6 +210,7 @@ export default function Nav({ investigation = false, headerAction }: NavProps) {
         <Button
           variant="ghost-dark"
           to="/resources"
+          onClick={scrollToPageTop}
           className={isActivePath("/resources") ? styles.activeNavItem : ""}
           aria-current={isActivePath("/resources") ? "page" : undefined}
         >
@@ -213,6 +219,7 @@ export default function Nav({ investigation = false, headerAction }: NavProps) {
         <Button
           variant="ghost-dark"
           to="/tool"
+          onClick={scrollToPageTop}
           className={isActivePath("/tool") ? styles.activeNavItem : ""}
           aria-current={isActivePath("/tool") ? "page" : undefined}
         >

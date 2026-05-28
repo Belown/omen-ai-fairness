@@ -1,19 +1,34 @@
+import { useEffect } from "react";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
+import PageProgressDots from "../../components/PageProgressDots";
 import styles from "./Tool.module.css";
 
+const SECTIONS = [
+  { id: "tool-overview", label: "Overview" },
+  { id: "demo-video", label: "Demo" },
+  { id: "tool-details", label: "Details" },
+];
+
 export default function Tool() {
+  useEffect(() => {
+    document.documentElement.classList.add("aboutHideScrollbar");
+    return () => document.documentElement.classList.remove("aboutHideScrollbar");
+  }, []);
+
   return (
     <>
       <Nav />
       <main className={styles.page}>
-        <section className={styles.hero}>
+        <PageProgressDots sections={SECTIONS} ariaLabel="Tool page sections" />
+
+        <section id="tool-overview" className={`${styles.hero} ${styles.pageSection}`}>
           <p className="eyebrow">Tool</p>
           <h1 className={styles.title}>Access, demo, and AI disclosure.</h1>
         </section>
 
         <section className={styles.layout} aria-label="Tool page content">
-          <div className={styles.videoPanel}>
+          <div id="demo-video" className={`${styles.videoPanel} ${styles.pageSection}`}>
             <div className={styles.sectionHeader}>
               <p className="eyebrow">Demo video</p>
               <h2>Walkthrough preview</h2>
@@ -24,7 +39,7 @@ export default function Tool() {
             </div>
           </div>
 
-          <section className={styles.textSection} aria-label="Tool information">
+          <section id="tool-details" className={`${styles.textSection} ${styles.pageSection}`} aria-label="Tool information">
             <div className={styles.textBlock}>
               <p className="eyebrow">Repository</p>
               <p>
