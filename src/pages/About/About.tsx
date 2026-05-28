@@ -11,9 +11,9 @@ const SECTIONS = [
   { id: "audience", label: "Audience" },
   { id: "objectives", label: "Objectives" },
   { id: "rationale", label: "Design" },
-  { id: "related-work", label: "Grounding" },
   { id: "team", label: "Team" },
   { id: "faq", label: "FAQ" },
+  { id: "related-work", label: "Grounding" },
 ];
 
 const TEAM_MEMBERS = [
@@ -340,11 +340,12 @@ export default function About() {
           <SectionHeader
             eyebrow="Who it is for"
             title="Built for first encounters with AI fairness."
-            body="The tool is intended for non-CS students and mixed-background learners who are meeting AI fairness concepts for the first time. It can also support educators who want a discussion starter for ethics, data literacy, or introductory AI courses."
+            body={
+              <>
+                The tool is intended for <strong>non-CS</strong> students and mixed-background learners who are meeting <strong>AI fairness</strong> concepts for the first time. It can also support <strong>educators</strong> who want a discussion starter for ethics, data literacy, or introductory AI courses.
+              </>
+            }
           />
-          <div className={styles.callout}>
-            <strong>Placeholder:</strong> add the exact course, age range, deployment context, and accessibility requirements for the final version.
-          </div>
         </section>
 
         <section id="objectives" className={`${styles.section} ${styles.pageSection}`}>
@@ -561,7 +562,7 @@ function SectionHeader({
 }: {
   eyebrow: string;
   title: string;
-  body?: string;
+  body?: ReactNode;
 }) {
   return (
     <div className={styles.sectionHeader}>

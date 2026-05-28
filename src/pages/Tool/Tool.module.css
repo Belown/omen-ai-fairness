@@ -6,10 +6,6 @@
   color: var(--diet-ink);
 }
 
-.page :global(.eyebrow) {
-  color: var(--diet-ink);
-}
-
 .hero,
 .layout {
   width: min(1040px, calc(100% - 2 * var(--gutter)));
@@ -68,7 +64,6 @@
 }
 
 .sectionHeader p:last-child {
-  max-width: 62ch;
   margin: 12px 0 0;
   color: var(--diet-ink-faded);
   line-height: 1.55;
@@ -108,7 +103,7 @@
   margin-bottom: 0;
 }
 
-.textBlock p {
+.textBlock p:not(:global(.eyebrow)) {
   margin: 0;
   color: var(--diet-ink-faded);
   font-size: 16px;
