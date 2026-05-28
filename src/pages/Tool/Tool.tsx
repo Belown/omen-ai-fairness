@@ -23,7 +23,7 @@ export default function Tool() {
               <iframe
                 width="100%"
                 height="100%"
-                src="https://www.youtube.com/embed/-FSHawwIbpU"
+                src="https://youtube.com/embed/DX9NNn-itUc"
                 title="Demo video"
                 style={{ border: "none" }}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
