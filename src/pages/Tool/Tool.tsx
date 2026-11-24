@@ -52,8 +52,8 @@ export default function Tool() {
               <p className="eyebrow">Repository</p>
               <p>
                 The source code repository for this website is available at{" "}
-                <a href="https://github.com/Belown/DIET" target="_blank" rel="noreferrer">
-                  Belown/DIET
+                <a href="https://github.com/Belown/omen-ai-fairness" target="_blank" rel="noreferrer">
+                  Belown/omen-ai-fairness
                 </a>
                 .
               </p>
