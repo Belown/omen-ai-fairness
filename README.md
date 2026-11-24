@@ -4,6 +4,20 @@
 
 The website is designed for learners who are encountering AI fairness concepts for the first time. Instead of requiring programming knowledge, it uses playable scenarios, case-file evidence, assessments, and reflection prompts to make abstract ideas easier to inspect and discuss.
 
+Live site: https://belown.github.io/omen-ai-fairness/
+
+## Course Project
+
+Θmen was built as a team project for the DIET course at ETH Zurich in 2026.
+
+| Team member | Contribution |
+| --- | --- |
+| Wanglei Shen | Chapter 1, UI |
+| Zihan Li | Chapter 1, evaluation |
+| Ines Araujo | Chapter 2, assets |
+| Sophia Kacem | Chapter 2, assets |
+| Rui Wang | Chapter 3 |
+
 ## Website Overview
 
 The experience is built around a time-travel detective story. Players move through a case about an AI system that appears objective but misses target context, then investigate different points in the AI pipeline where bias can enter.
